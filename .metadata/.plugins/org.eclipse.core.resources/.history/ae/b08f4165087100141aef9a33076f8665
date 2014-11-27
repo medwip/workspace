@@ -1,0 +1,46 @@
+package com.guntzergames.medievalwipeout.services;
+
+import com.guntzergames.medievalwipeout.activities.HomeActivity;
+import com.guntzergames.medievalwipeout.beans.Game;
+import com.guntzergames.medievalwipeout.interfaces.Constants;
+import com.guntzergames.medievalwipeout.webclients.GameWebClient;
+
+public class HomeGameCheckerThread extends Thread {
+	
+	private HomeActivity homeActivity = null;
+	private boolean checkActivated = false;
+	
+	public HomeGameCheckerThread(HomeActivity homeActivity) {
+		this.homeActivity = homeActivity;
+	}
+	
+	@Override
+	public void run() {
+		
+		while (true) {
+			
+			try {
+				Thread.sleep(3000);
+			}
+			catch ( Exception e ) {
+				
+			}
+			
+			if ( checkActivated ) {
+				GameWebClient gameWebClient = new GameWebClient(Constants.SERVER_IP_ADDRESS, null);
+				gameWebClient.checkGame(homeActivity.getGame().getId(), homeActivity);
+			}
+			
+		}
+		
+	}
+
+	public boolean isCheckActivated() {
+		return checkActivated;
+	}
+
+	public void setCheckActivated(boolean checkActivated) {
+		this.checkActivated = checkActivated;
+	}
+
+}

@@ -1,0 +1,82 @@
+package com.guntzergames.medievalwipeout.beans;
+
+import java.util.List;
+
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
+import org.codehaus.jackson.annotate.JsonIgnore;
+
+@Entity
+@Table(name = "DECK_TEMPLATE")
+public class PlayerDeckTemplate {
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Basic(optional = false)
+	@Column(name = "ID")
+	private long id;
+	
+	@JsonIgnore
+	@ManyToOne(targetEntity = Account.class)
+	@JoinColumn(name = "ACCOUNT_KEY")
+	private Account account;
+	
+	@Column(name = "DECK_LIBEL")
+	private String deckLibel;
+
+	@OneToMany(mappedBy = "deckTemplate", fetch = FetchType.EAGER)
+	private List<PlayerDeckCard> cards;
+	
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
+
+	public String getDeckLibel() {
+		return deckLibel;
+	}
+
+	public void setDeckLibel(String deckLibel) {
+		this.deckLibel = deckLibel;
+	}
+
+	public PlayerDeckTemplate() {
+		
+	}
+
+	public List<PlayerDeckCard> getCards() {
+		return cards;
+	}
+
+	public void setCards(List<PlayerDeckCard> cards) {
+		this.cards = cards;
+	}
+	
+	public PlayerDeck toDeck() {
+		PlayerDeck deck = new PlayerDeck();
+		deck.setCards(cards);
+		return deck;
+	}
+
+	public Account getAccount() {
+		return account;
+	}
+
+	public void setAccount(Account account) {
+		this.account = account;
+	}
+	
+}

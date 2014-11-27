@@ -1,0 +1,431 @@
+package com.guntzergames.medievalwipeout.activities;
+
+import android.content.ClipData;
+import android.content.Intent;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
+import android.view.DragEvent;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.View.DragShadowBuilder;
+import android.view.View.OnClickListener;
+import android.view.View.OnDragListener;
+import android.view.View.OnTouchListener;
+import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.facebook.Session;
+import com.guntzergames.medievalwipeout.beans.Game;
+import com.guntzergames.medievalwipeout.beans.Player;
+import com.guntzergames.medievalwipeout.beans.PlayerDeckCard;
+import com.guntzergames.medievalwipeout.exceptions.PlayerNotInGameException;
+import com.guntzergames.medievalwipeout.interfaces.Constants;
+import com.guntzergames.medievalwipeout.layouts.CardLayout;
+import com.guntzergames.medievalwipeout.listeners.PlayerFieldDragListener;
+import com.guntzergames.medievalwipeout.services.MainGameCheckerThread;
+import com.guntzergames.medievalwipeout.webclients.CardWebClient;
+import com.guntzergames.medievalwipeout.webclients.GameWebClient;
+
+public class MainActivity extends ActionBarActivity {
+
+	private RelativeLayout layout = null;
+	private long gameId;
+	private String gameCommand;
+	private Game game;
+	private Player player, opponent;
+	private String userName;
+	private MainGameCheckerThread mainGameCheckerThread;
+	private boolean beingModified = false;
+	private CardLayout cardLayoutDetail = null;
+	private CardDetailListener cardDetailListener = null;
+
+	final private Handler checkGameHandler = new Handler() {
+
+		@Override
+		public void handleMessage(Message message) {
+			super.handleMessage(message);
+			Game game = (Game) message.obj;
+			if (!beingModified)
+				onGetGame(game);
+		}
+	};
+
+	public long getGameId() {
+		return gameId;
+	}
+
+	public boolean isBeingModified() {
+		return beingModified;
+	}
+
+	public void setBeingModified(boolean beingModified) {
+		this.beingModified = beingModified;
+		ImageView beingModifiedImageView = (ImageView) layout.findViewById(R.id.beingModified);
+		beingModifiedImageView.setImageDrawable(getResources().getDrawable(beingModified ? R.drawable.red : R.drawable.green));
+	}
+
+	private class CardDetailHider implements OnDragListener {
+
+		@Override
+		public boolean onDrag(View v, DragEvent event) {
+
+			Log.i("CardDetailHider", String.format("onDrag event detected: %s for event %s", event.getAction(), v.getClass().getName()));
+
+			switch (event.getAction()) {
+			case DragEvent.ACTION_DROP:
+				hideCardLayoutDetail();
+				beingModified = false;
+				break;
+			default:
+				break;
+			}
+
+			return true;
+
+		}
+
+	}
+
+	private class CardDetailListener implements OnTouchListener {
+
+		private PlayerDeckCard card;
+		private CardLayout cardLayoutDetail = null;
+		private boolean calledFromHand;
+
+		public CardDetailListener(PlayerDeckCard card, boolean calledFromHand) {
+			this.card = card;
+			this.calledFromHand = calledFromHand;
+		}
+
+		@Override
+		public boolean onTouch(View v, MotionEvent event) {
+
+			setBeingModified(true);
+			Log.i("CardDetailListener", String.format("onTouch event detected: %s for event %s", event.getAction(), v.getClass().getName()));
+
+			if (event.getAction() == MotionEvent.ACTION_DOWN) {
+
+				cardLayoutDetail.setDetailShown(true);
+				cardLayoutDetail.setFields(getMainActivity(), card, 1f, 1f);
+				cardLayoutDetail.show();
+				Log.d("CardDetailListener", "Showing " + card);
+
+				v.performClick();
+
+				if (calledFromHand) {
+					ClipData data = ClipData.newPlainText("", "");
+					DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(v);
+					v.startDrag(data, shadowBuilder, v, 0);
+				}
+
+				return true;
+
+			}
+
+			if (event.getAction() == MotionEvent.ACTION_UP) {
+
+				hideCardLayoutDetail();
+				Log.d("CardDetailListener", "Hiding " + card);
+				setBeingModified(false);
+				return true;
+
+			}
+
+			setBeingModified(false);
+			return false;
+
+		}
+
+	}
+
+	protected MainActivity getMainActivity() {
+		return this;
+	}
+
+	public void hideCardLayoutDetail() {
+		cardLayoutDetail.hide();
+	}
+
+	private void drawCardFromDeck() {
+
+		CardWebClient cardWebClient = new CardWebClient("10.0.2.2", this);
+		cardWebClient.processAsynchHelloRequest();
+
+	}
+
+	public void onCardDrawn(PlayerDeckCard card) {
+		if (card != null) {
+			updateCardsDisplay();
+		}
+	}
+
+	private void updateCardsDisplay() {
+
+		try {
+
+			LinearLayout opponentFieldLayout = (LinearLayout) layout.findViewById(R.id.opponentField);
+			Player opponent = game.selectOpponent(userName);
+			float i = 0f;
+			float n = (float) opponent.getPlayerField().getCards().size();
+			opponentFieldLayout.removeAllViews();
+
+			for (PlayerDeckCard card : opponent.getPlayerField().getCards()) {
+				CardLayout cardInHandLayout = new CardLayout(this, card, i, n);
+				CardDetailListener cardDetailListener = new CardDetailListener(card, true);
+				// cardInHandLayout.setOnClickListener(cardDetailListener);
+				cardInHandLayout.setOnTouchListener(cardDetailListener);
+				opponentFieldLayout.addView(cardInHandLayout);
+				i++;
+			}
+
+			LinearLayout playerHandLayout = (LinearLayout) layout.findViewById(R.id.playerHand);
+			i = 0f;
+			n = (float) player.getPlayerHand().getCards().size();
+			playerHandLayout.removeAllViews();
+			Log.i("MainActivity", "Removed all views");
+
+			for (PlayerDeckCard card : player.getPlayerHand().getCards()) {
+				CardLayout cardInHandLayout = new CardLayout(this, card, i, n);
+				CardDetailListener cardDetailListener = new CardDetailListener(card, true);
+				// cardInHandLayout.setOnClickListener(cardDetailListener);
+				cardInHandLayout.setOnTouchListener(cardDetailListener);
+				playerHandLayout.addView(cardInHandLayout);
+				Log.i("MainActivity", "Added view " + cardInHandLayout + " visible " + cardInHandLayout.getVisibility());
+				i++;
+			}
+
+			LinearLayout playerFieldLayout = (LinearLayout) layout.findViewById(R.id.playerField);
+			i = 0f;
+			n = (float) player.getPlayerField().getCards().size();
+			playerFieldLayout.removeAllViews();
+
+			playerFieldLayout.setOnDragListener(new PlayerFieldDragListener(this, userName));
+
+			for (PlayerDeckCard card : player.getPlayerField().getCards()) {
+				CardLayout cardInHandLayout = new CardLayout(this, card, i, n);
+				CardDetailListener cardDetailListener = new CardDetailListener(card, false);
+				cardInHandLayout.setOnTouchListener(cardDetailListener);
+				playerFieldLayout.addView(cardInHandLayout);
+				i++;
+			}
+
+		} catch (PlayerNotInGameException e) {
+			Log.e("MainActivity", String.format("Player not in game...", e.getMessage()));
+		}
+
+	}
+
+	@Override
+	protected void onResume() {
+
+		super.onResume();
+
+		Log.d("MainActivity", "onResume");
+		mainGameCheckerThread.getGame(gameId);
+
+	}
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+
+		super.onCreate(savedInstanceState);
+
+		Log.d("MainActivity", "onCreate");
+		init();
+
+		layout.setOnDragListener(new CardDetailHider());
+		
+		cardLayoutDetail = (CardLayout) layout.findViewById(R.id.card_layout_detail);
+
+		ImageButton deckButton = (ImageButton) layout.findViewById(R.id.deckButton);
+		deckButton.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				drawCardFromDeck();
+			}
+
+		});
+
+		Button stopGameButton = (Button) layout.findViewById(R.id.stopGameButton);
+		stopGameButton.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				Log.d("MainActivity", "Clicker on delete for game " + gameId);
+				mainGameCheckerThread.setInterruptedSignalSent(true);
+				GameWebClient gameWebClient = new GameWebClient("10.0.2.2", null);
+				gameWebClient.deleteGame(gameId, getMainActivity());
+			}
+		});
+
+		Button homeButton = (Button) layout.findViewById(R.id.homeButton);
+		homeButton.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				returnHome(Constants.GAME_IN_PROGRESS);
+			}
+		});
+
+		Button getGameButton = (Button) layout.findViewById(R.id.getGameButton);
+		getGameButton.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				getGame(gameId);
+			}
+		});
+
+		Button nextPhaseButton = (Button) layout.findViewById(R.id.nextPhaseButton);
+		nextPhaseButton.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				nextPhase(gameId);
+			}
+		});
+
+		mainGameCheckerThread = new MainGameCheckerThread(checkGameHandler, gameId);
+		mainGameCheckerThread.start();
+		hideCardLayoutDetail();
+
+	}
+
+	@Override
+	protected void onStop() {
+		super.onStop();
+	}
+
+	private void init() {
+
+		gameId = getIntent().getExtras().getLong(Constants.GAME_ID);
+		gameCommand = getIntent().getExtras().getString(Constants.GAME_COMMAND);
+		userName = getIntent().getExtras().getString(Constants.USER_NAME);
+
+		Toast.makeText(this, String.format("Command %s for game ID: %s, userName=%s", gameCommand, gameId, userName), Toast.LENGTH_SHORT).show();
+
+		layout = (RelativeLayout) LinearLayout.inflate(this, R.layout.activity_main, null);
+
+		setContentView(layout);
+
+		getGame(gameId);
+
+	}
+
+	public void returnHome(int status) {
+		/*
+		 * Intent result = new Intent(); setResult(RESULT_OK, result); finish();
+		 */
+
+		Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+		intent.putExtra(Constants.GAME_ID, gameId);
+		intent.putExtra(Constants.GAME_STATE, status);
+		intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+		startActivity(intent);
+	}
+
+	public void getGame(long gameId) {
+		GameWebClient gameWebClient = new GameWebClient("10.0.2.2", null);
+		gameWebClient.getGame(gameId, this);
+	}
+
+	public void nextPhase(long gameId) {
+		GameWebClient gameWebClient = new GameWebClient("10.0.2.2", null);
+		gameWebClient.nextPhase(gameId, this);
+	}
+
+	public void onGetGame(Game game) {
+
+		if (game == null) {
+			Toast.makeText(this, String.format("Unable to get game"), Toast.LENGTH_LONG).show();
+			return;
+		}
+
+		TextView gameInfos = (TextView) layout.findViewById(R.id.gameInfos);
+		TextView playerTradeValue = (TextView) layout.findViewById(R.id.playerTradeValue);
+		TextView playerGoldValue = (TextView) layout.findViewById(R.id.playerGoldValue);
+		TextView playerDefenseValue = (TextView) layout.findViewById(R.id.playerDefenseValue);
+		TextView playerFaithValue = (TextView) layout.findViewById(R.id.playerFaithValue);
+		TextView opponentTradeValue = (TextView) layout.findViewById(R.id.opponentTradeValue);
+		TextView opponentGoldValue = (TextView) layout.findViewById(R.id.opponentGoldValue);
+		TextView opponentDefenseValue = (TextView) layout.findViewById(R.id.opponentDefenseValue);
+		TextView opponentFaithValue = (TextView) layout.findViewById(R.id.opponentFaithValue);
+		TextView goldResourceValue = (TextView) layout.findViewById(R.id.goldResourceValue);
+
+		try {
+			this.game = game;
+			player = game.selectPlayer(userName);
+			opponent = game.selectOpponent(userName);
+
+			Log.i("onGetGame", String.format("Entering onGetGame: state=%s", game.getGameState()));
+
+			switch (game.getGameState()) {
+
+			case STARTED:
+				updateCardsDisplay();
+				break;
+
+			default:
+				Log.e("onGetGame", String.format("Invalid game state: %s", game.getGameState()));
+				break;
+
+			}
+
+			gameInfos.setText(game.toString());
+			playerTradeValue.setText(String.format("%s", player.getTrade()));
+			playerGoldValue.setText(String.format("%s", player.getGold()));
+			playerDefenseValue.setText(String.format("%s (%s)", player.getCurrentProtection(), player.getProtection()));
+			playerFaithValue.setText(String.format("%s", player.getFaith()));
+			opponentTradeValue.setText(String.format("%s", opponent.getTrade()));
+			opponentGoldValue.setText(String.format("%s", opponent.getGold()));
+			opponentDefenseValue.setText(String.format("%s (%s)", opponent.getCurrentProtection(), opponent.getProtection()));
+			opponentFaithValue.setText(String.format("%s", opponent.getFaith()));
+			goldResourceValue.setText(String.format("%s", game.getGold()));
+
+		} catch (PlayerNotInGameException e) {
+			gameInfos.setText("Error, player not in game");
+		}
+	}
+
+	public void onDeleteGame() {
+		returnHome(Constants.GAME_STOPPED);
+		finish();
+	}
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		Session.getActiveSession().onActivityResult(this, requestCode, resultCode, data);
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.main, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle action bar item clicks here. The action bar will
+		// automatically handle clicks on the Home/Up button, so long
+		// as you specify a parent activity in AndroidManifest.xml.
+		int id = item.getItemId();
+		if (id == R.id.action_settings) {
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
+	}
+
+}
