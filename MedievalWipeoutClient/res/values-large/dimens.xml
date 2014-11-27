@@ -1,0 +1,10 @@
+<resources>
+
+    <dimen name="text_size_title">8dp</dimen>
+    <dimen name="fieldHeight">120dp</dimen>
+    <dimen name="cardWidth">80dp</dimen>
+    <dimen name="cardHeight">120dp</dimen>
+    <dimen name="cardDetailWidth">160dp</dimen>
+    <dimen name="cardDetailHeight">240dp</dimen>
+    
+</resources>

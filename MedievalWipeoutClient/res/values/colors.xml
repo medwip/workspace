@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <color name="red">#ffff0000</color>
+    <color name="backgroundModal">#55000000</color>
+    <color name="field">#55F5ECCE</color>
+    <color name="fieldBorderHighlightBackground">#55F5ECCE</color>
+    <color name="fieldBorderStroke">#FFAAAAAA</color>
+    <color name="fieldBorderHighlightStroke">#FF000000</color>
+    <color name="highlightFieldColor">#F7FE2E</color>
+    <color name="lifePointsColor">#0000A0</color>
+
+    <color name="cardBorderHighlightBackground">#55000000</color>
+    <color name="cardBorderBackground">#22000000</color>
+    <color name="cardBorderHighlightStroke">#5561210B</color>
+    <color name="cardBorderStroke">#22CB8152</color>
+    
+</resources>

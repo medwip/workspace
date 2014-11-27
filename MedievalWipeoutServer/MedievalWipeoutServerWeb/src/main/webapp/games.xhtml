@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core">
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+	<title>Game List</title>
+</h:head>
+
+<h:body>
+
+	<f:view>
+
+		<h:form>
+			<h:commandButton action="#{gameMB.createGame()}" value="Create" />
+			<h:commandButton action="#{gameMB.refresh()}" value="Refresh" /><br/>
+		
+			<h:dataTable value="#{gameMB.allGames}" var="game">
+				<h:column>
+					<f:facet name="header">
+						<h:outputText value="Id" />
+					</f:facet>
+					<h:outputText value="#{game.id}" />
+				</h:column>
+				<h:column>
+					<f:facet name="header">
+						<h:outputText value="Sate" />
+					</f:facet>
+					<h:outputText value="#{game.gameState}" />
+				</h:column>
+				<h:column>
+					<f:facet name="header">
+						<h:outputText value="Phase" />
+					</f:facet>
+					<h:outputText value="#{game.phase}" />
+				</h:column>
+				<h:column>
+					<f:facet name="header">
+						<h:outputText value="Creator" />
+					</f:facet>
+					<h:outputText value="#{game.creator}" />
+				</h:column>
+				<h:column>
+					<f:facet name="header">
+						<h:outputText value="Joiner" />
+					</f:facet>
+					<h:outputText value="#{game.joiner}" />
+				</h:column>
+				<h:column>
+					<f:facet name="header">
+						<h:outputText value="Actions" />
+					</f:facet>
+					<h:commandButton action="#{gameMB.deleteGame(game.id)}" value="Delete" />
+					<h:commandButton action="#{gameMB.joinGame(game.id)}" value="Join" />
+				</h:column>
+
+			</h:dataTable>
+		</h:form>
+
+	</f:view>
+
+
+</h:body>
+
+</html>
