@@ -57,14 +57,13 @@ public class AccountManager {
 			cards.add(new DeckTemplateElement(CardModel.ASTRAL_SPIDER));
 			cards.add(new DeckTemplateElement(CardModel.ASTRAL_SPIDER));*/
 			deckTemplate.setCards(cards);
+			List<DeckTemplate> deckTemplates = new ArrayList<DeckTemplate>();
+			deckTemplates.add(deckTemplate);
+			account.setDeckTemplates(deckTemplates);
 		}
 		else {
 			deckTemplate = account.getDeckTemplates().get(0);
 		}
-		
-		List<DeckTemplate> deckTemplates = new ArrayList<DeckTemplate>();
-		deckTemplates.add(deckTemplate);
-		account.setDeckTemplates(deckTemplates);
 		
 		return account;
 	}
