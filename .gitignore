@@ -52,3 +52,5 @@ target
 .metadata/.plugins/org.eclipse.core.resources/.projects/appcompat_v7/.indexes/properties.index
 .metadata/.plugins/org.eclipse.core.resources/.root/.indexes/properties.index
 target
+target
+.metadata

@@ -61,9 +61,6 @@ public class AccountManager {
 			deckTemplates.add(deckTemplate);
 			account.setDeckTemplates(deckTemplates);
 		}
-		else {
-			deckTemplate = account.getDeckTemplates().get(0);
-		}
 		
 		return account;
 	}
