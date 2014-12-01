@@ -1,42 +1,52 @@
 package com.guntzergames.medievalwipeout.beans;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
-import com.guntzergames.medievalwipeout.abstracts.AbstractCard;
+@Entity
+@Table(name = "COLLECTION_ELEMENT")
+public class CollectionElement {
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public class PlayerDeckCard extends AbstractCard {
-
-	@JsonIgnore
-	protected DeckTemplate deckTemplate;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Basic(optional = false)
+	@Column(name = "ID")
+	private int id;
 	
+	@Column(name = "DRAWABLE_RESOURCE_NAME")
 	protected String drawableResourceName;
 	
+	@ManyToOne(targetEntity = CardModel.class)
+	@JoinColumn(name = "CARD_MODEL_KEY")
+	private CardModel cardModel;
+	
+	@Column(name = "PLAYER_DECK_CARD_NAME")
 	protected String name;
 	
+	@Column(name = "ATTACK")
 	protected int attack;
 	
+	@Column(name = "LIFE_POINTS")
 	protected int lifePoints;
 	
+	@Column(name = "GOLD_COST")
 	protected int goldCost;
 	
+	@Column(name = "FAITH_COST")
 	protected int faithCost;
-
-	public PlayerDeckCard(int id, String drawableResourceName, String name, int attack, int lifePoints) {
-		this.id = id;
-		this.drawableResourceName = drawableResourceName;
-		this.name = name;
-		this.attack = attack;
-		this.lifePoints = lifePoints;
-	}
-
-	public PlayerDeckCard() {
+	
+	public CollectionElement() {
 
 	}
 
-	public PlayerDeckCard(CardModel model) {
-		this.id = model.getId();
+	public CollectionElement(CardModel model) {
 		this.drawableResourceName = model.getDrawableResourceName();
 		this.attack = model.getAttack();
 		this.lifePoints = model.getLifePoints();
@@ -44,23 +54,21 @@ public class PlayerDeckCard extends AbstractCard {
 		this.goldCost = model.getGoldCost();
 		this.faithCost = model.getFaithCost();
 	}
-
-	public PlayerDeckCard(PlayerDeckCard playerDeckCard) {
-		this.id = playerDeckCard.getId();
-		this.drawableResourceName = playerDeckCard.getDrawableResourceName();
-		this.attack = playerDeckCard.getAttack();
-		this.lifePoints = playerDeckCard.getLifePoints();
-		this.name = playerDeckCard.getName();
-		this.goldCost = playerDeckCard.getGoldCost();
-		this.faithCost = playerDeckCard.getFaithCost();
+	
+	public int getId() {
+		return id;
 	}
 
-	public DeckTemplate getDeckTemplate() {
-		return deckTemplate;
+	public void setId(int id) {
+		this.id = id;
 	}
 
-	public void setDeckTemplate(DeckTemplate deckTemplate) {
-		this.deckTemplate = deckTemplate;
+	public CardModel getCardModel() {
+		return cardModel;
+	}
+
+	public void setCardModel(CardModel cardModel) {
+		this.cardModel = cardModel;
 	}
 
 	public String getDrawableResourceName() {

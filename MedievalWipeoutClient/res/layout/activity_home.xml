@@ -1,59 +1,80 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res/com.guntzergames.medievalwipeout.activities"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:layout_gravity="top"
+    app:columnCount="5" >
 
     <TextView
         android:id="@+id/welcome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        app:layout_row="0"
+        app:layout_column="0"
+        app:layout_columnSpan="3"
         android:text="@string/not_initialized" >
     </TextView>
-
-    <TextView
-        android:id="@+id/debug"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/not_initialized" >
-    </TextView>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal" >
-
-        <Button
-            android:id="@+id/launchGame"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/start_game" />
-
-        <ProgressBar
-            android:id="@+id/progressBar"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:max="100"
-            android:progress="1"
-            android:visibility="invisible" />
-    </LinearLayout>
-
-    <Button
-        android:id="@+id/resumeGame"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/resume_game" />
 
     <Button
         android:id="@+id/preferences"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        app:layout_row="0"
+        app:layout_column="4"
         android:text="@string/preferences" />
+
+    <TextView
+        android:id="@+id/debug"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_row="1"
+        app:layout_column="0"
+        app:layout_columnSpan="3"
+        android:text="@string/not_initialized" >
+    </TextView>
+
+    <Button
+        android:id="@+id/resumeGame"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_row="1"
+        app:layout_column="4"
+        android:text="@string/resume_game" />
+
+    <Button
+        android:id="@+id/startGame"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_row="2"
+        app:layout_column="0"
+        android:text="@string/start_game" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_row="2"
+        app:layout_column="1"
+        android:max="100"
+        android:progress="1"
+        android:visibility="invisible" />
+
+    <Button
+        android:id="@+id/editDeck"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_row="2"
+        app:layout_column="2"
+        android:text="@string/edit_deck" />
 
     <ListView
         android:id="@+id/deckTemplatesList"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_width="160dp"
+        android:layout_height="wrap_content"
+        app:layout_row="3"
+        app:layout_column="0"
+        app:layout_columnSpan="3" />
 
-</LinearLayout>
+</android.support.v7.widget.GridLayout>

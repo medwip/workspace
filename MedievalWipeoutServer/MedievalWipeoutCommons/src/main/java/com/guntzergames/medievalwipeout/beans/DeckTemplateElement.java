@@ -13,7 +13,6 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 
 import com.guntzergames.medievalwipeout.abstracts.AbstractCard;
-import com.guntzergames.medievalwipeout.enums.CardModel;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @Entity
@@ -25,23 +24,9 @@ public class DeckTemplateElement extends AbstractCard {
 	@JoinColumn(name = "DECK_TEMPLATE_KEY")
 	protected DeckTemplate deckTemplate;
 	
-	@Column(name = "DRAWABLE_RESOURCE_NAME")
-	protected String drawableResourceName;
-	
-	@Column(name = "PLAYER_DECK_CARD_NAME")
-	protected String name;
-	
-	@Column(name = "ATTACK")
-	protected int attack;
-	
-	@Column(name = "LIFE_POINTS")
-	protected int lifePoints;
-	
-	@Column(name = "GOLD_COST")
-	protected int goldCost;
-	
-	@Column(name = "FAITH_COST")
-	protected int faithCost;
+	@ManyToOne(targetEntity = CollectionElement.class)
+	@JoinColumn(name = "COLLECTION_ELEMENT_KEY")
+	private CollectionElement collectionElement;
 	
 	@Column(name = "NUMBER_OF_CARDS")
 	private int numberOfCards;
@@ -50,23 +35,14 @@ public class DeckTemplateElement extends AbstractCard {
 
 	}
 
-	public DeckTemplateElement(CardModel model) {
-		this.drawableResourceName = model.getDrawableResourceName();
-		this.attack = model.getAttack();
-		this.lifePoints = model.getLifePoints();
-		this.name = model.getName();
-		this.goldCost = model.getGoldCost();
-		this.faithCost = model.getFaithCost();
-	}
-	
 	public PlayerDeckCard toPlayerDeckCard() {
 		PlayerDeckCard playerDeckCard = new PlayerDeckCard();
-		playerDeckCard.setDrawableResourceName(drawableResourceName);
-		playerDeckCard.setAttack(attack);
-		playerDeckCard.setFaithCost(faithCost);
-		playerDeckCard.setGoldCost(goldCost);
-		playerDeckCard.setLifePoints(lifePoints);
-		playerDeckCard.setName(name);
+		playerDeckCard.setDrawableResourceName(getDrawableResourceName());
+		playerDeckCard.setAttack(getAttack());
+		playerDeckCard.setFaithCost(getFaithCost());
+		playerDeckCard.setGoldCost(getGoldCost());
+		playerDeckCard.setLifePoints(getLifePoints());
+		playerDeckCard.setName(getName());
 		return playerDeckCard;
 	}
 	
@@ -90,52 +66,42 @@ public class DeckTemplateElement extends AbstractCard {
 		this.deckTemplate = deckTemplate;
 	}
 
+	public CollectionElement getCollectionElement() {
+		return collectionElement;
+	}
+
+	public void setCollectionElement(CollectionElement collectionElement) {
+		this.collectionElement = collectionElement;
+	}
+
+	@JsonIgnore
 	public String getDrawableResourceName() {
-		return drawableResourceName;
+		return collectionElement.getDrawableResourceName();
 	}
 
-	public void setDrawableResourceName(String drawableResourceName) {
-		this.drawableResourceName = drawableResourceName;
-	}
-
+	@JsonIgnore
 	public String getName() {
-		return name;
+		return collectionElement.getName();
 	}
 
-	public void setName(String name) {
-		this.name = name;
-	}
-
+	@JsonIgnore
 	public int getAttack() {
-		return attack;
+		return collectionElement.getAttack();
 	}
 
-	public void setAttack(int attack) {
-		this.attack = attack;
-	}
-
+	@JsonIgnore
 	public int getLifePoints() {
-		return lifePoints;
+		return collectionElement.getLifePoints();
 	}
 
-	public void setLifePoints(int lifePoints) {
-		this.lifePoints = lifePoints;
-	}
-
+	@JsonIgnore
 	public int getGoldCost() {
-		return goldCost;
+		return collectionElement.getGoldCost();
 	}
 
-	public void setGoldCost(int goldCost) {
-		this.goldCost = goldCost;
-	}
-
+	@JsonIgnore
 	public int getFaithCost() {
-		return faithCost;
-	}
-
-	public void setFaithCost(int faithCost) {
-		this.faithCost = faithCost;
+		return collectionElement.getFaithCost();
 	}
 
 	public int getNumberOfCards() {
@@ -148,7 +114,7 @@ public class DeckTemplateElement extends AbstractCard {
 
 	@Override
 	public String toString() {
-		return String.format("%s: Attack = %s, Life Points = %s", name, attack, lifePoints);
+		return String.format("%s: Attack = %s, Life Points = %s", getName(), getAttack(), getLifePoints());
 	}
 
 }

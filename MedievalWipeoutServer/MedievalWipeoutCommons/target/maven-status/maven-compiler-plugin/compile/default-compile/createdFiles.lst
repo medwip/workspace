@@ -1,8 +1,8 @@
 com\guntzergames\medievalwipeout\beans\ResourceDeck.class
 com\guntzergames\medievalwipeout\beans\GameEvent.class
 com\guntzergames\medievalwipeout\beans\ResourceDeckCard.class
-com\guntzergames\medievalwipeout\abstracts\AbstractCardList.class
 com\guntzergames\medievalwipeout\enums\Phase.class
+com\guntzergames\medievalwipeout\abstracts\AbstractCardList.class
 com\guntzergames\medievalwipeout\enums\CardLocation.class
 com\guntzergames\medievalwipeout\exceptions\GameException.class
 com\guntzergames\medievalwipeout\beans\DeckTemplate.class
@@ -13,6 +13,7 @@ com\guntzergames\medievalwipeout\beans\GameEventPlayCard.class
 com\guntzergames\medievalwipeout\beans\PlayerDiscard.class
 com\guntzergames\medievalwipeout\beans\PlayerFieldCard.class
 com\guntzergames\medievalwipeout\exceptions\PlayerNotInGameException.class
+com\guntzergames\medievalwipeout\beans\CardModel.class
 com\guntzergames\medievalwipeout\enums\GameState.class
 com\guntzergames\medievalwipeout\views\GameView.class
 com\guntzergames\medievalwipeout\abstracts\AbstractCard.class
@@ -20,8 +21,8 @@ com\guntzergames\medievalwipeout\beans\PlayerField.class
 com\guntzergames\medievalwipeout\beans\PlayerDeck.class
 com\guntzergames\medievalwipeout\beans\DeckTemplateElement.class
 com\guntzergames\medievalwipeout\beans\Account.class
-com\guntzergames\medievalwipeout\enums\CardModel.class
 com\guntzergames\medievalwipeout\beans\Game.class
 com\guntzergames\medievalwipeout\beans\PlayerDeckCard.class
 com\guntzergames\medievalwipeout\beans\GameEventPlayCard$PlayerType.class
+com\guntzergames\medievalwipeout\beans\CollectionElement.class
 com\guntzergames\medievalwipeout\beans\PlayerHand.class

@@ -31,18 +31,20 @@ import android.widget.Toast;
 import com.facebook.Session;
 import com.guntzergames.medievalwipeout.abstracts.AbstractCard;
 import com.guntzergames.medievalwipeout.abstracts.AbstractCardList;
+import com.guntzergames.medievalwipeout.beans.Account;
 import com.guntzergames.medievalwipeout.beans.GameEvent;
 import com.guntzergames.medievalwipeout.beans.GameEventPlayCard;
 import com.guntzergames.medievalwipeout.beans.GameEventPlayCard.PlayerType;
+import com.guntzergames.medievalwipeout.beans.CardModel;
 import com.guntzergames.medievalwipeout.beans.Player;
 import com.guntzergames.medievalwipeout.beans.PlayerDeckCard;
 import com.guntzergames.medievalwipeout.beans.PlayerFieldCard;
 import com.guntzergames.medievalwipeout.beans.PlayerHandCard;
 import com.guntzergames.medievalwipeout.beans.ResourceDeckCard;
 import com.guntzergames.medievalwipeout.enums.CardLocation;
-import com.guntzergames.medievalwipeout.enums.CardModel;
 import com.guntzergames.medievalwipeout.enums.Phase;
 import com.guntzergames.medievalwipeout.interfaces.Constants;
+import com.guntzergames.medievalwipeout.interfaces.GameWebClientCallbackable;
 import com.guntzergames.medievalwipeout.layouts.CardLayout;
 import com.guntzergames.medievalwipeout.listeners.GameAnimationListener;
 import com.guntzergames.medievalwipeout.listeners.GameDragListener;
@@ -50,7 +52,7 @@ import com.guntzergames.medievalwipeout.services.MainGameCheckerThread;
 import com.guntzergames.medievalwipeout.views.GameView;
 import com.guntzergames.medievalwipeout.webclients.GameWebClient;
 
-public class GameActivity extends ActionBarActivity {
+public class GameActivity extends ActionBarActivity implements GameWebClientCallbackable {
 
 	private RelativeLayout layout = null, playerChoicesLayout;
 	private long gameId;
@@ -309,16 +311,16 @@ public class GameActivity extends ActionBarActivity {
 		super.onCreate(savedInstanceState);
 
 		Log.d("MainActivity", "onCreate");
-		gameWebClient = new GameWebClient(Constants.SERVER_IP_ADDRESS, null);
+		gameWebClient = new GameWebClient(Constants.SERVER_IP_ADDRESS, this);
 
 		init();
 
 		cardLayoutDetail = (CardLayout) layout.findViewById(R.id.card_layout_detail);
 		cardLayoutDetail.setDetailShown(true);
-		cardLayoutDetail.init(this, new PlayerDeckCard(CardModel.GOBLIN_PIRAT), 0, false, CardLocation.HAND);
+		cardLayoutDetail.init(this, new PlayerDeckCard(CardModel.DEFAULT_CARD), 0, false, CardLocation.HAND);
 		hideCardLayoutDetail();
 		gameEventLayout = (CardLayout) layout.findViewById(R.id.gameEvent);
-		gameEventLayout.init(this, new PlayerDeckCard(CardModel.GOBLIN_PIRAT), 0, false, CardLocation.ANIMATION);
+		gameEventLayout.init(this, new PlayerDeckCard(CardModel.DEFAULT_CARD), 0, false, CardLocation.ANIMATION);
 		gameEventLayout.setVisibility(View.INVISIBLE);
 
 		playerHandLayout = (LinearLayout) layout.findViewById(R.id.playerHand);
@@ -332,16 +334,16 @@ public class GameActivity extends ActionBarActivity {
 
 			CardLayout opponentCardInFieldLayout = (CardLayout) layout.findViewById(CardLayout.getCardFromId("opponentField", num));
 			opponentCardInFieldLayout.setOnTouchListener(cardDetailListener);
-			opponentCardInFieldLayout.init(this, new PlayerDeckCard(CardModel.GOBLIN_PIRAT), 0, false, CardLocation.FIELD);
+			opponentCardInFieldLayout.init(this, new PlayerDeckCard(CardModel.DEFAULT_CARD), 0, false, CardLocation.FIELD);
 			opponentCardInFieldLayout.hide();
 			CardLayout cardInHandLayout = (CardLayout) layout.findViewById(CardLayout.getCardFromId("playerHand", num));
 			cardInHandLayout.setCalledFromHand(true);
-			cardInHandLayout.init(this, new PlayerDeckCard(CardModel.GOBLIN_PIRAT), 0, false, CardLocation.HAND);
+			cardInHandLayout.init(this, new PlayerDeckCard(CardModel.DEFAULT_CARD), 0, false, CardLocation.HAND);
 			cardInHandLayout.hide();
 			cardInHandLayout.setOnTouchListener(cardDetailListener);
 			CardLayout cardInFieldLayout = (CardLayout) layout.findViewById(CardLayout.getCardFromId("playerField", num));
 			cardInFieldLayout.setOnTouchListener(cardDetailListener);
-			cardInFieldLayout.init(this, new PlayerDeckCard(CardModel.GOBLIN_PIRAT), 0, false, CardLocation.FIELD);
+			cardInFieldLayout.init(this, new PlayerDeckCard(CardModel.DEFAULT_CARD), 0, false, CardLocation.FIELD);
 			cardInFieldLayout.hide();
 		}
 
@@ -352,7 +354,7 @@ public class GameActivity extends ActionBarActivity {
 			public void onClick(View v) {
 				Log.d("MainActivity", "Clicker on delete for game " + gameId);
 				mainGameCheckerThread.setInterruptedSignalSent(true);
-				gameWebClient.deleteGame(gameId, getMainActivity());
+				gameWebClient.deleteGame(gameId);
 			}
 		});
 
@@ -394,16 +396,16 @@ public class GameActivity extends ActionBarActivity {
 
 		resourceCard1Layout = (CardLayout) layout.findViewById(CardLayout.getCardFromId("resource", 0));
 		resourceCard1Layout.setOnTouchListener(cardDetailListener);
-		resourceCard1Layout.init(this, new PlayerDeckCard(CardModel.GOBLIN_PIRAT), 0, false, CardLocation.MODAL);
+		resourceCard1Layout.init(this, new PlayerDeckCard(CardModel.DEFAULT_CARD), 0, false, CardLocation.MODAL);
 		resourceCard2Layout = (CardLayout) layout.findViewById(CardLayout.getCardFromId("resource", 1));
 		resourceCard2Layout.setOnTouchListener(cardDetailListener);
-		resourceCard2Layout.init(this, new PlayerDeckCard(CardModel.GOBLIN_PIRAT), 0, false, CardLocation.MODAL);
+		resourceCard2Layout.init(this, new PlayerDeckCard(CardModel.DEFAULT_CARD), 0, false, CardLocation.MODAL);
 		playerDeckCard1Layout = (CardLayout) layout.findViewById(CardLayout.getCardFromId("playerDeck", 0));
 		playerDeckCard1Layout.setOnTouchListener(cardDetailListener);
-		playerDeckCard1Layout.init(this, new PlayerDeckCard(CardModel.GOBLIN_PIRAT), 0, false, CardLocation.MODAL);
+		playerDeckCard1Layout.init(this, new PlayerDeckCard(CardModel.DEFAULT_CARD), 0, false, CardLocation.MODAL);
 		playerDeckCard2Layout = (CardLayout) layout.findViewById(CardLayout.getCardFromId("playerDeck", 1));
 		playerDeckCard2Layout.setOnTouchListener(cardDetailListener);
-		playerDeckCard2Layout.init(this, new PlayerDeckCard(CardModel.GOBLIN_PIRAT), 0, false, CardLocation.MODAL);
+		playerDeckCard2Layout.init(this, new PlayerDeckCard(CardModel.DEFAULT_CARD), 0, false, CardLocation.MODAL);
 
 		mainGameCheckerThread = new MainGameCheckerThread(checkGameHandler, gameId, this);
 		mainGameCheckerThread.start();
@@ -461,11 +463,11 @@ public class GameActivity extends ActionBarActivity {
 	}
 
 	public void getGame(long gameId) {
-		gameWebClient.getGame(gameId, this);
+		gameWebClient.getGame(gameId);
 	}
 
 	public void nextPhase(long gameId) {
-		gameWebClient.nextPhase(gameId, this);
+		gameWebClient.nextPhase(gameId);
 	}
 
 	private boolean displayEvents() {
@@ -554,6 +556,7 @@ public class GameActivity extends ActionBarActivity {
 		this.gameEventLayout = gameEventLayout;
 	}
 
+	@Override
 	public void onGetGame(GameView game) {
 
 		Log.i("GameActivity", " ---> GET GAME <--- ");
@@ -607,6 +610,23 @@ public class GameActivity extends ActionBarActivity {
 		opponentFaithValue.setText(String.format("%s", opponent.getFaith()));
 		opponentLifePointsValue.setText(String.format("%s", opponent.getLifePoints()));
 
+	}
+	
+	@Override
+	public void onError(String err) {
+		Toast.makeText(this, String.format("Error occured: %s", err), Toast.LENGTH_LONG).show();
+	}
+
+	@Override
+	public void onCheckGame(GameView gameView) {
+	}
+
+	@Override
+	public void onGameJoined(GameView gameView) {
+	}
+
+	@Override
+	public void onGetAccount(Account account) {
 	}
 
 	public void onDeleteGame() {

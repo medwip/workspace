@@ -10,7 +10,6 @@ import com.guntzergames.medievalwipeout.beans.Account;
 import com.guntzergames.medievalwipeout.beans.DeckTemplate;
 import com.guntzergames.medievalwipeout.beans.DeckTemplateElement;
 import com.guntzergames.medievalwipeout.beans.Player;
-import com.guntzergames.medievalwipeout.enums.CardModel;
 import com.guntzergames.medievalwipeout.persistence.AccountDao;
 import com.guntzergames.medievalwipeout.singletons.BotAccountSingleton;
 
@@ -45,6 +44,8 @@ public class AccountManager {
 		if ( account.isBotAccount() ) {
 			deckTemplate = new DeckTemplate();
 			List<DeckTemplateElement> cards = new ArrayList<DeckTemplateElement>();
+			// TODO
+			/*
 			cards.add(new DeckTemplateElement(CardModel.GOBLIN_PIRAT));
 			cards.add(new DeckTemplateElement(CardModel.TEMPLAR));
 			cards.add(new DeckTemplateElement(CardModel.ASTRAL_SPIDER));
@@ -54,7 +55,7 @@ public class AccountManager {
 			cards.add(new DeckTemplateElement(CardModel.GNOME_ENGINEER));
 			cards.add(new DeckTemplateElement(CardModel.TEMPLAR));
 			cards.add(new DeckTemplateElement(CardModel.ASTRAL_SPIDER));
-			cards.add(new DeckTemplateElement(CardModel.ASTRAL_SPIDER));
+			cards.add(new DeckTemplateElement(CardModel.ASTRAL_SPIDER));*/
 			deckTemplate.setCards(cards);
 		}
 		else {

@@ -8,6 +8,7 @@ public interface Constants {
 	public static final String GAME_COMMAND = "com.guntzergames.medievalwipeout.gameCommand";
 	public static final String GAME_STATE = "com.guntzergames.medievalwipeout.gameState";
 	public static final String FACEBOOK_USER_ID = "com.guntzergames.medievalwipeout.userName";
+	public static final String DECK_TEMPLATE_ID = "com.guntzergames.medievalwipeout.deckTemplateId";
 	
 	public static final int GAME_IN_PROGRESS = 1;
 	public static final int GAME_STOPPED = 2;

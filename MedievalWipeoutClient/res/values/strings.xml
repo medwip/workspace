@@ -8,6 +8,7 @@
     <string name="deck">Deck</string>
     <string name="app_id">629309157185699</string>
     <string name="start_game">Start Game</string>
+    <string name="edit_deck">Edit Deck</string>
     <string name="stop_game">Stop Game</string>
     <string name="resume_game">Resume Game</string>
     <string name="home">Home</string>

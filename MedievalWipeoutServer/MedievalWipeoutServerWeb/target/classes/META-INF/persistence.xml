@@ -6,11 +6,13 @@ http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
 	<persistence-unit name="mwpu">
 		<jta-data-source>java:/jdbc/mwds</jta-data-source>
 		<exclude-unlisted-classes>false</exclude-unlisted-classes>
-		<class>com.guntzergames.medievalwipeout.beans.Account</class>
-		<class>com.guntzergames.medievalwipeout.beans.DeckTemplate</class>
-		<class>com.guntzergames.medievalwipeout.beans.DeckTemplateElement</class>
-				<class>com.guntzergames.medievalwipeout.beans.PlayerDeckCard</class>
 		<class>com.guntzergames.medievalwipeout.beans.AbstractCard</class>
+		<class>com.guntzergames.medievalwipeout.beans.Account</class>
+		<class>com.guntzergames.medievalwipeout.beans.CardModel</class>
+		<class>com.guntzergames.medievalwipeout.beans.CollectionElement</class>
+				<class>com.guntzergames.medievalwipeout.beans.DeckTemplate</class>
+		<class>com.guntzergames.medievalwipeout.beans.DeckTemplateElement</class>
+		<class>com.guntzergames.medievalwipeout.beans.PlayerDeckCard</class>
 		<properties>
 			<!-- Properties for Hibernate -->
 			<!-- <property name="hibernate.hbm2ddl.auto" value="create-drop" /> -->

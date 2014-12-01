@@ -11,11 +11,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.FragmentActivity;
-import android.widget.AdapterView.OnItemClickListener;
+import android.support.v7.widget.GridLayout;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
@@ -31,20 +32,20 @@ import com.guntzergames.medievalwipeout.beans.Account;
 import com.guntzergames.medievalwipeout.beans.DeckTemplate;
 import com.guntzergames.medievalwipeout.enums.GameState;
 import com.guntzergames.medievalwipeout.interfaces.Constants;
+import com.guntzergames.medievalwipeout.interfaces.GameWebClientCallbackable;
 import com.guntzergames.medievalwipeout.services.HomeGameCheckerThread;
 import com.guntzergames.medievalwipeout.views.GameView;
 import com.guntzergames.medievalwipeout.webclients.GameWebClient;
 
-public class HomeActivity extends FragmentActivity {
+public class HomeActivity extends FragmentActivity implements GameWebClientCallbackable {
 
 	private static final String TAG = "HomeActivity";
 
-	private LinearLayout layout = null;
+	private GridLayout layout = null;
 	private GameView game;
-	private long gameId;
+	private long gameId, selectedDeckTemplateId;
 	private GraphUser user = null;
-	private Button createGameButton = null;
-	private Button resumeGameButton = null;
+	private Button createGameButton, resumeGameButton, editDeckButton;
 	private TextView debugTextView = null;
 	private ProgressBar loader;
 	private int gameCheckAttempts;
@@ -74,7 +75,7 @@ public class HomeActivity extends FragmentActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
-		layout = (LinearLayout) LinearLayout.inflate(this, R.layout.activity_home, null);
+		layout = (GridLayout) LinearLayout.inflate(this, R.layout.activity_home, null);
 
 		setContentView(layout);
 		gameWebClient = new GameWebClient(Constants.SERVER_IP_ADDRESS, this);
@@ -83,6 +84,7 @@ public class HomeActivity extends FragmentActivity {
 		Intent intent = getIntent();
 
 		resumeGameButton = (Button) layout.findViewById(R.id.resumeGame);
+		editDeckButton = (Button) layout.findViewById(R.id.editDeck);
 		debugTextView = (TextView) layout.findViewById(R.id.debug);
 		loader = (ProgressBar) layout.findViewById(R.id.progressBar);
 		deckTemplateListView = (ListView) layout.findViewById(R.id.deckTemplatesList);
@@ -116,8 +118,9 @@ public class HomeActivity extends FragmentActivity {
 			loginFragment.setHomeActivity(this);
 		}
 
-		createGameButton = (Button) layout.findViewById(R.id.launchGame);
+		createGameButton = (Button) layout.findViewById(R.id.startGame);
 		createGameButton.setEnabled(false);
+		editDeckButton.setEnabled(false);
 
 		createGameButton.setOnClickListener(new OnClickListener() {
 
@@ -143,6 +146,14 @@ public class HomeActivity extends FragmentActivity {
 		}
 
 		);
+		
+		editDeckButton.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				startEditDeckActivity();
+			}
+		});
 
 		Button preferencesButton = (Button) layout.findViewById(R.id.preferences);
 		preferencesButton.setOnClickListener(new OnClickListener() {
@@ -163,25 +174,29 @@ public class HomeActivity extends FragmentActivity {
 			Toast.makeText(this, String.format("No access to Internet"), Toast.LENGTH_LONG).show();
 			createGameButton.setEnabled(false);
 		}
-		
+
 		gameCheckerThread = new HomeGameCheckerThread(this);
 		gameCheckerThread.start();
-		
+
 		deckTemplateListView.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				Log.i(TAG, String.format("id: %d", id));
-				selectedDeckTemplate = deckTemplates.get((int)id);
-				createGameButton.setEnabled(true);
+				onDeckSelected(id);
 			}
-			
+
 		});
 
 	}
 
 	public GraphUser getUser() {
 		return user;
+	}
+	
+	@Override
+	public String getFacebookUserId() {
+		if (user == null) return null;
+		return user.getId();
 	}
 
 	public void setUser(GraphUser user) {
@@ -209,19 +224,35 @@ public class HomeActivity extends FragmentActivity {
 	}
 
 	public void getGame(long gameId) {
-		gameWebClient.getGame(gameId, this);
+		gameWebClient.getGame(gameId);
 	}
 
+	public void onDeckSelected(long id) {
+
+		Log.i(TAG, String.format("id: %d", id));
+		selectedDeckTemplateId = id;
+		selectedDeckTemplate = deckTemplates.get((int) id);
+		createGameButton.setEnabled(true);
+		editDeckButton.setEnabled(true);
+
+	}
+	
+	@Override
+	public void onDeleteGame() {
+		onError(String.format("onDeleteGame not supported in class %s", HomeActivity.class.getSimpleName()));
+	}
+
+	@Override
 	public void onGetGame(GameView game) {
 		this.game = game;
 		debugTextView.setText("onGetGame: " + game);
 	}
 
 	public void onGetAccount(Account account) {
-		
+
 		this.account = account;
 		updateDeckTemplates();
-		
+
 	}
 
 	public void onCheckGame(GameView game) {
@@ -234,6 +265,12 @@ public class HomeActivity extends FragmentActivity {
 		}
 	}
 	
+	@Override
+	public void onError(String err) {
+		setDebugText(err);
+	}
+
+	@Override
 	public void onGameJoined(GameView game) {
 
 		this.game = game;
@@ -265,31 +302,30 @@ public class HomeActivity extends FragmentActivity {
 	public void onWaitingForGameCreation() {
 		debugTextView.setText("Looking for an opponent...");
 	}
-	
+
 	public void updateDeckTemplates() {
-		
+
 		Log.d(TAG, String.format("updateDeckTemplates"));
-		
-		List<HashMap<String, String>> listElements = new ArrayList<HashMap<String,String>>();
+
+		List<HashMap<String, String>> listElements = new ArrayList<HashMap<String, String>>();
 		deckTemplates = account.getDeckTemplates();
-		
+
 		HashMap<String, String> element;
-		
-		for ( DeckTemplate deckTemplate : deckTemplates ) {
-			
+
+		for (DeckTemplate deckTemplate : deckTemplates) {
+
 			element = new HashMap<String, String>();
 			element.put("id", deckTemplate.getId() + "");
 			element.put("libel", deckTemplate.getDeckLibel());
 			listElements.add(element);
-			
+
 		}
-		
-		ListAdapter adapter = new SimpleAdapter(this,
-			listElements, android.R.layout.simple_list_item_2,
-			new String[] {"id", "libel"}, new int[] {android.R.id.text1, android.R.id.text2 });
-				
+
+		ListAdapter adapter = new SimpleAdapter(this, listElements, android.R.layout.simple_list_item_2, new String[] { "id", "libel" }, new int[] { android.R.id.text1,
+				android.R.id.text2 });
+
 		deckTemplateListView.setAdapter(adapter);
-		
+
 	}
 
 	public void startGameActivity(GameView game) {
@@ -301,6 +337,15 @@ public class HomeActivity extends FragmentActivity {
 		intent.putExtra(Constants.FACEBOOK_USER_ID, user.getId());
 		intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 		// startActivityForResult(intent, MAIN_ACTIVITY);
+		startActivity(intent);
+	}
+
+	public void startEditDeckActivity() {
+		Intent intent = new Intent(HomeActivity.this, DeckTemplateActivity.class);
+		intent.putExtra(Constants.DECK_TEMPLATE_ID, selectedDeckTemplateId);
+		Log.i(TAG, "startEditDeckActivity");
+		intent.putExtra(Constants.FACEBOOK_USER_ID, user.getId());
+		intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 		startActivity(intent);
 	}
 
@@ -333,6 +378,7 @@ public class HomeActivity extends FragmentActivity {
 		return httpRequestBeingExecuted;
 	}
 
+	@Override
 	public void setHttpRequestBeingExecuted(boolean httpRequestBeingExecuted) {
 		this.httpRequestBeingExecuted = httpRequestBeingExecuted;
 	}

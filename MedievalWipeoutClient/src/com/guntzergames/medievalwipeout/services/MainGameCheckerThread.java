@@ -6,7 +6,6 @@ import android.util.Log;
 
 import com.guntzergames.medievalwipeout.activities.GameActivity;
 import com.guntzergames.medievalwipeout.views.GameView;
-import com.guntzergames.medievalwipeout.webclients.GameWebClient;
 
 public class MainGameCheckerThread extends Thread {
 	

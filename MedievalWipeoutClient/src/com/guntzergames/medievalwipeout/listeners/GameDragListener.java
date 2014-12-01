@@ -54,7 +54,7 @@ public class GameDragListener implements OnDragListener {
 			String target = cardLayout.getPossibleTarget(dest.getId());
 			
 			if ( target != null ) {
-				gameWebClient.playCard(gameActivity.getGameId(), target, cardLayout.getSeqNum(), gameActivity);
+				gameWebClient.playCard(gameActivity.getGameId(), target, cardLayout.getSeqNum());
 			}
 			
 			break;
