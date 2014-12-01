@@ -10,7 +10,6 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.GridLayout;
 import android.util.Log;
 import android.view.View;
@@ -32,17 +31,15 @@ import com.guntzergames.medievalwipeout.beans.Account;
 import com.guntzergames.medievalwipeout.beans.DeckTemplate;
 import com.guntzergames.medievalwipeout.enums.GameState;
 import com.guntzergames.medievalwipeout.interfaces.Constants;
-import com.guntzergames.medievalwipeout.interfaces.GameWebClientCallbackable;
 import com.guntzergames.medievalwipeout.services.HomeGameCheckerThread;
 import com.guntzergames.medievalwipeout.views.GameView;
 import com.guntzergames.medievalwipeout.webclients.GameWebClient;
 
-public class HomeActivity extends FragmentActivity implements GameWebClientCallbackable {
+public class HomeActivity extends ApplicationActivity {
 
 	private static final String TAG = "HomeActivity";
 
 	private GridLayout layout = null;
-	private GameView game;
 	private long gameId, selectedDeckTemplateId;
 	private GraphUser user = null;
 	private Button createGameButton, resumeGameButton, editDeckButton;
@@ -51,8 +48,6 @@ public class HomeActivity extends FragmentActivity implements GameWebClientCallb
 	private int gameCheckAttempts;
 	private HomeGameCheckerThread gameCheckerThread = null;
 	private LoginFragment loginFragment;
-	private GameWebClient gameWebClient;
-	private boolean httpRequestBeingExecuted = false;
 	private List<DeckTemplate> deckTemplates = new ArrayList<DeckTemplate>();
 	private ListView deckTemplateListView;
 	private DeckTemplate selectedDeckTemplate;
@@ -78,7 +73,6 @@ public class HomeActivity extends FragmentActivity implements GameWebClientCallb
 		layout = (GridLayout) LinearLayout.inflate(this, R.layout.activity_home, null);
 
 		setContentView(layout);
-		gameWebClient = new GameWebClient(Constants.SERVER_IP_ADDRESS, this);
 
 		// New intent
 		Intent intent = getIntent();
@@ -94,7 +88,7 @@ public class HomeActivity extends FragmentActivity implements GameWebClientCallb
 		if (gameId > 0 && gameState != Constants.GAME_STOPPED) {
 			getGame(gameId);
 		}
-		debugTextView.setText("Game: " + game);
+		debugTextView.setText("Game: " + gameView);
 
 		if (gameState == Constants.GAME_IN_PROGRESS) {
 			Toast.makeText(this, String.format("Returned to home page from game %s", gameId), Toast.LENGTH_SHORT).show();
@@ -120,7 +114,7 @@ public class HomeActivity extends FragmentActivity implements GameWebClientCallb
 
 		createGameButton = (Button) layout.findViewById(R.id.startGame);
 		createGameButton.setEnabled(false);
-		editDeckButton.setEnabled(false);
+		editDeckButton.setEnabled(true);
 
 		createGameButton.setOnClickListener(new OnClickListener() {
 
@@ -141,7 +135,7 @@ public class HomeActivity extends FragmentActivity implements GameWebClientCallb
 
 			@Override
 			public void onClick(View v) {
-				startGameActivity(game);
+				startGameActivity(gameView);
 			}
 		}
 
@@ -223,10 +217,6 @@ public class HomeActivity extends FragmentActivity implements GameWebClientCallb
 		Toast.makeText(this, str, Toast.LENGTH_LONG).show();
 	}
 
-	public void getGame(long gameId) {
-		gameWebClient.getGame(gameId);
-	}
-
 	public void onDeckSelected(long id) {
 
 		Log.i(TAG, String.format("id: %d", id));
@@ -243,11 +233,12 @@ public class HomeActivity extends FragmentActivity implements GameWebClientCallb
 	}
 
 	@Override
-	public void onGetGame(GameView game) {
-		this.game = game;
-		debugTextView.setText("onGetGame: " + game);
+	public void onGetGame(GameView gameView) {
+		this.gameView = gameView;
+		debugTextView.setText("onGetGame: " + gameView);
 	}
 
+	@Override
 	public void onGetAccount(Account account) {
 
 		this.account = account;
@@ -255,13 +246,14 @@ public class HomeActivity extends FragmentActivity implements GameWebClientCallb
 
 	}
 
-	public void onCheckGame(GameView game) {
-		this.game = game;
-		if (game.getGameState() == GameState.WAITING_FOR_JOINER) {
+	@Override
+	public void onCheckGame(GameView gameView) {
+		this.gameView = gameView;
+		if (gameView.getGameState() == GameState.WAITING_FOR_JOINER) {
 			Message message = checkGameHandler.obtainMessage();
 			checkGameHandler.sendMessage(message);
 		} else {
-			onGameJoined(game);
+			onGameJoined(gameView);
 		}
 	}
 	
@@ -271,13 +263,13 @@ public class HomeActivity extends FragmentActivity implements GameWebClientCallb
 	}
 
 	@Override
-	public void onGameJoined(GameView game) {
+	public void onGameJoined(GameView gameView) {
 
-		this.game = game;
+		this.gameView = gameView;
 
-		if (game != null) {
+		if (gameView != null) {
 
-			switch (game.getGameState()) {
+			switch (gameView.getGameState()) {
 
 			case WAITING_FOR_JOINER:
 				gameCheckerThread.setCheckActivated(true);
@@ -285,11 +277,11 @@ public class HomeActivity extends FragmentActivity implements GameWebClientCallb
 
 			case STARTED:
 				gameCheckerThread.setCheckActivated(false);
-				startGameActivity(game);
+				startGameActivity(gameView);
 				break;
 
 			default:
-				Toast.makeText(this, String.format("Unsupported game state %s for game %s", game.getGameState(), game.getId()), Toast.LENGTH_LONG).show();
+				Toast.makeText(this, String.format("Unsupported game state %s for game %s", gameView.getGameState(), gameView.getId()), Toast.LENGTH_LONG).show();
 				break;
 
 			}
@@ -328,10 +320,10 @@ public class HomeActivity extends FragmentActivity implements GameWebClientCallb
 
 	}
 
-	public void startGameActivity(GameView game) {
-		this.game = game;
+	public void startGameActivity(GameView gameView) {
+		this.gameView = gameView;
 		Intent intent = new Intent(HomeActivity.this, GameActivity.class);
-		intent.putExtra(Constants.GAME_ID, game.getId());
+		intent.putExtra(Constants.GAME_ID, gameView.getId());
 		intent.putExtra(Constants.GAME_COMMAND, "GAME_START");
 		Log.i("startGameActivity", user.getName());
 		intent.putExtra(Constants.FACEBOOK_USER_ID, user.getId());
@@ -364,23 +356,6 @@ public class HomeActivity extends FragmentActivity implements GameWebClientCallb
 				debugTextView.setText(String.format("requestCode: %s, resultCode: %s", requestCode, resultCode));
 			}
 		}
-	}
-
-	public GameView getGame() {
-		return game;
-	}
-
-	public void setGame(GameView game) {
-		this.game = game;
-	}
-
-	public boolean isHttpRequestBeingExecuted() {
-		return httpRequestBeingExecuted;
-	}
-
-	@Override
-	public void setHttpRequestBeingExecuted(boolean httpRequestBeingExecuted) {
-		this.httpRequestBeingExecuted = httpRequestBeingExecuted;
 	}
 
 }

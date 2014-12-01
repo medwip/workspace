@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v7.app.ActionBarActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
@@ -32,10 +31,10 @@ import com.facebook.Session;
 import com.guntzergames.medievalwipeout.abstracts.AbstractCard;
 import com.guntzergames.medievalwipeout.abstracts.AbstractCardList;
 import com.guntzergames.medievalwipeout.beans.Account;
+import com.guntzergames.medievalwipeout.beans.CardModel;
 import com.guntzergames.medievalwipeout.beans.GameEvent;
 import com.guntzergames.medievalwipeout.beans.GameEventPlayCard;
 import com.guntzergames.medievalwipeout.beans.GameEventPlayCard.PlayerType;
-import com.guntzergames.medievalwipeout.beans.CardModel;
 import com.guntzergames.medievalwipeout.beans.Player;
 import com.guntzergames.medievalwipeout.beans.PlayerDeckCard;
 import com.guntzergames.medievalwipeout.beans.PlayerFieldCard;
@@ -44,7 +43,6 @@ import com.guntzergames.medievalwipeout.beans.ResourceDeckCard;
 import com.guntzergames.medievalwipeout.enums.CardLocation;
 import com.guntzergames.medievalwipeout.enums.Phase;
 import com.guntzergames.medievalwipeout.interfaces.Constants;
-import com.guntzergames.medievalwipeout.interfaces.GameWebClientCallbackable;
 import com.guntzergames.medievalwipeout.layouts.CardLayout;
 import com.guntzergames.medievalwipeout.listeners.GameAnimationListener;
 import com.guntzergames.medievalwipeout.listeners.GameDragListener;
@@ -52,16 +50,15 @@ import com.guntzergames.medievalwipeout.services.MainGameCheckerThread;
 import com.guntzergames.medievalwipeout.views.GameView;
 import com.guntzergames.medievalwipeout.webclients.GameWebClient;
 
-public class GameActivity extends ActionBarActivity implements GameWebClientCallbackable {
+public class GameActivity extends ApplicationActivity {
 
 	private RelativeLayout layout = null, playerChoicesLayout;
 	private long gameId;
 	private String gameCommand;
-	private GameView game;
 	private Player player, opponent;
 	private String facebookUserId;
 	private MainGameCheckerThread mainGameCheckerThread;
-	private boolean beingModified = false, httpRequestBeingExecuted = false;;
+	private boolean beingModified = false;
 	private CardLayout cardLayoutDetail = null;
 	private CardDetailListener cardDetailListener;
 	private GameAnimationListener gameAnimationListener;
@@ -69,7 +66,6 @@ public class GameActivity extends ActionBarActivity implements GameWebClientCall
 	private int httpCallsDone = 0, httpCallsAborted = 0, touchEvents = 0;
 	private CardLayout resourceCard1Layout, resourceCard2Layout, playerDeckCard1Layout, playerDeckCard2Layout, gameEventLayout;
 	private TextView gameInfos;
-	private GameWebClient gameWebClient;
 
 	final private Handler checkGameHandler = new Handler() {
 
@@ -124,21 +120,21 @@ public class GameActivity extends ActionBarActivity implements GameWebClientCall
 
 				v.performClick();
 
-				if ((cardLayout.getCard() instanceof ResourceDeckCard) && game.getPhase() == getDuringPlayerResourceDrawPhase()) {
+				if ((cardLayout.getCard() instanceof ResourceDeckCard) && gameView.getPhase() == getDuringPlayerResourceDrawPhase()) {
 					Log.i("MainActivity", "Drag initiated during player resource draw");
 					ClipData data = ClipData.newPlainText("", "");
 					DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(cardLayout);
 					cardLayout.startDrag(data, shadowBuilder, cardLayout, 0);
 				}
 
-				if ((cardLayout.getCard() instanceof PlayerDeckCard) && game.getPhase() == getDuringPlayerDeckDrawPhase()) {
+				if ((cardLayout.getCard() instanceof PlayerDeckCard) && gameView.getPhase() == getDuringPlayerDeckDrawPhase()) {
 					Log.i("MainActivity", "Drag initiated during player deck draw");
 					ClipData data = ClipData.newPlainText("", "");
 					DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(cardLayout);
 					cardLayout.startDrag(data, shadowBuilder, cardLayout, 0);
 				}
 
-				if (cardLayout.isCalledFromHand() && (cardLayout.getCard() instanceof PlayerHandCard) && game.getPhase() == getDuringPlayerPlayPhase()
+				if (cardLayout.isCalledFromHand() && (cardLayout.getCard() instanceof PlayerHandCard) && gameView.getPhase() == getDuringPlayerPlayPhase()
 						&& ((PlayerHandCard) card).isPlayable()) {
 					Log.i("MainActivity", "Drag initiated during player play from hand");
 					ClipData data = ClipData.newPlainText("", "");
@@ -146,7 +142,7 @@ public class GameActivity extends ActionBarActivity implements GameWebClientCall
 					v.startDrag(data, shadowBuilder, v, 0);
 				}
 
-				if (!cardLayout.isCalledFromHand() && (cardLayout.getCard() instanceof PlayerFieldCard) && game.getPhase() == getDuringPlayerPlayPhase()
+				if (!cardLayout.isCalledFromHand() && (cardLayout.getCard() instanceof PlayerFieldCard) && gameView.getPhase() == getDuringPlayerPlayPhase()
 						&& !((PlayerFieldCard) card).isPlayed()) {
 					Log.i("MainActivity", "Drag initiated during player play from field");
 					ClipData data = ClipData.newPlainText("", "");
@@ -177,7 +173,7 @@ public class GameActivity extends ActionBarActivity implements GameWebClientCall
 
 	private Phase getDuringPlayerPlayPhase() {
 
-		if (game.isCreator())
+		if (gameView.isCreator())
 			return Phase.DURING_CREATOR_PLAY;
 		else
 			return Phase.DURING_JOINER_PLAY;
@@ -186,7 +182,7 @@ public class GameActivity extends ActionBarActivity implements GameWebClientCall
 
 	private Phase getDuringPlayerResourceDrawPhase() {
 
-		if (game.isCreator())
+		if (gameView.isCreator())
 			return Phase.DURING_CREATOR_RESOURCE_DRAW;
 		else
 			return Phase.DURING_JOINER_RESOURCE_DRAW;
@@ -195,7 +191,7 @@ public class GameActivity extends ActionBarActivity implements GameWebClientCall
 
 	private Phase getDuringPlayerDeckDrawPhase() {
 
-		if (game.isCreator())
+		if (gameView.isCreator())
 			return Phase.DURING_CREATOR_DECK_DRAW;
 		else
 			return Phase.DURING_JOINER_DECK_DRAW;
@@ -242,12 +238,12 @@ public class GameActivity extends ActionBarActivity implements GameWebClientCall
 		setupField(player.getPlayerHand(), "playerHand", CardLocation.HAND);
 		setupField(player.getPlayerField(), "playerField", CardLocation.FIELD);
 
-		if (game.getPhase() == getDuringPlayerResourceDrawPhase()) {
+		if (gameView.getPhase() == getDuringPlayerResourceDrawPhase()) {
 
 			playerChoicesLayout.setVisibility(View.VISIBLE);
-			resourceCard1Layout.setup(this, game.getResourceCard1(), 1, false, CardLocation.MODAL);
+			resourceCard1Layout.setup(this, gameView.getResourceCard1(), 1, false, CardLocation.MODAL);
 			resourceCard1Layout.show();
-			resourceCard2Layout.setup(this, game.getResourceCard2(), 2, false, CardLocation.MODAL);
+			resourceCard2Layout.setup(this, gameView.getResourceCard2(), 2, false, CardLocation.MODAL);
 			resourceCard2Layout.show();
 
 		} else {
@@ -257,7 +253,7 @@ public class GameActivity extends ActionBarActivity implements GameWebClientCall
 
 		}
 
-		if (game.getPhase() == getDuringPlayerDeckDrawPhase()) {
+		if (gameView.getPhase() == getDuringPlayerDeckDrawPhase()) {
 
 			playerChoicesLayout.setVisibility(View.VISIBLE);
 			playerDeckCard1Layout.setup(this, player.getPlayerDeckCard1(), 1, false, CardLocation.MODAL);
@@ -272,7 +268,7 @@ public class GameActivity extends ActionBarActivity implements GameWebClientCall
 
 		}
 
-		if (!(game.getPhase() == getDuringPlayerResourceDrawPhase() || game.getPhase() == getDuringPlayerDeckDrawPhase())) {
+		if (!(gameView.getPhase() == getDuringPlayerResourceDrawPhase() || gameView.getPhase() == getDuringPlayerDeckDrawPhase())) {
 
 			playerChoicesLayout.setVisibility(View.INVISIBLE);
 
@@ -311,7 +307,6 @@ public class GameActivity extends ActionBarActivity implements GameWebClientCall
 		super.onCreate(savedInstanceState);
 
 		Log.d("MainActivity", "onCreate");
-		gameWebClient = new GameWebClient(Constants.SERVER_IP_ADDRESS, this);
 
 		init();
 
@@ -454,14 +449,6 @@ public class GameActivity extends ActionBarActivity implements GameWebClientCall
 		this.facebookUserId = facebookUserId;
 	}
 
-	public boolean isHttpRequestBeingExecuted() {
-		return httpRequestBeingExecuted;
-	}
-
-	public void setHttpRequestBeingExecuted(boolean httpRequestBeingExecuted) {
-		this.httpRequestBeingExecuted = httpRequestBeingExecuted;
-	}
-
 	public void getGame(long gameId) {
 		gameWebClient.getGame(gameId);
 	}
@@ -578,7 +565,7 @@ public class GameActivity extends ActionBarActivity implements GameWebClientCall
 		TextView opponentFaithValue = (TextView) layout.findViewById(R.id.opponentFaithValue);
 		TextView opponentLifePointsValue = (TextView) layout.findViewById(R.id.opponentLifePointsValue);
 
-		this.game = game;
+		this.gameView = game;
 		player = game.getPlayer();
 		opponent = game.getOpponent();
 
@@ -615,18 +602,6 @@ public class GameActivity extends ActionBarActivity implements GameWebClientCall
 	@Override
 	public void onError(String err) {
 		Toast.makeText(this, String.format("Error occured: %s", err), Toast.LENGTH_LONG).show();
-	}
-
-	@Override
-	public void onCheckGame(GameView gameView) {
-	}
-
-	@Override
-	public void onGameJoined(GameView gameView) {
-	}
-
-	@Override
-	public void onGetAccount(Account account) {
 	}
 
 	public void onDeleteGame() {

@@ -7,7 +7,7 @@
     android:orientation="horizontal" >
 
     <android.support.v7.widget.GridLayout
-        android:layout_width="wrap_content"
+        android:layout_width="400dp"
         android:layout_height="wrap_content"
         app:rowCount="6"
         tools:context="com.guntzergames.medievalwipeout.activities.DeckTemplateActivity" >

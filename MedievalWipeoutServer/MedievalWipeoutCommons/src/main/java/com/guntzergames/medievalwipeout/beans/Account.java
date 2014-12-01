@@ -34,6 +34,9 @@ public class Account {
 	@OneToMany(mappedBy = "account", fetch = FetchType.EAGER)
 	private List<DeckTemplate> deckTemplates;
 
+	@OneToMany(mappedBy = "account", fetch = FetchType.EAGER)
+	private List<CollectionElement> collectionElements;
+
 	@Transient
 	private boolean botAccount = false;
 
@@ -47,6 +50,14 @@ public class Account {
 
 	public List<DeckTemplate> getDeckTemplates() {
 		return deckTemplates;
+	}
+
+	public List<CollectionElement> getCollectionElements() {
+		return collectionElements;
+	}
+
+	public void setCollectionElements(List<CollectionElement> collectionElements) {
+		this.collectionElements = collectionElements;
 	}
 
 	public void setDeckTemplates(List<DeckTemplate> deckTemplates) {

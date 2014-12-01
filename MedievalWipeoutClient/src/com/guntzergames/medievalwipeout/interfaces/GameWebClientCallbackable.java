@@ -1,6 +1,9 @@
 package com.guntzergames.medievalwipeout.interfaces;
 
+import java.util.List;
+
 import com.guntzergames.medievalwipeout.beans.Account;
+import com.guntzergames.medievalwipeout.beans.CardModel;
 import com.guntzergames.medievalwipeout.views.GameView;
 
 public interface GameWebClientCallbackable {
@@ -16,5 +19,6 @@ public interface GameWebClientCallbackable {
 	public void onDeleteGame();
 	
 	public void onGetAccount(Account account);
+	public void onGetCardModels(List<CardModel> cardModels);
 	
 }

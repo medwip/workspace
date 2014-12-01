@@ -11,6 +11,7 @@ import android.util.Log;
 
 import com.guntzergames.medievalwipeout.activities.GameActivity;
 import com.guntzergames.medievalwipeout.beans.Account;
+import com.guntzergames.medievalwipeout.beans.CardModelList;
 import com.guntzergames.medievalwipeout.interfaces.GameWebClientCallbackable;
 import com.guntzergames.medievalwipeout.services.MainGameCheckerThread;
 import com.guntzergames.medievalwipeout.views.GameView;
@@ -217,6 +218,32 @@ public class GameWebClient {
 					e.printStackTrace();
 				}
 				callbackable.onGetGame(game);
+			}
+		});
+
+	}
+
+	public void getCardModels() {
+
+		client.get("http://" + ip + ":8080/MedievalWipeout/rest/account/getCardModels", null, new AsyncHttpResponseHandler() {
+			@Override
+			public void onSuccess(String response) {
+
+				ObjectMapper mapper = new ObjectMapper();
+				CardModelList cardModelList = null;
+				try {
+					cardModelList = mapper.readValue(response, CardModelList.class);
+				} catch (JsonParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (JsonMappingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				callbackable.onGetCardModels(cardModelList.getCardModels());
 			}
 		});
 

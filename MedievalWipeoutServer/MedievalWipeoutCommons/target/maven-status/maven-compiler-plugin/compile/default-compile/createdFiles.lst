@@ -9,12 +9,13 @@ com\guntzergames\medievalwipeout\beans\DeckTemplate.class
 com\guntzergames\medievalwipeout\beans\Player.class
 com\guntzergames\medievalwipeout\beans\PlayerHandCard.class
 com\guntzergames\medievalwipeout\enums\GameEventType.class
+com\guntzergames\medievalwipeout\beans\CardModelList.class
 com\guntzergames\medievalwipeout\beans\GameEventPlayCard.class
 com\guntzergames\medievalwipeout\beans\PlayerDiscard.class
 com\guntzergames\medievalwipeout\beans\PlayerFieldCard.class
 com\guntzergames\medievalwipeout\exceptions\PlayerNotInGameException.class
-com\guntzergames\medievalwipeout\beans\CardModel.class
 com\guntzergames\medievalwipeout\enums\GameState.class
+com\guntzergames\medievalwipeout\beans\CardModel.class
 com\guntzergames\medievalwipeout\views\GameView.class
 com\guntzergames\medievalwipeout\abstracts\AbstractCard.class
 com\guntzergames\medievalwipeout\beans\PlayerField.class

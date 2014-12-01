@@ -28,7 +28,7 @@ public class HomeGameCheckerThread extends Thread {
 			}
 			
 			if ( checkActivated && !homeActivity.isHttpRequestBeingExecuted() ) {
-				gameWebClient.checkGame(homeActivity.getGame().getId());
+				gameWebClient.checkGame(homeActivity.getGameView().getId());
 			}
 			
 		}

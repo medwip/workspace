@@ -7,6 +7,7 @@ import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
 import com.guntzergames.medievalwipeout.beans.Account;
+import com.guntzergames.medievalwipeout.beans.CardModel;
 import com.guntzergames.medievalwipeout.beans.DeckTemplate;
 import com.guntzergames.medievalwipeout.beans.DeckTemplateElement;
 import com.guntzergames.medievalwipeout.beans.Player;
@@ -69,4 +70,10 @@ public class AccountManager {
 		return botAccountSingleton.getBotPlayer(i);
 	}
 
+	public List<CardModel> findAllCardModels() {
+		
+		return accountDao.findAllCardModels();
+		
+	}
+	
 }

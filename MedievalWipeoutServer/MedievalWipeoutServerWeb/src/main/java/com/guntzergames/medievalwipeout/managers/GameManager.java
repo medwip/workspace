@@ -6,12 +6,12 @@ import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
 import com.guntzergames.medievalwipeout.beans.Account;
+import com.guntzergames.medievalwipeout.beans.DeckTemplate;
 import com.guntzergames.medievalwipeout.beans.Game;
 import com.guntzergames.medievalwipeout.beans.GameEventPlayCard;
 import com.guntzergames.medievalwipeout.beans.GameEventPlayCard.PlayerType;
 import com.guntzergames.medievalwipeout.beans.Player;
 import com.guntzergames.medievalwipeout.beans.PlayerDeckCard;
-import com.guntzergames.medievalwipeout.beans.DeckTemplate;
 import com.guntzergames.medievalwipeout.beans.PlayerFieldCard;
 import com.guntzergames.medievalwipeout.beans.PlayerHand;
 import com.guntzergames.medievalwipeout.beans.PlayerHandCard;

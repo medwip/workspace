@@ -8,11 +8,18 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+
+import org.codehaus.jackson.annotate.JsonIgnore;
 
 @Entity
 @Table(name = "COLLECTION_ELEMENT")
+@NamedQueries({ @NamedQuery(name = CollectionElement.NQ_FIND_BY_ACCOUNT, query = "SELECT c FROM CollectionElement c WHERE c.account = :account") })
 public class CollectionElement {
+	
+	public static final String NQ_FIND_BY_ACCOUNT = "NQ_FIND_COLLECTION_ELEMENTS_BY_ACCOUNT";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,6 +33,11 @@ public class CollectionElement {
 	@ManyToOne(targetEntity = CardModel.class)
 	@JoinColumn(name = "CARD_MODEL_KEY")
 	private CardModel cardModel;
+	
+	@JsonIgnore
+	@ManyToOne(targetEntity = Account.class)
+	@JoinColumn(name = "ACCOUNT_KEY")
+	private Account account;
 	
 	@Column(name = "PLAYER_DECK_CARD_NAME")
 	protected String name;
@@ -69,6 +81,14 @@ public class CollectionElement {
 
 	public void setCardModel(CardModel cardModel) {
 		this.cardModel = cardModel;
+	}
+
+	public Account getAccount() {
+		return account;
+	}
+
+	public void setAccount(Account account) {
+		this.account = account;
 	}
 
 	public String getDrawableResourceName() {

@@ -2,6 +2,7 @@ package com.guntzergames.medievalwipeout.resources;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.List;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -15,6 +16,8 @@ import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import com.guntzergames.medievalwipeout.beans.Account;
+import com.guntzergames.medievalwipeout.beans.CardModel;
+import com.guntzergames.medievalwipeout.beans.CardModelList;
 import com.guntzergames.medievalwipeout.exceptions.PlayerNotInGameException;
 import com.guntzergames.medievalwipeout.managers.AccountManager;
 import com.guntzergames.medievalwipeout.managers.GameManager;
@@ -38,6 +41,35 @@ public class AccountResource {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		try {
 			mapper.writeValue(out, account);
+		} catch (JsonGenerationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		String ret = new String(out.toByteArray());
+		try {
+			out.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        return ret;
+	}
+	
+	@GET
+	@Path("getCardModels")
+    @Produces("text/plain")
+	public String getCardModels() {
+		List<CardModel> cardModels = accountManager.findAllCardModels();
+		ObjectMapper mapper = new ObjectMapper();
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		try {
+			mapper.writeValue(out, new CardModelList(cardModels));
 		} catch (JsonGenerationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
