@@ -40,8 +40,7 @@ public class DeckTemplateActivity extends ApplicationActivity {
 		homeButton = (Button) layout.findViewById(R.id.homeButton);
 		cardModelListView = (ListView) layout.findViewById(R.id.cardModelList);
 		
-		// To call getCollectionElements...
-		gameWebClient.getCardModels();
+		gameWebClient.getAccount(facebookUserId);
 
 		setContentView(layout);
 
@@ -103,6 +102,7 @@ public class DeckTemplateActivity extends ApplicationActivity {
 	@Override
 	public void onGetAccount(Account account) {
 		
+		this.account = account;
 		cardModelNames = new ArrayList<String>();
 
 		for (CollectionElement collectionElement : account.getCollectionElements()) {

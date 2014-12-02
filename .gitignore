@@ -46,11 +46,10 @@ Temporary Items
 bin
 facebook-android-sdk-3.18
 .metadata
-target
-.metadata/.log
 .metadata/.log
 .metadata/.plugins/org.eclipse.core.resources/.projects/appcompat_v7/.indexes/properties.index
 .metadata/.plugins/org.eclipse.core.resources/.root/.indexes/properties.index
 target
 target
-.metadata
+.metadata/*
+target
