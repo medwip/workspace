@@ -57,3 +57,6 @@ target
 *.index
 *.index
 *.log
+*.log
+.metadata/.plugins/org.eclipse.e4.workbench/workbench.xmi
+.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.jdt.ui.prefs
