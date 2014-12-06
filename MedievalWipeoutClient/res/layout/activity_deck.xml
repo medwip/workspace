@@ -4,14 +4,60 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal" >
+    android:orientation="horizontal"
+    tools:context="com.guntzergames.medievalwipeout.activities.DeckTemplateActivity" >
 
-    <android.support.v7.widget.GridLayout
+    <LinearLayout
         android:layout_width="400dp"
         android:layout_height="wrap_content"
-        app:rowCount="6"
-        tools:context="com.guntzergames.medievalwipeout.activities.DeckTemplateActivity" >
-    </android.support.v7.widget.GridLayout>
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <Spinner
+                android:id="@+id/deckTemplateSpinner"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <EditText
+                    android:id="@+id/newDeckLibel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="text"
+                    android:visibility="invisible" />
+
+                <Button
+                    android:id="@+id/newDeckButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/new_deck"
+                    android:text="@string/new_deck" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <android.support.v7.widget.GridLayout
+            android:id="@+id/cardGrid"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:columnCount="4"
+            app:rowCount="6" >
+
+            <com.guntzergames.medievalwipeout.layouts.CardLayout
+                android:id="@+id/card0_0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_column="0"
+                app:layout_row="0" />
+        </android.support.v7.widget.GridLayout>
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"

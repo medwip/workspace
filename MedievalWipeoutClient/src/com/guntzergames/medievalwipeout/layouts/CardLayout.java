@@ -109,11 +109,11 @@ public class CardLayout extends RelativeLayout {
 
 			if ( detailShown ) {
 				try {
-					image.setImageDrawable(getResources().getDrawable(getResourceFromName(playerDeckCard.getDrawableResourceName() + "_large")));
+					image.setImageDrawable(getResources().getDrawable(getResourceFromName("card_" + playerDeckCard.getDrawableResourceName() + "_large")));
 				} catch (Exception e) {
 					Log.i("CardLayout", "Large image not found");
 					try {
-						image.setImageDrawable(getResources().getDrawable(getResourceFromName(playerDeckCard.getDrawableResourceName())));
+						image.setImageDrawable(getResources().getDrawable(getResourceFromName(("card_" + playerDeckCard.getDrawableResourceName()))));
 					} catch (Exception e2) {
 						e2.printStackTrace();
 						image.setImageDrawable(getResources().getDrawable(R.drawable.card_unknown));
@@ -122,7 +122,7 @@ public class CardLayout extends RelativeLayout {
 			}
 			else {
 				try {
-					image.setImageDrawable(getResources().getDrawable(getResourceFromName(playerDeckCard.getDrawableResourceName())));
+					image.setImageDrawable(getResources().getDrawable(getResourceFromName("card_" + playerDeckCard.getDrawableResourceName())));
 				} catch (Exception e) {
 					e.printStackTrace();
 					image.setImageDrawable(getResources().getDrawable(R.drawable.card_unknown));

@@ -53,3 +53,7 @@ target
 target
 .metadata/*
 target
+.metadata/.log
+*.index
+*.index
+*.log

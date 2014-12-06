@@ -3,29 +3,43 @@ package com.guntzergames.medievalwipeout.activities;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayout;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.guntzergames.medievalwipeout.adapters.CollectionElementAdapter;
 import com.guntzergames.medievalwipeout.beans.Account;
-import com.guntzergames.medievalwipeout.beans.CardModel;
 import com.guntzergames.medievalwipeout.beans.CollectionElement;
+import com.guntzergames.medievalwipeout.beans.DeckTemplate;
+import com.guntzergames.medievalwipeout.beans.DeckTemplateElement;
+import com.guntzergames.medievalwipeout.enums.CardLocation;
 import com.guntzergames.medievalwipeout.interfaces.Constants;
+import com.guntzergames.medievalwipeout.layouts.CardLayout;
 
 public class DeckTemplateActivity extends ApplicationActivity {
 
 	private long deckTemplateId;
 	private String facebookUserId;
 	private LinearLayout layout;
-	private Button homeButton;
+	private Button homeButton, newDeckButton;
+	private EditText newDeckLibelEditText;
 	private ListView cardModelListView;
-	private List<String> cardModelNames;
+	private Spinner deckTemplateSpinner;
+	private GridLayout cardGridView;
+	private List<CollectionElement> collectionElements;
+	private DeckTemplate selectedDeckTemplate;
 	private Account account;
 
 	private void init() {
@@ -38,12 +52,18 @@ public class DeckTemplateActivity extends ApplicationActivity {
 		layout = (LinearLayout) LinearLayout.inflate(this, R.layout.activity_deck, null);
 
 		homeButton = (Button) layout.findViewById(R.id.homeButton);
+		newDeckButton = (Button) layout.findViewById(R.id.newDeckButton);
 		cardModelListView = (ListView) layout.findViewById(R.id.cardModelList);
+		deckTemplateSpinner = (Spinner) layout.findViewById(R.id.deckTemplateSpinner);
+		cardGridView = (GridLayout) layout.findViewById(R.id.cardGrid);
+		newDeckLibelEditText = (EditText) layout.findViewById(R.id.newDeckLibel);
 		
-		gameWebClient.getAccount(facebookUserId);
-
 		setContentView(layout);
 
+	}
+	
+	public Activity getActivity() {
+		return this;
 	}
 
 	public void returnHome() {
@@ -56,7 +76,9 @@ public class DeckTemplateActivity extends ApplicationActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
+		
 		init();
+
 		homeButton.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -64,21 +86,78 @@ public class DeckTemplateActivity extends ApplicationActivity {
 				returnHome();
 			}
 		});
+		
+		newDeckButton.setOnClickListener(new OnClickListener() {
 
+			@Override
+			public void onClick(View v) {
+				createNewDeck();
+			}
+		});
+
+		deckTemplateSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+			
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+				selectedDeckTemplate = account.getDeckTemplates().get(position);
+				Toast.makeText(getActivity(), "Click on ID " + selectedDeckTemplate.getId(), Toast.LENGTH_LONG).show();
+				updateDeckTemplateListElements();
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parent) {
+				
+			}
+			
+		});
+
+		gameWebClient.getAccount(facebookUserId);
+
+	}
+
+	private void updateDeckTemplateListView() {
+
+		List<String> elems = new ArrayList<String>();
+		for (DeckTemplate deckTemplate : account.getDeckTemplates()) {
+			elems.add(deckTemplate.getDeckLibel());
+		}
+
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, elems);
+		deckTemplateSpinner.setAdapter(adapter);
+		
+	}
+	
+	private void updateDeckTemplateListElements() {
+		
+		for ( DeckTemplateElement deckTemplateElement : selectedDeckTemplate.getCards() ) {
+			
+			CardLayout cardLayout = (CardLayout) layout.findViewById(R.id.card0_0);
+			cardLayout.init(this, deckTemplateElement.toPlayerDeckCard(), 0, false, CardLocation.FIELD);
+//			cardGridView.addView(cardLayout, new GridLayout.LayoutParams(
+//                    GridLayout.spec(1, GridLayout.CENTER),
+//                    GridLayout.spec(1, GridLayout.CENTER)));
+			Toast.makeText(getActivity(), "deckTemplateElement " + deckTemplateElement, Toast.LENGTH_LONG).show();
+			
+		}
+		
 	}
 
 	private void updateCardModelListView() {
 
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-				this, android.R.layout.simple_list_item_1, cardModelNames);
+		CollectionElementAdapter adapter = new CollectionElementAdapter(this, collectionElements, this.getResources());
 		cardModelListView.setAdapter(adapter);
 
+	}
+	
+	private void createNewDeck() {
+		
+		newDeckLibelEditText.setVisibility(View.VISIBLE);
+		
 	}
 
 	@Override
 	public void onError(String err) {
-		// TODO Auto-generated method stub
-
+		super.onError(err);
 	}
 
 	@Override
@@ -87,30 +166,14 @@ public class DeckTemplateActivity extends ApplicationActivity {
 	}
 
 	@Override
-	public void onGetCardModels(List<CardModel> cardModels) {
-
-		cardModelNames = new ArrayList<String>();
-
-		for (CardModel cardModel : cardModels) {
-			cardModelNames.add(cardModel.getName());
-		}
-		
-		updateCardModelListView();
-
-	}
-
-	@Override
 	public void onGetAccount(Account account) {
-		
-		this.account = account;
-		cardModelNames = new ArrayList<String>();
 
-		for (CollectionElement collectionElement : account.getCollectionElements()) {
-			cardModelNames.add(collectionElement.getName());
-		}
-		
+		this.account = account;
+		collectionElements = account.getCollectionElements();
+
 		updateCardModelListView();
-		
+		updateDeckTemplateListView();
+
 	}
-	
+
 }
