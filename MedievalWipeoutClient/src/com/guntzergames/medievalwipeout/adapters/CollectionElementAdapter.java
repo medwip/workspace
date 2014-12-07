@@ -6,10 +6,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.Resources.NotFoundException;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
@@ -19,14 +17,13 @@ import com.guntzergames.medievalwipeout.activities.R;
 import com.guntzergames.medievalwipeout.beans.CollectionElement;
 import com.guntzergames.medievalwipeout.layouts.CardLayout;
 
-public class CollectionElementAdapter extends BaseAdapter implements OnClickListener {
+public class CollectionElementAdapter extends BaseAdapter {
 
 	private static LayoutInflater inflater;
 
 	private Activity activity;
-	private List<CollectionElement> data;
+	private List<CollectionElement> collectionElements;
 	public Resources res;
-	private CollectionElement tempValues;
 	int i = 0;
 
 	public static class ViewHolder {
@@ -40,7 +37,7 @@ public class CollectionElementAdapter extends BaseAdapter implements OnClickList
 	public CollectionElementAdapter(Activity a, List<CollectionElement> d, Resources resLocal) {
 
 		activity = a;
-		data = d;
+		collectionElements = d;
 		res = resLocal;
 
 		inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -49,9 +46,9 @@ public class CollectionElementAdapter extends BaseAdapter implements OnClickList
 
 	public int getCount() {
 
-		if (data.size() <= 0)
+		if (collectionElements.size() <= 0)
 			return 1;
-		return data.size();
+		return collectionElements.size();
 	}
 
 	public Object getItem(int position) {
@@ -62,7 +59,6 @@ public class CollectionElementAdapter extends BaseAdapter implements OnClickList
 		return position;
 	}
 
-	/****** Depends upon data size called for each row , Create each ListView row *****/
 	public View getView(int position, View convertView, ViewGroup parent) {
 
 		View vi = convertView;
@@ -85,20 +81,19 @@ public class CollectionElementAdapter extends BaseAdapter implements OnClickList
 		} else
 			holder = (ViewHolder) vi.getTag();
 
-		if (data.size() <= 0) {
+		if (collectionElements.size() <= 0) {
 			holder.text.setText("No Data");
 
 		} else {
-			/***** Get each Model object from Arraylist ********/
-			tempValues = null;
-			tempValues = (CollectionElement) data.get(position);
+			CollectionElement collectionElement = null;
+			collectionElement = (CollectionElement) collectionElements.get(position);
 
 			/************ Set Model values in Holder elements ***********/
 
-			holder.text.setText(tempValues.getName());
-			holder.text1.setText(tempValues.getAttack() + "");
+			holder.text.setText(collectionElement.getName());
+			holder.text1.setText(collectionElement.getAttack() + "");
 			try {
-				holder.image.setImageDrawable(res.getDrawable(CardLayout.getResourceFromName("card_" + tempValues.getDrawableResourceName())));
+				holder.image.setImageDrawable(res.getDrawable(CardLayout.getResourceFromName("card_" + collectionElement.getDrawableResourceName())));
 			} catch (NotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -111,37 +106,11 @@ public class CollectionElementAdapter extends BaseAdapter implements OnClickList
 			} catch (IllegalArgumentException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}  // res.getIdentifier("com.androidexample.customlistview:drawable/" + tempValues.getImage(), null, null));
+			} // res.getIdentifier("com.androidexample.customlistview:drawable/"
+				// + tempValues.getImage(), null, null));
 
-			vi.setOnClickListener(new OnItemClickListener(position));
 		}
 		return vi;
 	}
 
-	@Override
-	public void onClick(View v) {
-		Log.v("CustomAdapter", "=====Row button clicked=====");
-	}
-
-	/********* Called when Item click in ListView ************/
-	private class OnItemClickListener implements OnClickListener {
-		private int mPosition;
-
-		OnItemClickListener(int position) {
-			mPosition = position;
-		}
-
-		@Override
-		public void onClick(View arg0) {
-
-//			CustomListViewAndroidExample sct = (CustomListViewAndroidExample) activity;
-
-			/****
-			 * Call onItemClick Method inside CustomListViewAndroidExample Class
-			 * ( See Below )
-			 ****/
-
-//			sct.onItemClick(mPosition);
-		}
-	}
 }

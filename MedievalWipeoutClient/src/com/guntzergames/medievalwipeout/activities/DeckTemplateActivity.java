@@ -7,9 +7,11 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayout;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -110,6 +112,15 @@ public class DeckTemplateActivity extends ApplicationActivity {
 			}
 			
 		});
+		
+		cardModelListView.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				gameWebClient.addDeckTemplateElement(selectedDeckTemplate.getId(), collectionElements.get(position).getId());
+			}
+			
+		});
 
 		gameWebClient.getAccount(facebookUserId);
 
@@ -129,10 +140,13 @@ public class DeckTemplateActivity extends ApplicationActivity {
 	
 	private void updateDeckTemplateListElements() {
 		
+		int i = 0;
+		
 		for ( DeckTemplateElement deckTemplateElement : selectedDeckTemplate.getCards() ) {
 			
-			CardLayout cardLayout = (CardLayout) layout.findViewById(R.id.card0_0);
-			cardLayout.init(this, deckTemplateElement.toPlayerDeckCard(), 0, false, CardLocation.FIELD);
+			CardLayout cardLayout = (CardLayout) layout.findViewById(CardLayout.getGridCardFromId(i++));
+			cardLayout.reset();
+			cardLayout.init(this, deckTemplateElement, 0, false, CardLocation.GRID);
 //			cardGridView.addView(cardLayout, new GridLayout.LayoutParams(
 //                    GridLayout.spec(1, GridLayout.CENTER),
 //                    GridLayout.spec(1, GridLayout.CENTER)));
@@ -144,6 +158,7 @@ public class DeckTemplateActivity extends ApplicationActivity {
 
 	private void updateCardModelListView() {
 
+		Log.i("DeckTemplateActivity", String.format("Number of elements: %s", collectionElements.size()));
 		CollectionElementAdapter adapter = new CollectionElementAdapter(this, collectionElements, this.getResources());
 		cardModelListView.setAdapter(adapter);
 
@@ -170,6 +185,7 @@ public class DeckTemplateActivity extends ApplicationActivity {
 
 		this.account = account;
 		collectionElements = account.getCollectionElements();
+		Log.i("DeckTemplateActivity", String.format("1 - Number of elements: %s", collectionElements.size()));
 
 		updateCardModelListView();
 		updateDeckTemplateListView();

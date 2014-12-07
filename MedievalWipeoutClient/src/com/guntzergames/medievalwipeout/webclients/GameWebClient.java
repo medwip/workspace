@@ -148,6 +148,49 @@ public class GameWebClient {
 
 	}
 
+	public void addDeckTemplateElement(long deckTemplateId, long collectionElementId) {
+		
+		if ( callbackable.getFacebookUserId() != null ) {
+			
+			client.get("http://" + ip + ":8080/MedievalWipeout/rest/account/addDeckTemplateElement/"
+			+ callbackable.getFacebookUserId() + "/" + deckTemplateId + "/" + collectionElementId,
+			null, new AsyncHttpResponseHandler() {
+				
+				@Override
+				public void onFinish() {
+					super.onFinish();
+					callbackable.setHttpRequestBeingExecuted(false);
+				}
+
+				@Override
+				public void onStart() {
+					super.onStart();
+					callbackable.setHttpRequestBeingExecuted(true);
+				}
+
+				@Override
+				public void onSuccess(String response) {
+					ObjectMapper mapper = new ObjectMapper();
+					Account account = null;
+					try {
+						account = mapper.readValue(response, Account.class);
+					} catch (JsonParseException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (JsonMappingException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					callbackable.onGetAccount(account);
+				}
+			});
+		}
+		
+	}
+
 	public void nextPhase(long gameId) {
 
 		client.get("http://" + ip + ":8080/MedievalWipeout/rest/game/nextPhase/" + gameId + "/" + callbackable.getFacebookUserId(), null, new AsyncHttpResponseHandler() {
@@ -276,30 +319,5 @@ public class GameWebClient {
 		}
 		
 	}
-/*
-	public void getGame(long gameId) {
-
-		client.get("http://" + ip + ":8080/MedievalWipeout/rest/game/get/" + gameId + "/" + callbackable.getFacebookUserId(), null, new AsyncHttpResponseHandler() {
-			@Override
-			public void onSuccess(String response) {
-
-				ObjectMapper mapper = new ObjectMapper();
-				GameView game = null;
-				try {
-					game = mapper.readValue(response, GameView.class);
-				} catch (JsonParseException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (JsonMappingException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				callbackable.onGetGame(game);
-			}
-		});
-	}
-*/
+	
 }

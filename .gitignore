@@ -42,21 +42,18 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-.metadata
 bin
 facebook-android-sdk-3.18
-.metadata
+.metadata/*
 .metadata/.log
 .metadata/.plugins/org.eclipse.core.resources/.projects/appcompat_v7/.indexes/properties.index
 .metadata/.plugins/org.eclipse.core.resources/.root/.indexes/properties.index
 target
 target
-.metadata/*
+.metadata/**/*
 target
 .metadata/.log
 *.index
-*.index
-*.log
 *.log
 .metadata/.plugins/org.eclipse.e4.workbench/workbench.xmi
 .metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.jdt.ui.prefs

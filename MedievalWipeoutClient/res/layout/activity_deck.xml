@@ -56,6 +56,13 @@
                 android:layout_height="wrap_content"
                 app:layout_column="0"
                 app:layout_row="0" />
+
+            <com.guntzergames.medievalwipeout.layouts.CardLayout
+                android:id="@+id/card0_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_column="1"
+                app:layout_row="0" />
         </android.support.v7.widget.GridLayout>
     </LinearLayout>
 

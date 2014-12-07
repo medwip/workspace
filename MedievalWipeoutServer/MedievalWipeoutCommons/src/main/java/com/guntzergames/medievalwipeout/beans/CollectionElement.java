@@ -25,7 +25,7 @@ public class CollectionElement {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)
 	@Column(name = "ID")
-	private int id;
+	private long id;
 	
 	@Column(name = "DRAWABLE_RESOURCE_NAME")
 	protected String drawableResourceName;
@@ -67,11 +67,11 @@ public class CollectionElement {
 		this.faithCost = model.getFaithCost();
 	}
 	
-	public int getId() {
+	public long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 

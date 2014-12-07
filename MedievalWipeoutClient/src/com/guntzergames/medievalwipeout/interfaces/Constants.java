@@ -20,6 +20,7 @@ public interface Constants {
 	public static final int CARD_LAYOUT_CARD_NAME_ID = 2;
 	public static final int CARD_LAYOUT_ATTACK_ID = 3;
 	public static final int CARD_LAYOUT_LIFE_POINTS_ID = 4;
+	public static final int CARD_LAYOUT_NUMBER_OF_CARDS_ID = 6;
 	
 	public static final int CARD_LAYOUT_ANIMATION_ID = 5;
 

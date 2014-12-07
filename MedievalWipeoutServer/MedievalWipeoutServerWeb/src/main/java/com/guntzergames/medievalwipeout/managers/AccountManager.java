@@ -8,6 +8,7 @@ import javax.ejb.Stateless;
 
 import com.guntzergames.medievalwipeout.beans.Account;
 import com.guntzergames.medievalwipeout.beans.CardModel;
+import com.guntzergames.medievalwipeout.beans.CollectionElement;
 import com.guntzergames.medievalwipeout.beans.DeckTemplate;
 import com.guntzergames.medievalwipeout.beans.DeckTemplateElement;
 import com.guntzergames.medievalwipeout.beans.Player;
@@ -66,14 +67,24 @@ public class AccountManager {
 		return account;
 	}
 	
+	public void addDeckTemplateElement(CollectionElement collectionElement, DeckTemplate deckTemplate) {
+		accountDao.addDeckTemplateElement(collectionElement, deckTemplate);
+	}
+	
 	public Player getBotPlayer(long i) {
 		return botAccountSingleton.getBotPlayer(i);
 	}
 
 	public List<CardModel> findAllCardModels() {
-		
 		return accountDao.findAllCardModels();
-		
+	}
+	
+	public DeckTemplate findDeckTemplateById(long id) {
+		return accountDao.findDeckTemplateById(id);
+	}
+	
+	public CollectionElement findCollectionElementById(long id) {
+		return accountDao.findCollectionElementById(id);
 	}
 	
 }

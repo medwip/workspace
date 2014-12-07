@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.guntzergames.medievalwipeout.abstracts.AbstractCard;
 import com.guntzergames.medievalwipeout.activities.R;
+import com.guntzergames.medievalwipeout.beans.DeckTemplateElement;
 import com.guntzergames.medievalwipeout.beans.PlayerDeckCard;
 import com.guntzergames.medievalwipeout.beans.PlayerFieldCard;
 import com.guntzergames.medievalwipeout.beans.PlayerHandCard;
@@ -27,7 +28,7 @@ public class CardLayout extends RelativeLayout {
 	private boolean calledFromHand = false;
 	private int seqNum;
 	private CardLocation cardLocation;
-	private TextView cardNameInHand, cardAttackTextView, cardLifePointsTextView, resourceCardTextView;
+	private TextView cardNameInHand, cardAttackTextView, cardLifePointsTextView, resourceCardTextView, numberOfCardsTextView;
 	
 	private ImageView image;
 
@@ -96,9 +97,26 @@ public class CardLayout extends RelativeLayout {
 		}
 		return 0;
 	}
+	
+	public static int getGridCardFromId(int id) {
+		int columnCount = 4;
+		Class<R.id> idClass = R.id.class;
+		Field field;
+		try {
+			field = idClass.getField(String.format("card%s_%s", id / columnCount, id % columnCount));
+			return field.getInt(null);
+		} catch (NoSuchFieldException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
 
 	public void reset() {
-//		this.removeAllViews();
+		this.removeAllViews();
 	}
 	
 	public void setup() {
@@ -135,6 +153,61 @@ public class CardLayout extends RelativeLayout {
 			Log.d("CardLayout", String.format("detailShown: %s", detailShown));
 			if (detailShown) {
 				cardLifePointsTextView.setText(String.format("%s", playerDeckCard.getLifePoints()));
+			}
+			if ( card instanceof PlayerFieldCard && !detailShown ) {
+				PlayerFieldCard playerFieldCard = (PlayerFieldCard)card;
+				if ( !playerFieldCard.isPlayed() ) {
+					this.setBackgroundDrawable(getResources().getDrawable(R.drawable.card_border_highlight));
+				}
+				else {
+					this.setBackgroundDrawable(getResources().getDrawable(R.drawable.card_border));
+				}
+			}
+			if ( card instanceof PlayerHandCard && !detailShown ) {
+				PlayerHandCard playerHandCard = (PlayerHandCard)card;
+				if ( playerHandCard.isPlayable() ) {
+					this.setBackgroundDrawable(getResources().getDrawable(R.drawable.card_border_highlight));
+				}
+				else {
+					this.setBackgroundDrawable(getResources().getDrawable(R.drawable.card_border));
+				}
+			}
+			
+		}
+		
+		if (card instanceof DeckTemplateElement) {
+			
+			DeckTemplateElement deckTemplateElement = (DeckTemplateElement)card;
+
+			if ( detailShown ) {
+				try {
+					image.setImageDrawable(getResources().getDrawable(getResourceFromName("card_" + deckTemplateElement.getDrawableResourceName() + "_large")));
+				} catch (Exception e) {
+					Log.i("CardLayout", "Large image not found");
+					try {
+						image.setImageDrawable(getResources().getDrawable(getResourceFromName(("card_" + deckTemplateElement.getDrawableResourceName()))));
+					} catch (Exception e2) {
+						e2.printStackTrace();
+						image.setImageDrawable(getResources().getDrawable(R.drawable.card_unknown));
+					}
+				}
+			}
+			else {
+				try {
+					image.setImageDrawable(getResources().getDrawable(getResourceFromName("card_" + deckTemplateElement.getDrawableResourceName())));
+				} catch (Exception e) {
+					e.printStackTrace();
+					image.setImageDrawable(getResources().getDrawable(R.drawable.card_unknown));
+				}
+			}
+			
+			cardNameInHand.setText(String.format("[%d] %s", seqNum, deckTemplateElement.getName()));
+			cardAttackTextView.setText(String.format("%s", deckTemplateElement.getAttack()));
+			numberOfCardsTextView.setText(String.format("%s", deckTemplateElement.getNumberOfCards()));
+			
+			Log.d("CardLayout", String.format("detailShown: %s", detailShown));
+			if (detailShown) {
+				cardLifePointsTextView.setText(String.format("%s", deckTemplateElement.getLifePoints()));
 			}
 			if ( card instanceof PlayerFieldCard && !detailShown ) {
 				PlayerFieldCard playerFieldCard = (PlayerFieldCard)card;
@@ -199,6 +272,7 @@ public class CardLayout extends RelativeLayout {
 		cardNameInHand = new TextView(context);
 		cardAttackTextView = new TextView(context);
 		cardLifePointsTextView = new TextView(context);
+		numberOfCardsTextView = new TextView(context);
 
 		if (card instanceof PlayerDeckCard) {
 			
@@ -221,6 +295,47 @@ public class CardLayout extends RelativeLayout {
 			layoutParams.addRule(RelativeLayout.BELOW, Constants.CARD_LAYOUT_CARD_NAME_ID);
 			cardAttackTextView.setLayoutParams(layoutParams);
 			this.addView(cardAttackTextView);
+			
+			if (detailShown) {
+				cardLifePointsTextView.setTextAppearance(context, R.style.CardStyle_LifePoints);
+				cardLifePointsTextView.setId(Constants.CARD_LAYOUT_LIFE_POINTS_ID);
+				layoutParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+				layoutParams.addRule(RelativeLayout.BELOW, Constants.CARD_LAYOUT_CARD_NAME_ID);
+				layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+				cardLifePointsTextView.setLayoutParams(layoutParams);
+				this.addView(cardLifePointsTextView);
+			}
+			
+		}
+		
+		if (card instanceof DeckTemplateElement) {
+			
+			LayoutParams layoutParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+			image.setLayoutParams(layoutParams);
+			image.setId(Constants.CARD_LAYOUT_IMAGE_ID);
+			this.addView(image);
+			
+			cardNameInHand.setTextAppearance(context, R.style.CardStyle);
+			cardNameInHand.setId(Constants.CARD_LAYOUT_CARD_NAME_ID);
+			layoutParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+			layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
+			layoutParams.addRule(RelativeLayout.BELOW, Constants.CARD_LAYOUT_IMAGE_ID);
+			cardNameInHand.setLayoutParams(layoutParams);
+			this.addView(cardNameInHand);
+			
+			cardAttackTextView.setTextAppearance(context, R.style.CardStyle_Attack);
+			cardAttackTextView.setId(Constants.CARD_LAYOUT_ATTACK_ID);
+			layoutParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+			layoutParams.addRule(RelativeLayout.BELOW, Constants.CARD_LAYOUT_CARD_NAME_ID);
+			cardAttackTextView.setLayoutParams(layoutParams);
+			this.addView(cardAttackTextView);
+			
+			numberOfCardsTextView.setTextAppearance(context, R.style.CardStyle_Attack);
+			numberOfCardsTextView.setId(Constants.CARD_LAYOUT_NUMBER_OF_CARDS_ID);
+			layoutParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+			layoutParams.addRule(RelativeLayout.BELOW, Constants.CARD_LAYOUT_ATTACK_ID);
+			numberOfCardsTextView.setLayoutParams(layoutParams);
+			this.addView(numberOfCardsTextView);
 			
 			if (detailShown) {
 				cardLifePointsTextView.setTextAppearance(context, R.style.CardStyle_LifePoints);
