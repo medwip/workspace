@@ -6,5 +6,6 @@
     <dimen name="cardHeight">120dp</dimen>
     <dimen name="cardDetailWidth">160dp</dimen>
     <dimen name="cardDetailHeight">240dp</dimen>
+    <dimen name="collectionElementRowText">16sp</dimen>
     
 </resources>

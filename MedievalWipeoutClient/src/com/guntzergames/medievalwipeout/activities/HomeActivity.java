@@ -301,6 +301,7 @@ public class HomeActivity extends ApplicationActivity {
 
 		List<HashMap<String, String>> listElements = new ArrayList<HashMap<String, String>>();
 		deckTemplates = account.getDeckTemplates();
+		if ( deckTemplates == null ) deckTemplates = new ArrayList<DeckTemplate>();
 
 		HashMap<String, String> element;
 

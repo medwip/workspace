@@ -16,10 +16,14 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 
 @Entity
 @Table(name = "COLLECTION_ELEMENT")
-@NamedQueries({ @NamedQuery(name = CollectionElement.NQ_FIND_BY_ACCOUNT, query = "SELECT c FROM CollectionElement c WHERE c.account = :account") })
+@NamedQueries({ 
+	@NamedQuery(name = CollectionElement.NQ_FIND_BY_ACCOUNT, query = "SELECT c FROM CollectionElement c WHERE c.account = :account"),
+	@NamedQuery(name = CollectionElement.NQ_FIND_BY_ACCOUNT_AND_CARD_MODEL, query = "SELECT c FROM CollectionElement c WHERE c.account = :account AND c.cardModel = :cardModel")	
+})
 public class CollectionElement {
 	
 	public static final String NQ_FIND_BY_ACCOUNT = "NQ_FIND_COLLECTION_ELEMENTS_BY_ACCOUNT";
+	public static final String NQ_FIND_BY_ACCOUNT_AND_CARD_MODEL = "NQ_FIND_COLLECTION_ELEMENTS_BY_ACCOUNT_AND_CARD_MODEL";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -54,6 +58,9 @@ public class CollectionElement {
 	@Column(name = "FAITH_COST")
 	protected int faithCost;
 	
+	@Column(name = "NUMBER_OF_CARDS")
+	private int numberOfCards;
+	
 	public CollectionElement() {
 
 	}
@@ -65,6 +72,7 @@ public class CollectionElement {
 		this.name = model.getName();
 		this.goldCost = model.getGoldCost();
 		this.faithCost = model.getFaithCost();
+		this.cardModel = model;
 	}
 	
 	public long getId() {
@@ -137,6 +145,18 @@ public class CollectionElement {
 
 	public void setFaithCost(int faithCost) {
 		this.faithCost = faithCost;
+	}
+
+	public int getNumberOfCards() {
+		return numberOfCards;
+	}
+
+	public void setNumberOfCards(int numberOfCards) {
+		this.numberOfCards = numberOfCards;
+	}
+	
+	public void incrementNumberOfCards() {
+		numberOfCards++;
 	}
 
 	@Override

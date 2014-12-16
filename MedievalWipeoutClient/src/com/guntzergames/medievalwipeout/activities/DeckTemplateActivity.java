@@ -102,7 +102,7 @@ public class DeckTemplateActivity extends ApplicationActivity {
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 				selectedDeckTemplate = account.getDeckTemplates().get(position);
-				Toast.makeText(getActivity(), "Click on ID " + selectedDeckTemplate.getId(), Toast.LENGTH_LONG).show();
+//				Toast.makeText(getActivity(), "Click on ID " + selectedDeckTemplate.getId(), Toast.LENGTH_LONG).show();
 				updateDeckTemplateListElements();
 			}
 
@@ -117,7 +117,12 @@ public class DeckTemplateActivity extends ApplicationActivity {
 
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				gameWebClient.addDeckTemplateElement(selectedDeckTemplate.getId(), collectionElements.get(position).getId());
+				if ( !isHttpRequestBeingExecuted() ) {
+					gameWebClient.addDeckTemplateElement(selectedDeckTemplate.getId(), collectionElements.get(position).getId());
+				}
+				else {
+					Toast.makeText(getActivity(), "HTTP being executed...", Toast.LENGTH_SHORT).show();
+				}
 			}
 			
 		});
@@ -140,17 +145,23 @@ public class DeckTemplateActivity extends ApplicationActivity {
 	
 	private void updateDeckTemplateListElements() {
 		
+		for ( int i = 0; i < 8; i++ ) {
+			
+			CardLayout cardLayout = (CardLayout) layout.findViewById(CardLayout.getGridCardFromId(i++));
+			cardLayout.reset();
+			
+		}
+		
 		int i = 0;
 		
 		for ( DeckTemplateElement deckTemplateElement : selectedDeckTemplate.getCards() ) {
 			
 			CardLayout cardLayout = (CardLayout) layout.findViewById(CardLayout.getGridCardFromId(i++));
-			cardLayout.reset();
 			cardLayout.init(this, deckTemplateElement, 0, false, CardLocation.GRID);
 //			cardGridView.addView(cardLayout, new GridLayout.LayoutParams(
 //                    GridLayout.spec(1, GridLayout.CENTER),
 //                    GridLayout.spec(1, GridLayout.CENTER)));
-			Toast.makeText(getActivity(), "deckTemplateElement " + deckTemplateElement, Toast.LENGTH_LONG).show();
+//			Toast.makeText(getActivity(), "deckTemplateElement " + deckTemplateElement, Toast.LENGTH_LONG).show();
 			
 		}
 		

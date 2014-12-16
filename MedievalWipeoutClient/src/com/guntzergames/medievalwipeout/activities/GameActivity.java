@@ -234,9 +234,9 @@ public class GameActivity extends ApplicationActivity {
 		
 		player.updatePlayableHandCards();
 
-		setupField(opponent.getPlayerField(), "opponentField", CardLocation.FIELD);
+		setupField(opponent.getPlayerField(), "opponentField", CardLocation.FIELD_ATTACK);
 		setupField(player.getPlayerHand(), "playerHand", CardLocation.HAND);
-		setupField(player.getPlayerField(), "playerField", CardLocation.FIELD);
+		setupField(player.getPlayerField(), "playerField", CardLocation.FIELD_ATTACK);
 
 		if (gameView.getPhase() == getDuringPlayerResourceDrawPhase()) {
 
@@ -329,7 +329,7 @@ public class GameActivity extends ApplicationActivity {
 
 			CardLayout opponentCardInFieldLayout = (CardLayout) layout.findViewById(CardLayout.getCardFromId("opponentField", num));
 			opponentCardInFieldLayout.setOnTouchListener(cardDetailListener);
-			opponentCardInFieldLayout.init(this, new PlayerDeckCard(CardModel.DEFAULT_CARD), 0, false, CardLocation.FIELD);
+			opponentCardInFieldLayout.init(this, new PlayerDeckCard(CardModel.DEFAULT_CARD), 0, false, CardLocation.FIELD_ATTACK);
 			opponentCardInFieldLayout.hide();
 			CardLayout cardInHandLayout = (CardLayout) layout.findViewById(CardLayout.getCardFromId("playerHand", num));
 			cardInHandLayout.setCalledFromHand(true);
@@ -338,7 +338,7 @@ public class GameActivity extends ApplicationActivity {
 			cardInHandLayout.setOnTouchListener(cardDetailListener);
 			CardLayout cardInFieldLayout = (CardLayout) layout.findViewById(CardLayout.getCardFromId("playerField", num));
 			cardInFieldLayout.setOnTouchListener(cardDetailListener);
-			cardInFieldLayout.init(this, new PlayerDeckCard(CardModel.DEFAULT_CARD), 0, false, CardLocation.FIELD);
+			cardInFieldLayout.init(this, new PlayerDeckCard(CardModel.DEFAULT_CARD), 0, false, CardLocation.FIELD_ATTACK);
 			cardInFieldLayout.hide();
 		}
 

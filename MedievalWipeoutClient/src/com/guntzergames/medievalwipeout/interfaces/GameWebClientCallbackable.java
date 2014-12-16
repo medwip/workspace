@@ -9,6 +9,7 @@ import com.guntzergames.medievalwipeout.views.GameView;
 public interface GameWebClientCallbackable {
 
 	public void onError(String err);
+	public boolean isHttpRequestBeingExecuted();
 	public void setHttpRequestBeingExecuted(boolean httpRequestBeingExecuted);
 	
 	public String getFacebookUserId();

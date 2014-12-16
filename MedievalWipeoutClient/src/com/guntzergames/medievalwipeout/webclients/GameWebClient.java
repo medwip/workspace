@@ -150,7 +150,7 @@ public class GameWebClient {
 
 	public void addDeckTemplateElement(long deckTemplateId, long collectionElementId) {
 		
-		if ( callbackable.getFacebookUserId() != null ) {
+		if ( callbackable.getFacebookUserId() != null && !callbackable.isHttpRequestBeingExecuted() ) {
 			
 			client.get("http://" + ip + ":8080/MedievalWipeout/rest/account/addDeckTemplateElement/"
 			+ callbackable.getFacebookUserId() + "/" + deckTemplateId + "/" + collectionElementId,

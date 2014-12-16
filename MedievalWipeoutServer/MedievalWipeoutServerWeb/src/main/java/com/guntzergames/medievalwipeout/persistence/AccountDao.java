@@ -29,26 +29,47 @@ public class AccountDao {
 
 	}
 
-	public void addAccount(Account account) {
+	public Account mergeAccount(Account account) {
 
 		System.out.println("Account: " + account);
 		if (!account.isBotAccount()) {
 			System.out.println("Persisting new account: " + account);
 			account = em.merge(account);
+			System.out.println("After persisting new account: " + account);
 		}
+		
+		return account;
 
 	}
 	
 	public void mergeDeckTemplateElement(DeckTemplateElement deckTemplateElement) {
-		
 		em.merge(deckTemplateElement);
-		
 	}
 
-	public void addCollectionElement(CollectionElement collectionElement) {
-
+	public void flush() {
+		em.flush();
+	}
+	
+	public void mergeCollectionElement(CollectionElement collectionElement) {
 		collectionElement = em.merge(collectionElement);
-
+	}
+	
+	public CollectionElement addCollectionElement(Account account, CardModel cardModel) {
+		
+		CollectionElement collectionElement = findCollectionElementsByAccountAndCardModel(account, cardModel);
+		
+		if ( collectionElement == null ) {
+			collectionElement = new CollectionElement(cardModel);
+			collectionElement.setAccount(account);
+			collectionElement.setNumberOfCards(1);
+		}
+		else {
+			collectionElement.incrementNumberOfCards();
+		}
+		
+		mergeCollectionElement(collectionElement);
+		return collectionElement;
+		
 	}
 
 	public List<CardModel> findAllCardModels() {
@@ -57,10 +78,30 @@ public class AccountDao {
 
 	}
 
-	public List<CollectionElement> findCollectionELementsByAccount(Account account) {
+	public List<CollectionElement> findCollectionElementsByAccount(Account account) {
 
 		return em.createNamedQuery(CollectionElement.NQ_FIND_BY_ACCOUNT, CollectionElement.class).setParameter("account", account).getResultList();
 
+	}
+	
+	public CollectionElement findCollectionElementsByAccountAndCardModel(Account account, CardModel cardModel) {
+
+		try {
+			return em.createNamedQuery(CollectionElement.NQ_FIND_BY_ACCOUNT_AND_CARD_MODEL, CollectionElement.class)
+					.setParameter("account", account)
+					.setParameter("cardModel", cardModel)
+					.getSingleResult();
+		}
+		catch (NoResultException e) {
+			return null;
+		}
+	}
+	
+	public List<CardModel> findCardModelsForAccount(Account account) {
+		
+		List<CardModel> cardModels = em.createNamedQuery(CardModel.NQ_FIND_BY_REQUIRED_LEVEL, CardModel.class).setParameter("requiredLevel", account.getLevel()).getResultList();
+		return cardModels;
+		
 	}
 
 	public DeckTemplateElement findDeckTemplateElementByCollectionElement(CollectionElement collectionElement, DeckTemplate deckTemplate) {

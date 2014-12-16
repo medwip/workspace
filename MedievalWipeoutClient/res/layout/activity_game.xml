@@ -484,6 +484,7 @@
 
         <Button
             android:id="@+id/stopGameButton"
+            style="@style/Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
@@ -493,6 +494,7 @@
 
         <Button
             android:id="@+id/homeButton"
+            style="@style/Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
@@ -501,6 +503,7 @@
 
         <Button
             android:id="@+id/getGameButton"
+            style="@style/Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
@@ -509,6 +512,7 @@
 
         <Button
             android:id="@+id/nextPhaseButton"
+            style="@style/Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"

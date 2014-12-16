@@ -12,10 +12,12 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "CARD_MODEL")
-@NamedQueries({ @NamedQuery(name = CardModel.NQ_FIND_ALL, query = "SELECT c FROM CardModel c") })
+@NamedQueries({ @NamedQuery(name = CardModel.NQ_FIND_ALL, query = "SELECT c FROM CardModel c"),
+		@NamedQuery(name = CardModel.NQ_FIND_BY_REQUIRED_LEVEL, query = "SELECT c FROM CardModel c WHERE c.requiredLevel <= :requiredLevel"), })
 public class CardModel {
 
 	public static final String NQ_FIND_ALL = "NQ_FIND_ALL_CARD_MODELS";
+	public static final String NQ_FIND_BY_REQUIRED_LEVEL = "NQ_FIND_CARD_MODELS_BY_REQUIRED_LEVEL";
 
 	public CardModel(int id, String drawableResourceName, String name, int attack, int lifePoints, int goldCost, int faithCost) {
 		this.id = id;
@@ -56,6 +58,9 @@ public class CardModel {
 
 	@Column(name = "FAITH_COST")
 	private int faithCost;
+
+	@Column(name = "REQUIRED_LEVEL")
+	private int requiredLevel;
 
 	public int getId() {
 		return id;
@@ -111,6 +116,14 @@ public class CardModel {
 
 	public void setFaithCost(int faithCost) {
 		this.faithCost = faithCost;
+	}
+
+	public int getRequiredLevel() {
+		return requiredLevel;
+	}
+
+	public void setRequiredLevel(int requiredLevel) {
+		this.requiredLevel = requiredLevel;
 	}
 
 	@Override

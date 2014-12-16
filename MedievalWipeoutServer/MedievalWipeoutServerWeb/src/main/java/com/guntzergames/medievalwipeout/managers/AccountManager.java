@@ -2,6 +2,7 @@ package com.guntzergames.medievalwipeout.managers;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -35,7 +36,11 @@ public class AccountManager {
 			account = new Account();
 			account.setFacebookUserId(facebookUserId);
 			account.setBotAccount(botAccount);
-			accountDao.addAccount(account);
+			account.setLevel(1);
+			account = accountDao.mergeAccount(account);
+			System.out.println("Account before drawPacket " + account);
+			drawPacket(10, account);
+			account = accountDao.mergeAccount(account);
 		}
 		
 		System.out.println("Account: " + account);
@@ -67,6 +72,26 @@ public class AccountManager {
 		return account;
 	}
 	
+	public List<CollectionElement> drawPacket(int numberOfCards, Account account) {
+		
+		List<CollectionElement> collectionElements = new ArrayList<CollectionElement>();
+		
+		List<CardModel> cardModels = findCardModelsForAccount(account);
+		Random generator = new Random();
+		int len = cardModels.size();
+		System.out.println("len = " + len);
+		
+		for ( int i = 0; i < numberOfCards; i++ ) {
+			CardModel cardModel = cardModels.get(generator.nextInt(len));
+			System.out.println("Account before addCollectionElement " + account);
+			CollectionElement collectionElement = accountDao.addCollectionElement(account, cardModel);
+			collectionElements.add(collectionElement);
+		}
+		
+		return collectionElements;
+		
+	}
+	
 	public void addDeckTemplateElement(CollectionElement collectionElement, DeckTemplate deckTemplate) {
 		accountDao.addDeckTemplateElement(collectionElement, deckTemplate);
 	}
@@ -85,6 +110,10 @@ public class AccountManager {
 	
 	public CollectionElement findCollectionElementById(long id) {
 		return accountDao.findCollectionElementById(id);
+	}
+	
+	public List<CardModel> findCardModelsForAccount(Account account) {
+		return accountDao.findCardModelsForAccount(account);
 	}
 	
 }

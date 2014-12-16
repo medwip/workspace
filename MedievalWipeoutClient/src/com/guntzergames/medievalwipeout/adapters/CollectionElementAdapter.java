@@ -28,8 +28,8 @@ public class CollectionElementAdapter extends BaseAdapter {
 
 	public static class ViewHolder {
 
-		public TextView text;
-		public TextView text1;
+		public TextView name;
+		public TextView numberOfCards;
 		public ImageView image;
 
 	}
@@ -72,17 +72,16 @@ public class CollectionElementAdapter extends BaseAdapter {
 			/****** View Holder Object to contain tabitem.xml file elements ******/
 
 			holder = new ViewHolder();
-			holder.text = (TextView) vi.findViewById(R.id.text);
-			holder.text1 = (TextView) vi.findViewById(R.id.text1);
-			holder.image = (ImageView) vi.findViewById(R.id.image);
+			holder.name = (TextView) vi.findViewById(R.id.name);
+			holder.numberOfCards = (TextView) vi.findViewById(R.id.numberOfCards);
+			holder.image = (ImageView) vi.findViewById(R.id.cardLayoutImage);
 
-			/************ Set holder with LayoutInflater ************/
 			vi.setTag(holder);
 		} else
 			holder = (ViewHolder) vi.getTag();
 
 		if (collectionElements.size() <= 0) {
-			holder.text.setText("No Data");
+			holder.name.setText("No Data");
 
 		} else {
 			CollectionElement collectionElement = null;
@@ -90,8 +89,8 @@ public class CollectionElementAdapter extends BaseAdapter {
 
 			/************ Set Model values in Holder elements ***********/
 
-			holder.text.setText(collectionElement.getName());
-			holder.text1.setText(collectionElement.getAttack() + "");
+			holder.name.setText(collectionElement.getName());
+			holder.numberOfCards.setText(String.format("%s", collectionElement.getNumberOfCards()));
 			try {
 				holder.image.setImageDrawable(res.getDrawable(CardLayout.getResourceFromName("card_" + collectionElement.getDrawableResourceName())));
 			} catch (NotFoundException e) {

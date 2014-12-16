@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     
+<!--     <color name="defaultBackground">#FFFFDDA6</color> -->
+    <color name="defaultBackground">#FF000000</color>
+    
+    <color name="buttonBackground">#FFFFFFFF</color>
+    <color name="buttonBorderBackground">#663D2D17</color>
+    <color name="buttonBorderStroke">#FF660000</color>
+    <color name="buttonTextColor">#FFFFFFFF</color>
+    
     <color name="red">#ffff0000</color>
     <color name="backgroundModal">#55000000</color>
     <color name="field">#55F5ECCE</color>

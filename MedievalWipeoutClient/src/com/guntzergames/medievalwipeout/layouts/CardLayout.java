@@ -5,8 +5,10 @@ import java.lang.reflect.Field;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -18,17 +20,19 @@ import com.guntzergames.medievalwipeout.beans.PlayerFieldCard;
 import com.guntzergames.medievalwipeout.beans.PlayerHandCard;
 import com.guntzergames.medievalwipeout.beans.ResourceDeckCard;
 import com.guntzergames.medievalwipeout.enums.CardLocation;
-import com.guntzergames.medievalwipeout.interfaces.Constants;
 
 public class CardLayout extends RelativeLayout {
 
+	private static LayoutInflater layoutInflater;
+	
 	private AbstractCard card;
 	private Context context;
 	private boolean detailShown = false;
 	private boolean calledFromHand = false;
 	private int seqNum;
 	private CardLocation cardLocation;
-	private TextView cardNameInHand, cardAttackTextView, cardLifePointsTextView, resourceCardTextView, numberOfCardsTextView;
+	private LinearLayout rootView;
+	private TextView name, attack, lifePoints, resource, numberOfCards;
 	
 	private ImageView image;
 
@@ -147,12 +151,12 @@ public class CardLayout extends RelativeLayout {
 				}
 			}
 			
-			cardNameInHand.setText(String.format("[%d] %s", seqNum, playerDeckCard.getName()));
-			cardAttackTextView.setText(String.format("%s", playerDeckCard.getAttack()));
+			name.setText(String.format("[%d] %s", seqNum, playerDeckCard.getName()));
+			attack.setText(String.format("%s", playerDeckCard.getAttack()));
 			
 			Log.d("CardLayout", String.format("detailShown: %s", detailShown));
 			if (detailShown) {
-				cardLifePointsTextView.setText(String.format("%s", playerDeckCard.getLifePoints()));
+				lifePoints.setText(String.format("%s", playerDeckCard.getLifePoints()));
 			}
 			if ( card instanceof PlayerFieldCard && !detailShown ) {
 				PlayerFieldCard playerFieldCard = (PlayerFieldCard)card;
@@ -201,13 +205,13 @@ public class CardLayout extends RelativeLayout {
 				}
 			}
 			
-			cardNameInHand.setText(String.format("[%d] %s", seqNum, deckTemplateElement.getName()));
-			cardAttackTextView.setText(String.format("%s", deckTemplateElement.getAttack()));
-			numberOfCardsTextView.setText(String.format("%s", deckTemplateElement.getNumberOfCards()));
+			name.setText(String.format("[%d] %s", seqNum, deckTemplateElement.getName()));
+			attack.setText(String.format("%s", deckTemplateElement.getAttack()));
+			numberOfCards.setText(String.format("%s", deckTemplateElement.getNumberOfCards()));
 			
 			Log.d("CardLayout", String.format("detailShown: %s", detailShown));
 			if (detailShown) {
-				cardLifePointsTextView.setText(String.format("%s", deckTemplateElement.getLifePoints()));
+				lifePoints.setText(String.format("%s", deckTemplateElement.getLifePoints()));
 			}
 			if ( card instanceof PlayerFieldCard && !detailShown ) {
 				PlayerFieldCard playerFieldCard = (PlayerFieldCard)card;
@@ -240,7 +244,7 @@ public class CardLayout extends RelativeLayout {
 				image.setImageDrawable(getResources().getDrawable(R.drawable.card_unknown));
 			}
 			
-			resourceCardTextView.setText(String.format("Trade: %s\nDefense: %s\nFaith: %s", resourceDeckCard.getTrade(), resourceDeckCard.getDefense(), resourceDeckCard.getFaith()));
+			resource.setText(String.format("Trade: %s\nDefense: %s\nFaith: %s", resourceDeckCard.getTrade(), resourceDeckCard.getDefense(), resourceDeckCard.getFaith()));
 			
 		}
 		
@@ -257,7 +261,7 @@ public class CardLayout extends RelativeLayout {
 		if ( cardLocation == CardLocation.HAND && calledFromHand && card instanceof PlayerDeckCard && dest == R.id.playerField ) {
 			return "playerField";
 		}
-		if ( cardLocation == CardLocation.FIELD && !calledFromHand && card instanceof PlayerDeckCard && dest == R.id.opponentField ) {
+		if ( cardLocation == CardLocation.FIELD_ATTACK && !calledFromHand && card instanceof PlayerDeckCard && dest == R.id.opponentField ) {
 			return "opponentField";
 		}
 		
@@ -266,111 +270,38 @@ public class CardLayout extends RelativeLayout {
 	}
 
 	private void init() {
+		
+		layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		rootView = (LinearLayout)layoutInflater.inflate(R.layout.card, null);
+		
 		reset();
-		resourceCardTextView = new TextView(context);
-		image = new ImageView(context);
-		cardNameInHand = new TextView(context);
-		cardAttackTextView = new TextView(context);
-		cardLifePointsTextView = new TextView(context);
-		numberOfCardsTextView = new TextView(context);
+		resource = new TextView(context);
+		image = (ImageView)rootView.findViewById(R.id.cardLayoutImage);
+		name = (TextView)rootView.findViewById(R.id.cardLayoutName);
+		attack = (TextView)rootView.findViewById(R.id.cardLayoutAttack);
+		lifePoints = (TextView)rootView.findViewById(R.id.cardLayoutLifePoints);
+		numberOfCards = (TextView)rootView.findViewById(R.id.cardLayoutNumberOfCards);
+		resource = (TextView)rootView.findViewById(R.id.cardLayoutResource);
+		
+		this.addView(rootView);
 
 		if (card instanceof PlayerDeckCard) {
 			
-			LayoutParams layoutParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-			image.setLayoutParams(layoutParams);
-			image.setId(Constants.CARD_LAYOUT_IMAGE_ID);
-			this.addView(image);
-			
-			cardNameInHand.setTextAppearance(context, R.style.CardStyle);
-			cardNameInHand.setId(Constants.CARD_LAYOUT_CARD_NAME_ID);
-			layoutParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-			layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
-			layoutParams.addRule(RelativeLayout.BELOW, Constants.CARD_LAYOUT_IMAGE_ID);
-			cardNameInHand.setLayoutParams(layoutParams);
-			this.addView(cardNameInHand);
-			
-			cardAttackTextView.setTextAppearance(context, R.style.CardStyle_Attack);
-			cardAttackTextView.setId(Constants.CARD_LAYOUT_ATTACK_ID);
-			layoutParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-			layoutParams.addRule(RelativeLayout.BELOW, Constants.CARD_LAYOUT_CARD_NAME_ID);
-			cardAttackTextView.setLayoutParams(layoutParams);
-			this.addView(cardAttackTextView);
-			
-			if (detailShown) {
-				cardLifePointsTextView.setTextAppearance(context, R.style.CardStyle_LifePoints);
-				cardLifePointsTextView.setId(Constants.CARD_LAYOUT_LIFE_POINTS_ID);
-				layoutParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-				layoutParams.addRule(RelativeLayout.BELOW, Constants.CARD_LAYOUT_CARD_NAME_ID);
-				layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-				cardLifePointsTextView.setLayoutParams(layoutParams);
-				this.addView(cardLifePointsTextView);
+			if (!detailShown) {
+				lifePoints.setVisibility(View.INVISIBLE);
 			}
 			
 		}
 		
 		if (card instanceof DeckTemplateElement) {
 			
-			LayoutParams layoutParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-			image.setLayoutParams(layoutParams);
-			image.setId(Constants.CARD_LAYOUT_IMAGE_ID);
-			this.addView(image);
-			
-			cardNameInHand.setTextAppearance(context, R.style.CardStyle);
-			cardNameInHand.setId(Constants.CARD_LAYOUT_CARD_NAME_ID);
-			layoutParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-			layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
-			layoutParams.addRule(RelativeLayout.BELOW, Constants.CARD_LAYOUT_IMAGE_ID);
-			cardNameInHand.setLayoutParams(layoutParams);
-			this.addView(cardNameInHand);
-			
-			cardAttackTextView.setTextAppearance(context, R.style.CardStyle_Attack);
-			cardAttackTextView.setId(Constants.CARD_LAYOUT_ATTACK_ID);
-			layoutParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-			layoutParams.addRule(RelativeLayout.BELOW, Constants.CARD_LAYOUT_CARD_NAME_ID);
-			cardAttackTextView.setLayoutParams(layoutParams);
-			this.addView(cardAttackTextView);
-			
-			numberOfCardsTextView.setTextAppearance(context, R.style.CardStyle_Attack);
-			numberOfCardsTextView.setId(Constants.CARD_LAYOUT_NUMBER_OF_CARDS_ID);
-			layoutParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-			layoutParams.addRule(RelativeLayout.BELOW, Constants.CARD_LAYOUT_ATTACK_ID);
-			numberOfCardsTextView.setLayoutParams(layoutParams);
-			this.addView(numberOfCardsTextView);
-			
-			if (detailShown) {
-				cardLifePointsTextView.setTextAppearance(context, R.style.CardStyle_LifePoints);
-				cardLifePointsTextView.setId(Constants.CARD_LAYOUT_LIFE_POINTS_ID);
-				layoutParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-				layoutParams.addRule(RelativeLayout.BELOW, Constants.CARD_LAYOUT_CARD_NAME_ID);
-				layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-				cardLifePointsTextView.setLayoutParams(layoutParams);
-				this.addView(cardLifePointsTextView);
-			}
+			numberOfCards.setVisibility(View.VISIBLE);
 			
 		}
 		
 		if ( card instanceof ResourceDeckCard ) {
 			
-			ResourceDeckCard resourceDeckCard = (ResourceDeckCard)card;
-			image = new ImageView(context);
-			try {
-				image.setImageDrawable(getResources().getDrawable(R.drawable.gold));
-			} catch (Exception e) {
-				e.printStackTrace();
-				image.setImageDrawable(getResources().getDrawable(R.drawable.card_unknown));
-			}
-			LayoutParams layoutParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-			image.setLayoutParams(layoutParams);
-			image.setId(Constants.CARD_LAYOUT_IMAGE_ID);
-			this.addView(image);
-			
-			resourceCardTextView.setText(String.format("Trade: %s\nDefense: %s\nFaith: %s", resourceDeckCard.getTrade(), resourceDeckCard.getDefense(), resourceDeckCard.getFaith()));
-			resourceCardTextView.setTextAppearance(context, R.style.CardStyle_Attack);
-			resourceCardTextView.setId(Constants.CARD_LAYOUT_ATTACK_ID);
-			layoutParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-			layoutParams.addRule(RelativeLayout.BELOW, Constants.CARD_LAYOUT_IMAGE_ID);
-			resourceCardTextView.setLayoutParams(layoutParams);
-			this.addView(resourceCardTextView);
+			resource.setVisibility(View.VISIBLE);
 			
 		}
 		

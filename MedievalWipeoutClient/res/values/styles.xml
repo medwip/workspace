@@ -16,6 +16,7 @@
     <style name="AppTheme" parent="AppBaseTheme">
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
         <item name="android:textSize">8sp</item>
+<!--         <item name="android:background">@color/defaultBackground</item> -->
 <!--         <item name="android:background">#3B170B</item> -->
 <!--         <item name="android:textColor">#F8ECE0</item> -->
     </style>

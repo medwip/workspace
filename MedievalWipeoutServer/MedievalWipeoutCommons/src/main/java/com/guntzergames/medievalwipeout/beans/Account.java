@@ -3,6 +3,7 @@ package com.guntzergames.medievalwipeout.beans;
 import java.util.List;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -30,11 +31,14 @@ public class Account {
 
 	@Column(name = "FACEBOOK_USER_ID")
 	private String facebookUserId;
+	
+	@Column(name = "LEVEL")
+	private int level;
 
 	@OneToMany(mappedBy = "account", fetch = FetchType.EAGER)
 	private List<DeckTemplate> deckTemplates;
 
-	@OneToMany(mappedBy = "account", fetch = FetchType.EAGER)
+	@OneToMany(mappedBy = "account", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	private List<CollectionElement> collectionElements;
 
 	@Transient
@@ -46,6 +50,14 @@ public class Account {
 
 	public void setFacebookUserId(String facebookUserId) {
 		this.facebookUserId = facebookUserId;
+	}
+
+	public int getLevel() {
+		return level;
+	}
+
+	public void setLevel(int level) {
+		this.level = level;
 	}
 
 	public List<DeckTemplate> getDeckTemplates() {
