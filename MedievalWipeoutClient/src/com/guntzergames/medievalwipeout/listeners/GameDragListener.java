@@ -19,6 +19,14 @@ public class GameDragListener implements OnDragListener {
 		this.gameActivity = gameActivity;
 		this.userName = userName;
 	}
+	
+	private boolean isPossibleDest(View dest) {
+		return dest.getId() == R.id.playerFieldAttack || dest.getId() == R.id.playerFieldDefense || 
+				dest.getId() == R.id.opponentField || dest.getId() == R.id.playerHand ||
+				dest.getId() == R.id.opponentFieldAttackCard0 || dest.getId() == R.id.opponentFieldAttackCard1 ||
+				dest.getId() == R.id.opponentFieldAttackCard2 || dest.getId() == R.id.opponentFieldAttackCard3 ||
+				dest.getId() == R.id.opponentFieldAttackCard4;
+	}
 
 	@Override
 	public boolean onDrag(View dest, DragEvent event) {
@@ -37,7 +45,7 @@ public class GameDragListener implements OnDragListener {
 			break;
 			
 		case DragEvent.ACTION_DRAG_EXITED:
-			if ( dest.getId() == R.id.playerFieldAttack || dest.getId() == R.id.playerFieldDefense || dest.getId() == R.id.opponentField || dest.getId() == R.id.playerHand ) {
+			if ( isPossibleDest(dest) ) {
 				dest.setBackgroundDrawable(gameActivity.getResources().getDrawable(R.drawable.frame_border));
 			}
 			break;
@@ -47,7 +55,7 @@ public class GameDragListener implements OnDragListener {
 			Log.i("PlayerFieldDragListener", String.format("ici, view = %h alors que field id = %h", dest.getId(), R.id.playerField));
 			gameActivity.hideCardLayoutDetail();
 			
-			if ( dest.getId() == R.id.playerFieldAttack || dest.getId() == R.id.playerFieldDefense || dest.getId() == R.id.opponentField || dest.getId() == R.id.playerHand ) {
+			if ( isPossibleDest(dest) ) {
 				dest.setBackgroundDrawable(gameActivity.getResources().getDrawable(R.drawable.frame_border));
 			}
 			

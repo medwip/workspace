@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v7.widget.GridLayout;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
@@ -38,7 +37,6 @@ import com.guntzergames.medievalwipeout.beans.GameEventPlayCard.PlayerType;
 import com.guntzergames.medievalwipeout.beans.Player;
 import com.guntzergames.medievalwipeout.beans.PlayerDeckCard;
 import com.guntzergames.medievalwipeout.beans.PlayerFieldCard;
-import com.guntzergames.medievalwipeout.beans.PlayerFieldCard.Location;
 import com.guntzergames.medievalwipeout.beans.PlayerHandCard;
 import com.guntzergames.medievalwipeout.beans.ResourceDeckCard;
 import com.guntzergames.medievalwipeout.enums.CardLocation;
@@ -99,15 +97,13 @@ public class GameActivity extends ApplicationActivity {
 
 	private class CardDetailListener implements OnTouchListener {
 
-		private AbstractCard card;
-		
 		@Override
 		public boolean onTouch(View v, MotionEvent event) {
 
 			setBeingModified(true);
 
 			CardLayout cardLayout = ((CardLayout) v);
-			card = cardLayout.getCard();
+			AbstractCard card = cardLayout.getCard();
 
 			Log.d("CardDetailListener", String.format("onTouch event detected: %s for event %s", event.getAction(), v.getClass().getName()));
 
@@ -235,10 +231,11 @@ public class GameActivity extends ApplicationActivity {
 		
 		player.updatePlayableHandCards();
 
-		setupField(opponent.getPlayerFieldDefense(), "opponentField", 10, CardLocation.FIELD_ATTACK);
-		setupField(player.getPlayerHand(), "playerHand", 10, CardLocation.HAND);
+		setupField(opponent.getPlayerFieldDefense(), "opponentFieldDefense", 5, CardLocation.FIELD_DEFENSE);
+		setupField(opponent.getPlayerFieldAttack(), "opponentFieldAttack", 5, CardLocation.FIELD_ATTACK);
 		setupField(player.getPlayerFieldDefense(), "playerFieldDefense", 5, CardLocation.FIELD_DEFENSE);
 		setupField(player.getPlayerFieldAttack(), "playerFieldAttack", 5, CardLocation.FIELD_ATTACK);
+		setupField(player.getPlayerHand(), "playerHand", 10, CardLocation.HAND);
 
 		if (gameView.getPhase() == getDuringPlayerResourceDrawPhase()) {
 
@@ -327,13 +324,11 @@ public class GameActivity extends ApplicationActivity {
 		playerChoicesLayout = (RelativeLayout) layout.findViewById(R.id.playerChoices);
 
 		cardDetailListener = new CardDetailListener();
+		GameDragListener gameDragListener = new GameDragListener(this, facebookUserId);
+		gameAnimationListener = new GameAnimationListener(this);
 
 		for (int num = 0; num < 9; num++) {
 
-			CardLayout opponentCardInFieldLayout = (CardLayout) layout.findViewById(CardLayout.getCardFromId("opponentField", num));
-			opponentCardInFieldLayout.setOnTouchListener(cardDetailListener);
-			opponentCardInFieldLayout.init(this, new PlayerDeckCard(CardModel.DEFAULT_CARD), 0, CardLocation.FIELD_ATTACK);
-			opponentCardInFieldLayout.hide();
 			CardLayout cardInHandLayout = (CardLayout) layout.findViewById(CardLayout.getCardFromId("playerHand", num));
 			cardInHandLayout.init(this, new PlayerDeckCard(CardModel.DEFAULT_CARD), 0, CardLocation.HAND);
 			cardInHandLayout.hide();
@@ -343,7 +338,17 @@ public class GameActivity extends ApplicationActivity {
 		
 		for ( int num = 0; num < 5; num ++ ) {
 			
-			CardLayout cardInFieldLayout = (CardLayout) layout.findViewById(CardLayout.getCardFromId("playerFieldDefense", num));
+			CardLayout cardInFieldLayout = (CardLayout) layout.findViewById(CardLayout.getCardFromId("opponentFieldDefense", num));
+			cardInFieldLayout.setOnTouchListener(cardDetailListener);
+			cardInFieldLayout.init(this, new PlayerDeckCard(CardModel.DEFAULT_CARD), 0, CardLocation.FIELD_DEFENSE);
+			cardInFieldLayout.hide();
+			cardInFieldLayout = (CardLayout) layout.findViewById(CardLayout.getCardFromId("opponentFieldAttack", num));
+			cardInFieldLayout.setOnTouchListener(cardDetailListener);
+			cardInFieldLayout.setOnDragListener(gameDragListener);
+			cardInFieldLayout.init(this, new PlayerDeckCard(CardModel.DEFAULT_CARD), 0, CardLocation.FIELD_ATTACK);
+			cardInFieldLayout.hide();
+			
+			cardInFieldLayout = (CardLayout) layout.findViewById(CardLayout.getCardFromId("playerFieldDefense", num));
 			cardInFieldLayout.setOnTouchListener(cardDetailListener);
 			cardInFieldLayout.init(this, new PlayerDeckCard(CardModel.DEFAULT_CARD), 0, CardLocation.FIELD_DEFENSE);
 			cardInFieldLayout.hide();
@@ -394,8 +399,6 @@ public class GameActivity extends ApplicationActivity {
 			}
 		});
 
-		GameDragListener gameDragListener = new GameDragListener(this, facebookUserId);
-		gameAnimationListener = new GameAnimationListener(this);
 		layout.setOnDragListener(gameDragListener);
 		playerHandLayout.setOnDragListener(gameDragListener);
 		playerFieldDefenseLayout.setOnDragListener(gameDragListener);

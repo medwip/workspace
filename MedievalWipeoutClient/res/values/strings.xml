@@ -21,5 +21,6 @@
     <string name="life_points">Life Points</string>
     <string name="not_initialized">Not initialized</string>
     <string name="loading">Loading</string>
+    <string name="being_modified">Being modified</string>
     
 </resources>
