@@ -7,7 +7,7 @@ public class Player {
 	private Account account;
 	private PlayerDeck playerDeck = new PlayerDeck();
 	private PlayerHand playerHand = new PlayerHand();
-	private PlayerField playerField = new PlayerField();
+	private PlayerField playerFieldAttack = new PlayerField(), playerFieldDefense = new PlayerField();
 	private PlayerDiscard playerDiscard = new PlayerDiscard();
 	private DeckTemplate deckTemplate;
 	private PlayerDeckCard playerDeckCard1, playerDeckCard2;
@@ -71,12 +71,20 @@ public class Player {
 		this.lifePoints -= lifePoints;
 	}
 
-	public PlayerField getPlayerField() {
-		return playerField;
+	public PlayerField getPlayerFieldAttack() {
+		return playerFieldAttack;
 	}
 
-	public void setPlayerField(PlayerField playerField) {
-		this.playerField = playerField;
+	public void setPlayerFieldAttack(PlayerField playerFieldAttack) {
+		this.playerFieldAttack = playerFieldAttack;
+	}
+
+	public PlayerField getPlayerFieldDefense() {
+		return playerFieldDefense;
+	}
+
+	public void setPlayerFieldDefense(PlayerField playerFieldDefense) {
+		this.playerFieldDefense = playerFieldDefense;
 	}
 
 	public int getTrade() {

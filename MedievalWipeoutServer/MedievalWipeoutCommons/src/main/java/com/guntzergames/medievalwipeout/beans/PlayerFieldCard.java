@@ -1,9 +1,14 @@
 package com.guntzergames.medievalwipeout.beans;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+
 public class PlayerFieldCard extends PlayerDeckCard {
 	
 	private boolean played = false;
 	private int currentLifePoints;
+	private Location location;
+	
+	public enum Location {ATTACK, DEFENSE};
 	
 	public PlayerFieldCard() {
 		
@@ -29,6 +34,19 @@ public class PlayerFieldCard extends PlayerDeckCard {
 
 	public void setCurrentLifePoints(int currentLifePoints) {
 		this.currentLifePoints = currentLifePoints;
+	}
+
+	public Location getLocation() {
+		return location;
+	}
+
+	public void setLocation(Location location) {
+		this.location = location;
+	}
+	
+	@JsonIgnore
+	public String getField() {
+		return location == Location.DEFENSE ? "playerFieldDefense" : "playerFieldAttack";
 	}
 	
 }

@@ -18,6 +18,10 @@
         <item name="android:background">@color/field</item>
     </style>
 
+    <style name="FieldStyle.Defense">
+        <item name="android:background">@color/abc_search_url_text_normal</item>
+    </style>
+
     <style name="Section" parent="@android:style/TextAppearance.Large">
         <item name="android:textColor">#333</item>
         <item name="android:typeface">normal</item>

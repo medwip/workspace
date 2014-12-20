@@ -164,7 +164,8 @@ public class Game {
 		gameClientView.setResourceCard2(resourceCard2);
 		
 		gameClientView.setPlayerHand(player.getPlayerHand());
-		gameClientView.setPlayerField(player.getPlayerField());
+		gameClientView.setPlayerFieldAttack(player.getPlayerFieldAttack());
+		gameClientView.setPlayerFieldDefense(player.getPlayerFieldDefense());
 		
 		gameClientView.setGameState(gameState);
 		gameClientView.setTurn(turn);
@@ -186,15 +187,20 @@ public class Game {
 		
 	}
 	
+	private void resetPlayable(PlayerField playerField) {
+		
+		for ( PlayerFieldCard card : playerField.getCards() ) {
+			card.setPlayed(false);
+		}
+		
+	}
+	
 	public void resetPlayable() {
 		
-		for ( PlayerFieldCard card : creator.getPlayerField().getCards() ) {
-			card.setPlayed(false);
-		}
-		
-		for ( PlayerFieldCard card : joiner.getPlayerField().getCards() ) {
-			card.setPlayed(false);
-		}
+		resetPlayable(creator.getPlayerFieldAttack());
+		resetPlayable(creator.getPlayerFieldDefense());
+		resetPlayable(joiner.getPlayerFieldAttack());
+		resetPlayable(joiner.getPlayerFieldDefense());
 		
 	}
 	

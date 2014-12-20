@@ -28,7 +28,6 @@ public class CardLayout extends RelativeLayout {
 	private AbstractCard card;
 	private Context context;
 	private boolean detailShown = false;
-	private boolean calledFromHand = false;
 	private int seqNum;
 	private CardLocation cardLocation;
 	private LinearLayout rootView;
@@ -61,20 +60,18 @@ public class CardLayout extends RelativeLayout {
 		init();
 	}
 	
-	public void init(Context context, AbstractCard card, int seqNum, boolean calledFromHand, CardLocation cardLocation) {
+	public void init(Context context, AbstractCard card, int seqNum, CardLocation cardLocation) {
 		this.context = context;
 		this.card = card;
-		this.calledFromHand = calledFromHand;
 		this.seqNum = seqNum;
 		this.cardLocation = cardLocation;
 		init();
-		setup();
+//		setup();
 	}
 
-	public void setup(Context context, AbstractCard card, int seqNum, boolean calledFromHand, CardLocation cardLocation) {
+	public void setup(Context context, AbstractCard card, int seqNum, CardLocation cardLocation) {
 		this.context = context;
 		this.card = card;
-		this.calledFromHand = calledFromHand;
 		this.seqNum = seqNum;
 		this.cardLocation = cardLocation;
 		setup();
@@ -153,6 +150,10 @@ public class CardLayout extends RelativeLayout {
 			
 			name.setText(String.format("[%d] %s", seqNum, playerDeckCard.getName()));
 			attack.setText(String.format("%s", playerDeckCard.getAttack()));
+			
+			if ( card instanceof PlayerFieldCard ) {
+				attack.setText(String.format("%s %s", ((PlayerFieldCard) card).getLocation() , playerDeckCard.getAttack()));
+			}
 			
 			Log.d("CardLayout", String.format("detailShown: %s", detailShown));
 			if (detailShown) {
@@ -252,20 +253,49 @@ public class CardLayout extends RelativeLayout {
 	
 	public String getPossibleTarget(int dest) {
 		
-		if ( cardLocation == CardLocation.MODAL && card instanceof ResourceDeckCard && dest == R.id.playerField ) {
-			return "playerField";
+		if ( cardLocation == CardLocation.MODAL && card instanceof ResourceDeckCard && dest == R.id.playerHand ) {
+			return "playerHand";
 		}
 		if ( cardLocation == CardLocation.MODAL && card instanceof PlayerDeckCard && dest == R.id.playerHand ) {
 			return "playerHand";
 		}
-		if ( cardLocation == CardLocation.HAND && calledFromHand && card instanceof PlayerDeckCard && dest == R.id.playerField ) {
-			return "playerField";
+		if ( cardLocation == CardLocation.HAND && card instanceof PlayerDeckCard && dest == R.id.playerFieldAttack ) {
+			return "playerFieldAttack";
 		}
-		if ( cardLocation == CardLocation.FIELD_ATTACK && !calledFromHand && card instanceof PlayerDeckCard && dest == R.id.opponentField ) {
+		if ( cardLocation == CardLocation.HAND && card instanceof PlayerDeckCard && dest == R.id.playerFieldDefense ) {
+			return "playerFieldDefense";
+		}
+		if ( cardLocation == CardLocation.FIELD_ATTACK && card instanceof PlayerDeckCard && dest == R.id.opponentField ) {
+			return "opponentField";
+		}
+		if ( cardLocation == CardLocation.FIELD_DEFENSE && card instanceof PlayerDeckCard && dest == R.id.opponentField ) {
 			return "opponentField";
 		}
 		
 		return null;
+		
+	}
+
+	public String getPossibleSource(int id) {
+		
+		if ( id == R.id.playerField ) {
+			return "playerField";
+		}
+		else if ( id == R.id.playerHand ) {
+			return "playerHand";
+		}
+		else if ( id == R.id.playerFieldAttack ) {
+			return "playerFieldAttack";
+		}
+		else if ( id == R.id.playerFieldDefense ) {
+			return "playerFieldDefense";
+		}
+		else if ( id == R.id.opponentField ) {
+			return "opponentField";
+		}
+		else {
+			return null;
+		}
 		
 	}
 
@@ -317,14 +347,6 @@ public class CardLayout extends RelativeLayout {
 
 	public void setDetailShown(boolean detailShown) {
 		this.detailShown = detailShown;
-	}
-
-	public boolean isCalledFromHand() {
-		return calledFromHand;
-	}
-
-	public void setCalledFromHand(boolean calledFromHand) {
-		this.calledFromHand = calledFromHand;
 	}
 
 	public AbstractCard getCard() {

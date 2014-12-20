@@ -4,6 +4,7 @@ com\guntzergames\medievalwipeout\beans\ResourceDeckCard.class
 com\guntzergames\medievalwipeout\enums\Phase.class
 com\guntzergames\medievalwipeout\abstracts\AbstractCardList.class
 com\guntzergames\medievalwipeout\enums\CardLocation.class
+com\guntzergames\medievalwipeout\beans\PlayerFieldCard$Location.class
 com\guntzergames\medievalwipeout\exceptions\GameException.class
 com\guntzergames\medievalwipeout\beans\DeckTemplate.class
 com\guntzergames\medievalwipeout\beans\Player.class

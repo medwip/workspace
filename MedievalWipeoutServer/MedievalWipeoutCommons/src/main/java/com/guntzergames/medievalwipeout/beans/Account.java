@@ -1,5 +1,7 @@
 package com.guntzergames.medievalwipeout.beans;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.List;
 
 import javax.persistence.Basic;
@@ -15,6 +17,13 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+
+import org.codehaus.jackson.JsonGenerationException;
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.DeserializationConfig;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.SerializationConfig;
 
 @Entity
 @Table(name = "ACCOUNT")
@@ -82,6 +91,55 @@ public class Account {
 
 	public void setBotAccount(boolean botAccount) {
 		this.botAccount = botAccount;
+	}
+	
+	public static Account fromJson(String json) {
+		
+		ObjectMapper mapper = new ObjectMapper();
+    	Account account = null;
+    	try {
+    		account = mapper.readValue(json, Account.class);
+		} catch (JsonParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	return account;
+		
+	}
+	
+	public String toJson() {
+
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.enable(SerializationConfig.Feature.INDENT_OUTPUT);
+		mapper.enable(DeserializationConfig.Feature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT);
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		try {
+			mapper.writeValue(out, this);
+		} catch (JsonGenerationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		String json = new String(out.toByteArray());
+		try {
+			out.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return json;
+	
 	}
 
 	@Override

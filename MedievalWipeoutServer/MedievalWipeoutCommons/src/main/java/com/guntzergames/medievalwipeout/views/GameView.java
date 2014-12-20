@@ -28,7 +28,7 @@ public class GameView {
 	private ResourceDeckCard resourceCard1, resourceCard2;
 	
 	private PlayerHand playerHand;
-	private PlayerField playerField;
+	private PlayerField playerFieldAttack, playerFieldDefense;
 	
 	private int gold, trade, defense, faith, turn;
 	
@@ -87,12 +87,20 @@ public class GameView {
 		this.playerHand = playerHand;
 	}
 
-	public PlayerField getPlayerField() {
-		return playerField;
+	public PlayerField getPlayerFieldAttack() {
+		return playerFieldAttack;
 	}
 
-	public void setPlayerField(PlayerField playerField) {
-		this.playerField = playerField;
+	public void setPlayerFieldAttack(PlayerField playerFieldAttack) {
+		this.playerFieldAttack = playerFieldAttack;
+	}
+
+	public PlayerField getPlayerFieldDefense() {
+		return playerFieldDefense;
+	}
+
+	public void setPlayerFieldDefense(PlayerField playerFieldDefense) {
+		this.playerFieldDefense = playerFieldDefense;
 	}
 
 	public int getGold() {

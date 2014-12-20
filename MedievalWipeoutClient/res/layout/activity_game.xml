@@ -1,5 +1,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res/com.guntzergames.medievalwipeout.activities"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -105,8 +106,8 @@
             style="@style/FieldStyle"
             android:layout_width="fill_parent"
             android:layout_height="@dimen/fieldHeight"
-            android:background="@drawable/frame_border"
-            android:layout_below="@id/opponentGoldLibel" >
+            android:layout_below="@id/opponentGoldLibel"
+            android:background="@drawable/frame_border" >
 
             <com.guntzergames.medievalwipeout.layouts.CardLayout
                 android:id="@+id/opponentFieldCard0"
@@ -276,104 +277,122 @@
             android:layout_toRightOf="@id/playerLifePointsLibel"
             android:text="@string/not_initialized" />
 
-        <LinearLayout
+        <android.support.v7.widget.GridLayout
             android:id="@+id/playerField"
-            style="@style/FieldStyle"
             android:layout_width="fill_parent"
             android:layout_height="@dimen/fieldHeight"
             android:layout_below="@id/playerGoldLibel"
-            android:background="@drawable/frame_border" >
+            android:background="@drawable/frame_border"
+            app:columnCount="5" >
 
-            <com.guntzergames.medievalwipeout.layouts.CardLayout
-                android:id="@+id/playerFieldCard0"
-                style="@style/CardStyle"
-                android:layout_width="@dimen/cardWidth"
-                android:layout_height="@dimen/cardHeight"
-                android:background="@drawable/card_border"
-                android:padding="5dp" >
-            </com.guntzergames.medievalwipeout.layouts.CardLayout>
+            <LinearLayout
+                android:id="@+id/playerFieldDefense"
+                style="@style/FieldStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/fieldHeight"
+                android:background="@drawable/frame_border"
+                android:orientation="horizontal" >
 
-            <com.guntzergames.medievalwipeout.layouts.CardLayout
-                android:id="@+id/playerFieldCard1"
-                style="@style/CardStyle"
-                android:layout_width="@dimen/cardWidth"
-                android:layout_height="@dimen/cardHeight"
-                android:background="@drawable/card_border"
-                android:padding="5dp" >
-            </com.guntzergames.medievalwipeout.layouts.CardLayout>
+                <com.guntzergames.medievalwipeout.layouts.CardLayout
+                    android:id="@+id/playerFieldDefenseCard0"
+                    style="@style/CardStyle"
+                    android:layout_width="@dimen/cardWidth"
+                    android:layout_height="@dimen/cardHeight"
+                    android:background="@drawable/card_border"
+                    android:padding="5dp" >
+                </com.guntzergames.medievalwipeout.layouts.CardLayout>
 
-            <com.guntzergames.medievalwipeout.layouts.CardLayout
-                android:id="@+id/playerFieldCard2"
-                style="@style/CardStyle"
-                android:layout_width="@dimen/cardWidth"
-                android:layout_height="@dimen/cardHeight"
-                android:background="@drawable/card_border"
-                android:padding="5dp" >
-            </com.guntzergames.medievalwipeout.layouts.CardLayout>
+                <com.guntzergames.medievalwipeout.layouts.CardLayout
+                    android:id="@+id/playerFieldDefenseCard1"
+                    style="@style/CardStyle"
+                    android:layout_width="@dimen/cardWidth"
+                    android:layout_height="@dimen/cardHeight"
+                    android:background="@drawable/card_border"
+                    android:padding="5dp" >
+                </com.guntzergames.medievalwipeout.layouts.CardLayout>
 
-            <com.guntzergames.medievalwipeout.layouts.CardLayout
-                android:id="@+id/playerFieldCard3"
-                style="@style/CardStyle"
-                android:layout_width="@dimen/cardWidth"
-                android:layout_height="@dimen/cardHeight"
-                android:background="@drawable/card_border"
-                android:padding="5dp" >
-            </com.guntzergames.medievalwipeout.layouts.CardLayout>
+                <com.guntzergames.medievalwipeout.layouts.CardLayout
+                    android:id="@+id/playerFieldDefenseCard2"
+                    style="@style/CardStyle"
+                    android:layout_width="@dimen/cardWidth"
+                    android:layout_height="@dimen/cardHeight"
+                    android:background="@drawable/card_border"
+                    android:padding="5dp" >
+                </com.guntzergames.medievalwipeout.layouts.CardLayout>
 
-            <com.guntzergames.medievalwipeout.layouts.CardLayout
-                android:id="@+id/playerFieldCard4"
-                style="@style/CardStyle"
-                android:layout_width="@dimen/cardWidth"
-                android:layout_height="@dimen/cardHeight"
-                android:background="@drawable/card_border"
-                android:padding="5dp" >
-            </com.guntzergames.medievalwipeout.layouts.CardLayout>
+                <com.guntzergames.medievalwipeout.layouts.CardLayout
+                    android:id="@+id/playerFieldDefenseCard3"
+                    style="@style/CardStyle"
+                    android:layout_width="@dimen/cardWidth"
+                    android:layout_height="@dimen/cardHeight"
+                    android:background="@drawable/card_border"
+                    android:padding="5dp" >
+                </com.guntzergames.medievalwipeout.layouts.CardLayout>
 
-            <com.guntzergames.medievalwipeout.layouts.CardLayout
-                android:id="@+id/playerFieldCard5"
-                style="@style/CardStyle"
-                android:layout_width="@dimen/cardWidth"
-                android:layout_height="@dimen/cardHeight"
-                android:background="@drawable/card_border"
-                android:padding="5dp" >
-            </com.guntzergames.medievalwipeout.layouts.CardLayout>
+                <com.guntzergames.medievalwipeout.layouts.CardLayout
+                    android:id="@+id/playerFieldDefenseCard4"
+                    style="@style/CardStyle"
+                    android:layout_width="@dimen/cardWidth"
+                    android:layout_height="@dimen/cardHeight"
+                    android:background="@drawable/card_border"
+                    android:padding="5dp" >
+                </com.guntzergames.medievalwipeout.layouts.CardLayout>
+            </LinearLayout>
 
-            <com.guntzergames.medievalwipeout.layouts.CardLayout
-                android:id="@+id/playerFieldCard6"
-                style="@style/CardStyle"
-                android:layout_width="@dimen/cardWidth"
-                android:layout_height="@dimen/cardHeight"
-                android:background="@drawable/card_border"
-                android:padding="5dp" >
-            </com.guntzergames.medievalwipeout.layouts.CardLayout>
+            <LinearLayout
+                android:id="@+id/playerFieldAttack"
+                style="@style/FieldStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/fieldHeight"
+                android:background="@drawable/frame_border"
+                android:orientation="horizontal" >
 
-            <com.guntzergames.medievalwipeout.layouts.CardLayout
-                android:id="@+id/playerFieldCard7"
-                style="@style/CardStyle"
-                android:layout_width="@dimen/cardWidth"
-                android:layout_height="@dimen/cardHeight"
-                android:background="@drawable/card_border"
-                android:padding="5dp" >
-            </com.guntzergames.medievalwipeout.layouts.CardLayout>
+                <com.guntzergames.medievalwipeout.layouts.CardLayout
+                    android:id="@+id/playerFieldAttackCard0"
+                    style="@style/CardStyle"
+                    android:layout_width="@dimen/cardWidth"
+                    android:layout_height="@dimen/cardHeight"
+                    android:background="@drawable/card_border"
+                    android:padding="5dp" >
+                </com.guntzergames.medievalwipeout.layouts.CardLayout>
 
-            <com.guntzergames.medievalwipeout.layouts.CardLayout
-                android:id="@+id/playerFieldCard8"
-                style="@style/CardStyle"
-                android:layout_width="@dimen/cardWidth"
-                android:layout_height="@dimen/cardHeight"
-                android:background="@drawable/card_border"
-                android:padding="5dp" >
-            </com.guntzergames.medievalwipeout.layouts.CardLayout>
+                <com.guntzergames.medievalwipeout.layouts.CardLayout
+                    android:id="@+id/playerFieldAttackCard1"
+                    style="@style/CardStyle"
+                    android:layout_width="@dimen/cardWidth"
+                    android:layout_height="@dimen/cardHeight"
+                    android:background="@drawable/card_border"
+                    android:padding="5dp" >
+                </com.guntzergames.medievalwipeout.layouts.CardLayout>
 
-            <com.guntzergames.medievalwipeout.layouts.CardLayout
-                android:id="@+id/playerFieldCard9"
-                style="@style/CardStyle"
-                android:layout_width="@dimen/cardWidth"
-                android:layout_height="@dimen/cardHeight"
-                android:background="@drawable/card_border"
-                android:padding="5dp" >
-            </com.guntzergames.medievalwipeout.layouts.CardLayout>
-        </LinearLayout>
+                <com.guntzergames.medievalwipeout.layouts.CardLayout
+                    android:id="@+id/playerFieldAttackCard2"
+                    style="@style/CardStyle"
+                    android:layout_width="@dimen/cardWidth"
+                    android:layout_height="@dimen/cardHeight"
+                    android:background="@drawable/card_border"
+                    android:padding="5dp" >
+                </com.guntzergames.medievalwipeout.layouts.CardLayout>
+
+                <com.guntzergames.medievalwipeout.layouts.CardLayout
+                    android:id="@+id/playerFieldAttackCard3"
+                    style="@style/CardStyle"
+                    android:layout_width="@dimen/cardWidth"
+                    android:layout_height="@dimen/cardHeight"
+                    android:background="@drawable/card_border"
+                    android:padding="5dp" >
+                </com.guntzergames.medievalwipeout.layouts.CardLayout>
+
+                <com.guntzergames.medievalwipeout.layouts.CardLayout
+                    android:id="@+id/playerFieldAttackCard4"
+                    style="@style/CardStyle"
+                    android:layout_width="@dimen/cardWidth"
+                    android:layout_height="@dimen/cardHeight"
+                    android:background="@drawable/card_border"
+                    android:padding="5dp" >
+                </com.guntzergames.medievalwipeout.layouts.CardLayout>
+            </LinearLayout>
+        </android.support.v7.widget.GridLayout>
 
         <TextView
             android:id="@+id/playerHandLibel"

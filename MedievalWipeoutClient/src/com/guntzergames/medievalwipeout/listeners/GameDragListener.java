@@ -37,7 +37,7 @@ public class GameDragListener implements OnDragListener {
 			break;
 			
 		case DragEvent.ACTION_DRAG_EXITED:
-			if ( dest.getId() == R.id.playerField || dest.getId() == R.id.opponentField || dest.getId() == R.id.playerHand ) {
+			if ( dest.getId() == R.id.playerFieldAttack || dest.getId() == R.id.playerFieldDefense || dest.getId() == R.id.opponentField || dest.getId() == R.id.playerHand ) {
 				dest.setBackgroundDrawable(gameActivity.getResources().getDrawable(R.drawable.frame_border));
 			}
 			break;
@@ -47,14 +47,16 @@ public class GameDragListener implements OnDragListener {
 			Log.i("PlayerFieldDragListener", String.format("ici, view = %h alors que field id = %h", dest.getId(), R.id.playerField));
 			gameActivity.hideCardLayoutDetail();
 			
-			if ( dest.getId() == R.id.playerField || dest.getId() == R.id.opponentField || dest.getId() == R.id.playerHand ) {
+			if ( dest.getId() == R.id.playerFieldAttack || dest.getId() == R.id.playerFieldDefense || dest.getId() == R.id.opponentField || dest.getId() == R.id.playerHand ) {
 				dest.setBackgroundDrawable(gameActivity.getResources().getDrawable(R.drawable.frame_border));
 			}
 			
+			String source = cardLayout.getPossibleSource(((View)cardLayout.getParent()).getId());
+			Log.i("TEST", String.format("source=%s, cardLayout.getId()=%s, R.id.playerFieldDefense=%s", source, ((View)cardLayout.getParent()).getId(), R.id.playerFieldDefense));
 			String target = cardLayout.getPossibleTarget(dest.getId());
 			
 			if ( target != null ) {
-				gameWebClient.playCard(gameActivity.getGameId(), target, cardLayout.getSeqNum());
+				gameWebClient.playCard(gameActivity.getGameId(), source, target, cardLayout.getSeqNum());
 			}
 			
 			break;

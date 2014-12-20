@@ -12,7 +12,9 @@ import com.guntzergames.medievalwipeout.beans.GameEventPlayCard;
 import com.guntzergames.medievalwipeout.beans.GameEventPlayCard.PlayerType;
 import com.guntzergames.medievalwipeout.beans.Player;
 import com.guntzergames.medievalwipeout.beans.PlayerDeckCard;
+import com.guntzergames.medievalwipeout.beans.PlayerField;
 import com.guntzergames.medievalwipeout.beans.PlayerFieldCard;
+import com.guntzergames.medievalwipeout.beans.PlayerFieldCard.Location;
 import com.guntzergames.medievalwipeout.beans.PlayerHand;
 import com.guntzergames.medievalwipeout.beans.PlayerHandCard;
 import com.guntzergames.medievalwipeout.beans.ResourceDeck;
@@ -259,7 +261,7 @@ public class GameManager {
 		
 	}
 	
-	public Game playCard(String userName, long gameId, String destinationLayout, int cardId) throws PlayerNotInGameException {
+	public Game playCard(String userName, long gameId, String sourceLayout, String destinationLayout, int cardId) throws PlayerNotInGameException {
 		
 		Game game = getGame(gameId);
 		Player player = playerManager.selectPlayer(game, userName);
@@ -275,22 +277,35 @@ public class GameManager {
 				GameEventPlayCard playerEvent = new GameEventPlayCard(PlayerType.PLAYER);
 				
 				// Play card from hand
-				if ( destinationLayout.equals("playerField") ) {
+				if ( destinationLayout.startsWith("playerField") ) {
+					PlayerField playerField = null;
 					PlayerHandCard card = hand.getCards().get(cardId);
+					PlayerFieldCard fieldCard = new PlayerFieldCard(card);
+					if ( destinationLayout.endsWith("Attack") ) {
+						playerField = player.getPlayerFieldAttack();
+						fieldCard.setLocation(Location.ATTACK);
+					}
+					else {
+						playerField = player.getPlayerFieldDefense();
+						fieldCard.setLocation(Location.DEFENSE);
+					}
 					playerEvent.setSource(card);
 					playerEvent.setSourceIndex(cardId);
 					playerEvent.setDestination(new PlayerFieldCard(card));
-					playerEvent.setDestinationIndex(player.getPlayerField().getLastIndex());
+					playerEvent.setDestinationIndex(playerField.getLastIndex());
 					player.setGold(player.getGold() - card.getGoldCost());
-					player.getPlayerField().addCard(new PlayerFieldCard(card));
+					playerField.addCard(fieldCard);
 					hand.getCards().remove((int)cardId);
 					player.updatePlayableHandCards();
 				}
 				
 				// Play card from field
 				if ( destinationLayout.equals("opponentField") ) {
-					PlayerFieldCard card = player.getPlayerField().getCards().get(cardId);
-					playerEvent.setSource(new PlayerFieldCard(card));
+					// TODO, handle opponent field type
+					System.out.println(String.format("Source layout: %s", sourceLayout));
+					PlayerField playerField = sourceLayout.equals("playerFieldDefense") ? player.getPlayerFieldDefense() : player.getPlayerFieldAttack();
+					PlayerFieldCard card = playerField.getCards().get(cardId);
+					playerEvent.setSource(card);
 					playerEvent.setSourceIndex(cardId);
 					playerEvent.setDestination(new PlayerFieldCard(card));
 					playerEvent.setDestinationIndex(cardId);
