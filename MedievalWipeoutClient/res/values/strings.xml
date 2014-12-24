@@ -10,6 +10,8 @@
     <string name="start_game">Start Game</string>
     <string name="edit_deck">Edit Deck</string>
     <string name="stop_game">Stop Game</string>
+    <string name="next_phase">Next Phase</string>
+    <string name="refresh_game">Refresh Game</string>
     <string name="resume_game">Resume Game</string>
     <string name="home">Home</string>
     <string name="new_deck">New Deck</string>

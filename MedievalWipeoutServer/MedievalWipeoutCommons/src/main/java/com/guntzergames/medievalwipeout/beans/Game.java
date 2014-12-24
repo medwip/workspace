@@ -30,6 +30,10 @@ public class Game {
 	private ResourceDeck resourceDeck = new ResourceDeck();
 	private ResourceDeckCard resourceCard1, resourceCard2;
 	private int turn;
+	
+	private int trade;
+	private int defense;
+	private int faith;
 
 	public Player getCreator() {
 		return creator;
@@ -171,9 +175,9 @@ public class Game {
 		gameClientView.setTurn(turn);
 		gameClientView.setPhase(phase);
 		gameClientView.setGold(player.getGold());
-		gameClientView.setTrade(player.getTrade());
-		gameClientView.setDefense(player.getDefense());
-		gameClientView.setFaith(player.getFaith());
+		gameClientView.setTrade(trade);
+		gameClientView.setDefense(defense);
+		gameClientView.setFaith(faith);
 		
 		return gameClientView;
 		
@@ -209,6 +213,42 @@ public class Game {
 		creator.adjustResources();
 		joiner.adjustResources();
 		
+	}
+
+	public int getTrade() {
+		return trade;
+	}
+
+	public void setTrade(int trade) {
+		this.trade = trade;
+	}
+	
+	public void addTrade(int trade) {
+		this.trade += trade;
+	}
+
+	public int getDefense() {
+		return defense;
+	}
+
+	public void setDefense(int defense) {
+		this.defense = defense;
+	}
+	
+	public void addDefense(int defense) {
+		this.defense += defense;
+	}
+
+	public int getFaith() {
+		return faith;
+	}
+
+	public void setFaith(int faith) {
+		this.faith = faith;
+	}
+	
+	public void addFaith(int faith) {
+		this.faith += faith;
 	}
 	
 }

@@ -22,10 +22,18 @@ public class GameDragListener implements OnDragListener {
 	
 	private boolean isPossibleDest(View dest) {
 		return dest.getId() == R.id.playerFieldAttack || dest.getId() == R.id.playerFieldDefense || 
-				dest.getId() == R.id.opponentField || dest.getId() == R.id.playerHand ||
+				dest.getId() == R.id.opponentFieldDefense || dest.getId() == R.id.playerHand ||
 				dest.getId() == R.id.opponentFieldAttackCard0 || dest.getId() == R.id.opponentFieldAttackCard1 ||
 				dest.getId() == R.id.opponentFieldAttackCard2 || dest.getId() == R.id.opponentFieldAttackCard3 ||
 				dest.getId() == R.id.opponentFieldAttackCard4;
+	}
+	
+	private boolean isDefenseDest(View dest) {
+		return dest.getId() == R.id.playerFieldDefense || dest.getId() == R.id.opponentFieldDefense;
+	}
+	
+	private int getFrameBorderId(View dest) {
+		return isDefenseDest(dest) ? R.drawable.frame_border_defense : R.drawable.frame_border;
 	}
 
 	@Override
@@ -46,7 +54,7 @@ public class GameDragListener implements OnDragListener {
 			
 		case DragEvent.ACTION_DRAG_EXITED:
 			if ( isPossibleDest(dest) ) {
-				dest.setBackgroundDrawable(gameActivity.getResources().getDrawable(R.drawable.frame_border));
+				dest.setBackgroundDrawable(gameActivity.getResources().getDrawable(getFrameBorderId(dest)));
 			}
 			break;
 			
@@ -56,7 +64,7 @@ public class GameDragListener implements OnDragListener {
 			gameActivity.hideCardLayoutDetail();
 			
 			if ( isPossibleDest(dest) ) {
-				dest.setBackgroundDrawable(gameActivity.getResources().getDrawable(R.drawable.frame_border));
+				dest.setBackgroundDrawable(gameActivity.getResources().getDrawable(getFrameBorderId(dest)));
 			}
 			
 			String source = cardLayout.getPossibleSource(((View)cardLayout.getParent()).getId());

@@ -31,7 +31,7 @@ public class CardLayout extends RelativeLayout {
 	private int seqNum;
 	private CardLocation cardLocation;
 	private LinearLayout rootView;
-	private TextView name, attack, lifePoints, resource, numberOfCards;
+	private TextView name, attack, lifePoints, trade, defense, faith, numberOfCards;
 	
 	private ImageView image;
 
@@ -45,30 +45,16 @@ public class CardLayout extends RelativeLayout {
 
 	public CardLayout(Context context) {
 		super(context);
+		this.context = context;
+		init();
 	}
 
 	public CardLayout(Context context, AttributeSet attrs) {
 		super(context, attrs);
-	}
-
-	public CardLayout(Context context, PlayerDeckCard card, int seqNum, CardLocation cardLocation) {
-		super(context);
-		this.card = card;
 		this.context = context;
-		this.seqNum = seqNum;
-		this.cardLocation = cardLocation;
 		init();
 	}
 	
-	public void init(Context context, AbstractCard card, int seqNum, CardLocation cardLocation) {
-		this.context = context;
-		this.card = card;
-		this.seqNum = seqNum;
-		this.cardLocation = cardLocation;
-		init();
-//		setup();
-	}
-
 	public void setup(Context context, AbstractCard card, int seqNum, CardLocation cardLocation) {
 		this.context = context;
 		this.card = card;
@@ -125,6 +111,9 @@ public class CardLayout extends RelativeLayout {
 		if (card instanceof PlayerDeckCard) {
 			
 			PlayerDeckCard playerDeckCard = (PlayerDeckCard)card;
+			if (!detailShown) {
+				lifePoints.setVisibility(View.INVISIBLE);
+			}
 
 			if ( detailShown ) {
 				try {
@@ -183,6 +172,7 @@ public class CardLayout extends RelativeLayout {
 		if (card instanceof DeckTemplateElement) {
 			
 			DeckTemplateElement deckTemplateElement = (DeckTemplateElement)card;
+			numberOfCards.setVisibility(View.VISIBLE);
 
 			if ( detailShown ) {
 				try {
@@ -245,7 +235,13 @@ public class CardLayout extends RelativeLayout {
 				image.setImageDrawable(getResources().getDrawable(R.drawable.card_unknown));
 			}
 			
-			resource.setText(String.format("Trade: %s\nDefense: %s\nFaith: %s", resourceDeckCard.getTrade(), resourceDeckCard.getDefense(), resourceDeckCard.getFaith()));
+			trade.setVisibility(View.VISIBLE);
+			defense.setVisibility(View.VISIBLE);
+			faith.setVisibility(View.VISIBLE);
+			
+			trade.setText(String.format("%s", resourceDeckCard.getTrade()));
+			defense.setText(String.format("%s", resourceDeckCard.getDefense()));
+			faith.setText(String.format("%s", resourceDeckCard.getFaith()));
 			
 		}
 		
@@ -305,36 +301,17 @@ public class CardLayout extends RelativeLayout {
 		rootView = (LinearLayout)layoutInflater.inflate(R.layout.card, null);
 		
 		reset();
-		resource = new TextView(context);
 		image = (ImageView)rootView.findViewById(R.id.cardLayoutImage);
 		name = (TextView)rootView.findViewById(R.id.cardLayoutName);
 		attack = (TextView)rootView.findViewById(R.id.cardLayoutAttack);
 		lifePoints = (TextView)rootView.findViewById(R.id.cardLayoutLifePoints);
 		numberOfCards = (TextView)rootView.findViewById(R.id.cardLayoutNumberOfCards);
-		resource = (TextView)rootView.findViewById(R.id.cardLayoutResource);
+		trade = (TextView)rootView.findViewById(R.id.cardLayoutTrade);
+		defense = (TextView)rootView.findViewById(R.id.cardLayoutDefense);
+		faith = (TextView)rootView.findViewById(R.id.cardLayoutFaith);
 		
 		this.addView(rootView);
 
-		if (card instanceof PlayerDeckCard) {
-			
-			if (!detailShown) {
-				lifePoints.setVisibility(View.INVISIBLE);
-			}
-			
-		}
-		
-		if (card instanceof DeckTemplateElement) {
-			
-			numberOfCards.setVisibility(View.VISIBLE);
-			
-		}
-		
-		if ( card instanceof ResourceDeckCard ) {
-			
-			resource.setVisibility(View.VISIBLE);
-			
-		}
-		
 	}
 
 	public PlayerDeckCard getPlayerDeckCard() {

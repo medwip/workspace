@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:drawable="@drawable/background"
+        android:scaleType="centerInside"/>
+    <item>
+        <shape>
+            <solid android:color="@color/field" />
+
+            <stroke
+                android:width="3dp"
+                android:color="@color/fieldBorderStroke" />
+
+            <corners android:radius="8dp" />
+        </shape>
+    </item>
+
+</layer-list>

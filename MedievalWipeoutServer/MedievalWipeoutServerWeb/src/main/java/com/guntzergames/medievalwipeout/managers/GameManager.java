@@ -95,7 +95,7 @@ public class GameManager {
 		resourceDeck.addCard(new ResourceDeckCard(0, 1, 0));
 		resourceDeck.addCard(new ResourceDeckCard(0, 0, 1));
 		game.setTurn(1);
-		game.setPhase(Phase.BEFORE_CREATOR_RESOURCE_DRAW);
+		game.setPhase(Phase.BEFORE_CREATOR_RESOURCE_CHOOSE);
 		nextPhase(game.getId());
 		
 	}
@@ -128,21 +128,21 @@ public class GameManager {
 		
 		switch (game.getPhase()) {
 		
-			case BEFORE_CREATOR_RESOURCE_DRAW:
+			case BEFORE_CREATOR_RESOURCE_CHOOSE:
 				resolveBeforeResourceDraw(game.getCreator());
 				game.setResourceCard1(game.getResourceDeck().pop());
 				game.getResourceCard1().setId(1);
 				game.setResourceCard2(game.getResourceDeck().pop());
 				game.getResourceCard2().setId(2);
-				game.setPhase(Phase.DURING_CREATOR_RESOURCE_DRAW);
+				game.setPhase(Phase.DURING_CREATOR_RESOURCE_CHOOSE);
 				break;
 				
-			case DURING_CREATOR_RESOURCE_DRAW:
-				game.setPhase(Phase.AFTER_CREATOR_RESOURCE_DRAW);
+			case DURING_CREATOR_RESOURCE_CHOOSE:
+				game.setPhase(Phase.AFTER_CREATOR_RESOURCE_CHOOSE);
 				nextPhase(gameId);
 				break;
 				
-			case AFTER_CREATOR_RESOURCE_DRAW:
+			case AFTER_CREATOR_RESOURCE_CHOOSE:
 				game.setPhase(Phase.BEFORE_CREATOR_DECK_DRAW);
 				nextPhase(gameId);
 				break;
@@ -158,10 +158,24 @@ public class GameManager {
 				break;
 				
 			case AFTER_CREATOR_DECK_DRAW:
-				game.setPhase(Phase.BEFORE_CREATOR_PLAY);
+				game.setPhase(Phase.BEFORE_CREATOR_RESOURCE_SELECT);
 				nextPhase(gameId);
 				break;
 				
+			case BEFORE_CREATOR_RESOURCE_SELECT:
+				game.setPhase(Phase.DURING_CREATOR_RESOURCE_SELECT);
+				break;
+			
+			case DURING_CREATOR_RESOURCE_SELECT:
+				game.setPhase(Phase.AFTER_CREATOR_RESOURCE_SELECT);
+				nextPhase(gameId);
+				break;
+			
+			case AFTER_CREATOR_RESOURCE_SELECT:
+				game.setPhase(Phase.BEFORE_CREATOR_PLAY);
+				nextPhase(gameId);
+				break;
+
 			case BEFORE_CREATOR_PLAY:
 				game.setPhase(Phase.DURING_CREATOR_PLAY);
 				break;
@@ -172,25 +186,25 @@ public class GameManager {
 				break;
 				
 			case AFTER_CREATOR_PLAY:
-				game.setPhase(Phase.BEFORE_JOINER_RESOURCE_DRAW);
+				game.setPhase(Phase.BEFORE_JOINER_RESOURCE_CHOOSE);
 				nextPhase(gameId);
 				break;
 				
-			case BEFORE_JOINER_RESOURCE_DRAW:
+			case BEFORE_JOINER_RESOURCE_CHOOSE:
 				resolveBeforeResourceDraw(game.getJoiner());
 				game.setResourceCard1(game.getResourceDeck().pop());
 				game.getResourceCard1().setId(1);
 				game.setResourceCard2(game.getResourceDeck().pop());
 				game.getResourceCard2().setId(2);
-				game.setPhase(Phase.DURING_JOINER_RESOURCE_DRAW);
+				game.setPhase(Phase.DURING_JOINER_RESOURCE_CHOOSE);
 				break;
 				
-			case DURING_JOINER_RESOURCE_DRAW:
-				game.setPhase(Phase.AFTER_JOINER_RESOURCE_DRAW);
+			case DURING_JOINER_RESOURCE_CHOOSE:
+				game.setPhase(Phase.AFTER_JOINER_RESOURCE_CHOOSE);
 				nextPhase(gameId);
 				break;
 				
-			case AFTER_JOINER_RESOURCE_DRAW:
+			case AFTER_JOINER_RESOURCE_CHOOSE:
 				game.setPhase(Phase.BEFORE_JOINER_DECK_DRAW);
 				nextPhase(gameId);
 				break;
@@ -210,6 +224,20 @@ public class GameManager {
 				nextPhase(gameId);
 				break;
 				
+			case BEFORE_JOINER_RESOURCE_SELECT:
+				game.setPhase(Phase.DURING_JOINER_RESOURCE_SELECT);
+				break;
+
+			case DURING_JOINER_RESOURCE_SELECT:
+				game.setPhase(Phase.AFTER_JOINER_RESOURCE_SELECT);
+				nextPhase(gameId);
+				break;
+			
+			case AFTER_JOINER_RESOURCE_SELECT:
+				game.setPhase(Phase.BEFORE_JOINER_PLAY);
+				nextPhase(gameId);
+				break;
+			
 			case BEFORE_JOINER_PLAY:
 				game.setPhase(Phase.DURING_JOINER_PLAY);
 				break;
@@ -220,11 +248,11 @@ public class GameManager {
 				break;
 				
 			case AFTER_JOINER_PLAY:
-				game.setPhase(Phase.BEFORE_CREATOR_RESOURCE_DRAW);
+				game.setPhase(Phase.BEFORE_CREATOR_RESOURCE_CHOOSE);
 				game.nextTurn();
 				nextPhase(gameId);
 				break;
-		
+
 			default:
 				break;
 		
@@ -291,7 +319,7 @@ public class GameManager {
 					}
 					playerEvent.setSource(card);
 					playerEvent.setSourceIndex(cardId);
-					playerEvent.setDestination(new PlayerFieldCard(card));
+					playerEvent.setDestination(fieldCard);
 					playerEvent.setDestinationIndex(playerField.getLastIndex());
 					player.setGold(player.getGold() - card.getGoldCost());
 					playerField.addCard(fieldCard);
@@ -332,13 +360,17 @@ public class GameManager {
 				game = nextPhase(gameId);
 				break;
 				
-			case DURING_CREATOR_RESOURCE_DRAW:
-			case DURING_JOINER_RESOURCE_DRAW:
-				ResourceDeckCard resourceDeckCard = ((cardId == 1) ? game.getResourceCard1() : game.getResourceCard2());
-				player.addTrade(resourceDeckCard.getTrade());
-				player.addDefense(resourceDeckCard.getDefense());
-				player.addFaith(resourceDeckCard.getFaith());
+			case DURING_CREATOR_RESOURCE_CHOOSE:
+			case DURING_JOINER_RESOURCE_CHOOSE:
+				ResourceDeckCard playerResourceDeckCard = ((cardId == 1) ? game.getResourceCard1() : game.getResourceCard2());
+				ResourceDeckCard gameResourceDeckCard = ((cardId == 2) ? game.getResourceCard1() : game.getResourceCard2());
+				player.addTrade(playerResourceDeckCard.getTrade());
+				player.addDefense(playerResourceDeckCard.getDefense());
+				player.addFaith(playerResourceDeckCard.getFaith());
 				player.updatePlayableHandCards();
+				game.addTrade(gameResourceDeckCard.getTrade());
+				game.addDefense(gameResourceDeckCard.getDefense());
+				game.addFaith(gameResourceDeckCard.getFaith());
 				game = nextPhase(gameId);
 				break;
 				

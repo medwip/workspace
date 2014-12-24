@@ -15,7 +15,7 @@
     </style>
     
     <style name="FieldStyle">
-        <item name="android:background">@color/field</item>
+        <item name="android:background">@drawable/background</item>
     </style>
 
     <style name="FieldStyle.Defense">

@@ -1,6 +1,5 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res/com.guntzergames.medievalwipeout.activities"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -115,7 +114,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_weight="1"
-                android:background="@drawable/frame_border"
+                android:background="@drawable/frame_border_defense"
                 android:orientation="horizontal" >
 
                 <com.guntzergames.medievalwipeout.layouts.CardLayout
@@ -311,7 +310,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_weight="1"
-                android:background="@drawable/frame_border"
+                android:background="@drawable/frame_border_defense"
                 android:orientation="horizontal" >
 
                 <com.guntzergames.medievalwipeout.layouts.CardLayout
@@ -416,19 +415,12 @@
             </LinearLayout>
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/playerHandLibel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/playerField"
-            android:text="Hand" />
-
         <LinearLayout
             android:id="@+id/playerHand"
             style="@style/FieldStyle"
             android:layout_width="fill_parent"
             android:layout_height="@dimen/fieldHeight"
-            android:layout_below="@id/playerHandLibel"
+            android:layout_below="@id/playerField"
             android:background="@drawable/frame_border"
             android:orientation="horizontal" >
 
@@ -549,7 +541,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_toLeftOf="@id/homeButton"
-            android:text="Get Game" />
+            android:text="@string/refresh_game" />
 
         <Button
             android:id="@+id/nextPhaseButton"
@@ -558,7 +550,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_toLeftOf="@id/getGameButton"
-            android:text="Next Phase" />
+            android:text="@string/next_phase" />
 
         <ImageButton
             android:id="@+id/deckButton"
@@ -569,6 +561,79 @@
             android:contentDescription="@string/deck"
             android:src="@drawable/abc_ab_bottom_solid_dark_holo" />
     </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/gameResources"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:background="@drawable/frame_border"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:layout_width="110dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/card_border"
+            android:orientation="horizontal"
+            android:paddingBottom="5dp"
+            android:paddingLeft="10dp"
+            android:paddingTop="5dp" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/trade" />
+
+            <TextView
+                android:id="@+id/gameTrade"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/not_initialized" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="110dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/card_border"
+            android:orientation="horizontal"
+            android:paddingBottom="5dp"
+            android:paddingLeft="10dp"
+            android:paddingTop="5dp" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/defense" />
+
+            <TextView
+                android:id="@+id/gameDefense"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/not_initialized" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="110dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/card_border"
+            android:orientation="horizontal"
+            android:paddingBottom="5dp"
+            android:paddingLeft="10dp"
+            android:paddingTop="5dp" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/faith" />
+
+            <TextView
+                android:id="@+id/gameFaith"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/not_initialized" />
+        </LinearLayout>
+    </LinearLayout>
 
     <RelativeLayout
         android:id="@+id/playerChoices"

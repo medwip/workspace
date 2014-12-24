@@ -157,7 +157,7 @@ public class DeckTemplateActivity extends ApplicationActivity {
 		for ( DeckTemplateElement deckTemplateElement : selectedDeckTemplate.getCards() ) {
 			
 			CardLayout cardLayout = (CardLayout) layout.findViewById(CardLayout.getGridCardFromId(i++));
-			cardLayout.init(this, deckTemplateElement, 0, CardLocation.GRID);
+			cardLayout.setup(this, deckTemplateElement, 0, CardLocation.GRID);
 //			cardGridView.addView(cardLayout, new GridLayout.LayoutParams(
 //                    GridLayout.spec(1, GridLayout.CENTER),
 //                    GridLayout.spec(1, GridLayout.CENTER)));
