@@ -2,6 +2,7 @@ package com.guntzergames.medievalwipeout.views;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.List;
 
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonParseException;
@@ -22,8 +23,8 @@ public class GameView {
 	private long id;
 	
 	private Player player;
-	private Player opponent;
-	private boolean creator, joiner;
+	private List<Player> opponents;
+	private boolean activePlayer;
 	
 	private ResourceDeckCard resourceCard1, resourceCard2;
 	
@@ -55,12 +56,12 @@ public class GameView {
 		this.player = player;
 	}
 
-	public Player getOpponent() {
-		return opponent;
+	public List<Player> getOpponents() {
+		return opponents;
 	}
 
-	public void setOpponent(Player opponent) {
-		this.opponent = opponent;
+	public void setOpponents(List<Player> opponents) {
+		this.opponents = opponents;
 	}
 
 	public ResourceDeckCard getResourceCard1() {
@@ -159,22 +160,14 @@ public class GameView {
 		this.gameState = gameState;
 	}
 
-	public boolean isCreator() {
-		return creator;
+	public boolean isActivePlayer() {
+		return activePlayer;
 	}
 
-	public void setCreator(boolean creator) {
-		this.creator = creator;
+	public void setActivePlayer(boolean activePlayer) {
+		this.activePlayer = activePlayer;
 	}
 
-	public boolean isJoiner() {
-		return joiner;
-	}
-
-	public void setJoiner(boolean joiner) {
-		this.joiner = joiner;
-	}
-	
 	public static GameView fromJson(String json) {
 		
 		ObjectMapper mapper = new ObjectMapper();

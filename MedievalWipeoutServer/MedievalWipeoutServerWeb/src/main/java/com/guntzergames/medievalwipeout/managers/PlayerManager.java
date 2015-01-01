@@ -11,8 +11,9 @@ public class PlayerManager {
 	
 	public Player selectPlayer(Game game, String facebookUserId) throws PlayerNotInGameException {
 		
-		if ( game.getCreator().getAccount().getFacebookUserId().equals(facebookUserId) ) return game.getCreator();
-		if ( game.getJoiner().getAccount().getFacebookUserId().equals(facebookUserId) ) return game.getJoiner();
+		for ( Player player : game.getPlayers() ) {
+			if ( player.getAccount().getFacebookUserId().equals(facebookUserId) ) return player;
+		}
 		
 		throw new PlayerNotInGameException();
 		

@@ -113,7 +113,7 @@ public class PlayerDeckCard extends AbstractCard {
 
 	@Override
 	public String toString() {
-		return String.format("%s: Attack = %s, Life Points = %s", name, attack, lifePoints);
+		return String.format("[%s] %s: Attack = %s, Life Points = %s", this.getClass().getSimpleName(), name, attack, lifePoints);
 	}
 
 }

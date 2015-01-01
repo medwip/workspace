@@ -27,7 +27,7 @@ import com.guntzergames.medievalwipeout.beans.CollectionElement;
 import com.guntzergames.medievalwipeout.beans.DeckTemplate;
 import com.guntzergames.medievalwipeout.beans.DeckTemplateElement;
 import com.guntzergames.medievalwipeout.enums.CardLocation;
-import com.guntzergames.medievalwipeout.interfaces.Constants;
+import com.guntzergames.medievalwipeout.interfaces.ClientConstants;
 import com.guntzergames.medievalwipeout.layouts.CardLayout;
 
 public class DeckTemplateActivity extends ApplicationActivity {
@@ -46,8 +46,8 @@ public class DeckTemplateActivity extends ApplicationActivity {
 
 	private void init() {
 
-		deckTemplateId = getIntent().getExtras().getLong(Constants.DECK_TEMPLATE_ID);
-		facebookUserId = getIntent().getExtras().getString(Constants.FACEBOOK_USER_ID);
+		deckTemplateId = getIntent().getExtras().getLong(ClientConstants.DECK_TEMPLATE_ID);
+		facebookUserId = getIntent().getExtras().getString(ClientConstants.FACEBOOK_USER_ID);
 
 		Toast.makeText(this, String.format("Editing template ID=%s, facebookUserId=%s", deckTemplateId, facebookUserId), Toast.LENGTH_SHORT).show();
 
@@ -155,14 +155,8 @@ public class DeckTemplateActivity extends ApplicationActivity {
 		int i = 0;
 		
 		for ( DeckTemplateElement deckTemplateElement : selectedDeckTemplate.getCards() ) {
-			
 			CardLayout cardLayout = (CardLayout) layout.findViewById(CardLayout.getGridCardFromId(i++));
 			cardLayout.setup(this, deckTemplateElement, 0, CardLocation.GRID);
-//			cardGridView.addView(cardLayout, new GridLayout.LayoutParams(
-//                    GridLayout.spec(1, GridLayout.CENTER),
-//                    GridLayout.spec(1, GridLayout.CENTER)));
-//			Toast.makeText(getActivity(), "deckTemplateElement " + deckTemplateElement, Toast.LENGTH_LONG).show();
-			
 		}
 		
 	}

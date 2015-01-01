@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android" >
-    <solid android:color="@color/field" />
-    <stroke android:width="3dp" android:color="@color/fieldBorderHighlightStroke" />
-    <corners android:radius="8dp" />
-</shape>
+<transition xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item android:drawable="@drawable/highlight_border1"/>
+    <item android:drawable="@drawable/frame_border"/>
+    
+</transition>

@@ -30,10 +30,10 @@ import com.facebook.model.GraphUser;
 import com.guntzergames.medievalwipeout.beans.Account;
 import com.guntzergames.medievalwipeout.beans.DeckTemplate;
 import com.guntzergames.medievalwipeout.enums.GameState;
-import com.guntzergames.medievalwipeout.interfaces.Constants;
+import com.guntzergames.medievalwipeout.interfaces.ClientConstants;
+import com.guntzergames.medievalwipeout.interfaces.CommonConstants;
 import com.guntzergames.medievalwipeout.services.HomeGameCheckerThread;
 import com.guntzergames.medievalwipeout.views.GameView;
-import com.guntzergames.medievalwipeout.webclients.GameWebClient;
 
 public class HomeActivity extends ApplicationActivity {
 
@@ -83,20 +83,20 @@ public class HomeActivity extends ApplicationActivity {
 		loader = (ProgressBar) layout.findViewById(R.id.progressBar);
 		deckTemplateListView = (ListView) layout.findViewById(R.id.deckTemplatesList);
 
-		gameId = intent.getLongExtra(Constants.GAME_ID, 0);
-		int gameState = intent.getIntExtra(Constants.GAME_STATE, Constants.GAME_NOT_STARTED);
-		if (gameId > 0 && gameState != Constants.GAME_STOPPED) {
+		gameId = intent.getLongExtra(ClientConstants.GAME_ID, 0);
+		int gameState = intent.getIntExtra(ClientConstants.GAME_STATE, ClientConstants.GAME_NOT_STARTED);
+		if (gameId > 0 && gameState != ClientConstants.GAME_STOPPED) {
 			getGame(gameId);
 		}
 		debugTextView.setText("Game: " + gameView);
 
-		if (gameState == Constants.GAME_IN_PROGRESS) {
+		if (gameState == ClientConstants.GAME_IN_PROGRESS) {
 			Toast.makeText(this, String.format("Returned to home page from game %s", gameId), Toast.LENGTH_SHORT).show();
 			resumeGameButton.setEnabled(true);
-		} else if (gameState == Constants.GAME_STOPPED) {
+		} else if (gameState == ClientConstants.GAME_STOPPED) {
 			Toast.makeText(this, String.format("Stopped game %s", gameId), Toast.LENGTH_SHORT).show();
 			resumeGameButton.setEnabled(false);
-		} else if (gameState == Constants.GAME_NOT_STARTED) {
+		} else if (gameState == ClientConstants.GAME_NOT_STARTED) {
 			resumeGameButton.setEnabled(false);
 		} else {
 			Toast.makeText(this, String.format("Unknown state... %s", gameId), Toast.LENGTH_SHORT).show();
@@ -258,11 +258,6 @@ public class HomeActivity extends ApplicationActivity {
 	}
 	
 	@Override
-	public void onError(String err) {
-		setDebugText(err);
-	}
-
-	@Override
 	public void onGameJoined(GameView gameView) {
 
 		this.gameView = gameView;
@@ -324,10 +319,10 @@ public class HomeActivity extends ApplicationActivity {
 	public void startGameActivity(GameView gameView) {
 		this.gameView = gameView;
 		Intent intent = new Intent(HomeActivity.this, GameActivity.class);
-		intent.putExtra(Constants.GAME_ID, gameView.getId());
-		intent.putExtra(Constants.GAME_COMMAND, "GAME_START");
+		intent.putExtra(ClientConstants.GAME_ID, gameView.getId());
+		intent.putExtra(ClientConstants.GAME_COMMAND, "GAME_START");
 		Log.i("startGameActivity", user.getName());
-		intent.putExtra(Constants.FACEBOOK_USER_ID, user.getId());
+		intent.putExtra(ClientConstants.FACEBOOK_USER_ID, user.getId());
 		intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 		// startActivityForResult(intent, MAIN_ACTIVITY);
 		startActivity(intent);
@@ -335,9 +330,9 @@ public class HomeActivity extends ApplicationActivity {
 
 	public void startEditDeckActivity() {
 		Intent intent = new Intent(HomeActivity.this, DeckTemplateActivity.class);
-		intent.putExtra(Constants.DECK_TEMPLATE_ID, selectedDeckTemplateId);
+		intent.putExtra(ClientConstants.DECK_TEMPLATE_ID, selectedDeckTemplateId);
 		Log.i(TAG, "startEditDeckActivity");
-		intent.putExtra(Constants.FACEBOOK_USER_ID, user.getId());
+		intent.putExtra(ClientConstants.FACEBOOK_USER_ID, user.getId());
 		intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 		startActivity(intent);
 	}

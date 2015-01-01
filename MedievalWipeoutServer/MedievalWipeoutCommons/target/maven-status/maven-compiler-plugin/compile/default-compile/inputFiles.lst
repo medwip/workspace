@@ -8,8 +8,9 @@ C:\dev\workspace\MedievalWipeoutServer\MedievalWipeoutCommons\src\main\java\com\
 C:\dev\workspace\MedievalWipeoutServer\MedievalWipeoutCommons\src\main\java\com\guntzergames\medievalwipeout\enums\Phase.java
 C:\dev\workspace\MedievalWipeoutServer\MedievalWipeoutCommons\src\main\java\com\guntzergames\medievalwipeout\beans\PlayerHand.java
 C:\dev\workspace\MedievalWipeoutServer\MedievalWipeoutCommons\src\main\java\com\guntzergames\medievalwipeout\enums\GameState.java
-C:\dev\workspace\MedievalWipeoutServer\MedievalWipeoutCommons\src\main\java\com\guntzergames\medievalwipeout\beans\PlayerHandCard.java
+C:\dev\workspace\MedievalWipeoutServer\MedievalWipeoutCommons\src\main\java\com\guntzergames\medievalwipeout\interfaces\CommonConstants.java
 C:\dev\workspace\MedievalWipeoutServer\MedievalWipeoutCommons\src\main\java\com\guntzergames\medievalwipeout\beans\CollectionElement.java
+C:\dev\workspace\MedievalWipeoutServer\MedievalWipeoutCommons\src\main\java\com\guntzergames\medievalwipeout\beans\PlayerHandCard.java
 C:\dev\workspace\MedievalWipeoutServer\MedievalWipeoutCommons\src\main\java\com\guntzergames\medievalwipeout\beans\ResourceDeckCard.java
 C:\dev\workspace\MedievalWipeoutServer\MedievalWipeoutCommons\src\main\java\com\guntzergames\medievalwipeout\beans\Game.java
 C:\dev\workspace\MedievalWipeoutServer\MedievalWipeoutCommons\src\main\java\com\guntzergames\medievalwipeout\beans\GameEvent.java

@@ -1,7 +1,7 @@
 package com.guntzergames.medievalwipeout.services;
 
 import com.guntzergames.medievalwipeout.activities.HomeActivity;
-import com.guntzergames.medievalwipeout.interfaces.Constants;
+import com.guntzergames.medievalwipeout.interfaces.ClientConstants;
 import com.guntzergames.medievalwipeout.webclients.GameWebClient;
 
 public class HomeGameCheckerThread extends Thread {
@@ -12,7 +12,7 @@ public class HomeGameCheckerThread extends Thread {
 	
 	public HomeGameCheckerThread(HomeActivity homeActivity) {
 		this.homeActivity = homeActivity;
-		gameWebClient = new GameWebClient(Constants.SERVER_IP_ADDRESS, homeActivity);
+		gameWebClient = new GameWebClient(ClientConstants.SERVER_IP_ADDRESS, homeActivity);
 	}
 	
 	@Override

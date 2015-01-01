@@ -1,6 +1,6 @@
 package com.guntzergames.medievalwipeout.interfaces;
 
-public interface Constants {
+public interface ClientConstants {
 	
 //	public static final String SERVER_IP_ADDRESS = "192.168.10.10";
 	public static final String SERVER_IP_ADDRESS = "guntzergames.ddns.net";
@@ -24,5 +24,5 @@ public interface Constants {
 	public static final int CARD_LAYOUT_NUMBER_OF_CARDS_ID = 6;
 	
 	public static final int CARD_LAYOUT_ANIMATION_ID = 5;
-
+	
 }

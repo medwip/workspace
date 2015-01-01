@@ -20,6 +20,12 @@ public class PlayerFieldCard extends PlayerDeckCard {
 		this.played = false;
 	}
 
+	public PlayerFieldCard(PlayerFieldCard playerFieldCard) {
+		this((PlayerDeckCard)playerFieldCard);
+		this.currentLifePoints = playerFieldCard.getLifePoints();
+		this.location = playerFieldCard.getLocation();
+	}
+
 	public boolean isPlayed() {
 		return played;
 	}
@@ -30,6 +36,10 @@ public class PlayerFieldCard extends PlayerDeckCard {
 
 	public int getCurrentLifePoints() {
 		return currentLifePoints;
+	}
+	
+	public void removeCurrentLifePoints(int lifePoints) {
+		currentLifePoints -= lifePoints;
 	}
 
 	public void setCurrentLifePoints(int currentLifePoints) {

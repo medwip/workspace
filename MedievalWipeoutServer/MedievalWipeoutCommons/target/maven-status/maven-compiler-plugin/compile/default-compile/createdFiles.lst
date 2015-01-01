@@ -21,6 +21,7 @@ com\guntzergames\medievalwipeout\views\GameView.class
 com\guntzergames\medievalwipeout\abstracts\AbstractCard.class
 com\guntzergames\medievalwipeout\beans\PlayerField.class
 com\guntzergames\medievalwipeout\beans\PlayerDeck.class
+com\guntzergames\medievalwipeout\interfaces\CommonConstants.class
 com\guntzergames\medievalwipeout\beans\DeckTemplateElement.class
 com\guntzergames\medievalwipeout\beans\Account.class
 com\guntzergames\medievalwipeout\beans\Game.class

@@ -166,6 +166,10 @@ public class Player {
 	public LinkedList<GameEvent> getEvents() {
 		return events;
 	}
+	
+	public boolean hasSameAccount(Player player) {
+		return player != null && account.getFacebookUserId().equals(player.getAccount().getFacebookUserId());
+	}
 
 //	@JsonIgnore
 	public void setEvents(LinkedList<GameEvent> events) {

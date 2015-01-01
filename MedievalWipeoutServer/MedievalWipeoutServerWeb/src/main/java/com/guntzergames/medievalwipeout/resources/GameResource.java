@@ -99,11 +99,11 @@ public class GameResource {
 	}
 
 	@GET
-	@Path("play/{userName}/{gameId}/{sourceLayout}/{destinationLayout}/{cardId}")
+	@Path("play/{userName}/{gameId}/{sourceLayout}/{sourceCardId}/{destinationLayout}/{destinationCardId}")
     @Produces("text/plain")
-    public String playCard(@PathParam("userName") String userName, @PathParam("gameId") long gameId, @PathParam("sourceLayout") String sourceLayout, @PathParam("destinationLayout") String destinationLayout, @PathParam("cardId") int cardId) 
+    public String playCard(@PathParam("userName") String userName, @PathParam("gameId") long gameId, @PathParam("sourceLayout") String sourceLayout, @PathParam("sourceCardId") int sourceCardId, @PathParam("destinationLayout") String destinationLayout, @PathParam("destinationCardId") int destinationCardId) 
 	throws PlayerNotInGameException {
-		Game game = gameManager.playCard(userName, gameId, sourceLayout, destinationLayout, cardId);
+		Game game = gameManager.playCard(userName, gameId, sourceLayout, sourceCardId, destinationLayout, destinationCardId);
 		Player player = playerManager.selectPlayer(game, userName);
 		String ret = buildGameView(player, game);
         return ret;

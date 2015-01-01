@@ -247,31 +247,6 @@ public class CardLayout extends RelativeLayout {
 		
 	}
 	
-	public String getPossibleTarget(int dest) {
-		
-		if ( cardLocation == CardLocation.MODAL && card instanceof ResourceDeckCard && dest == R.id.playerHand ) {
-			return "playerHand";
-		}
-		if ( cardLocation == CardLocation.MODAL && card instanceof PlayerDeckCard && dest == R.id.playerHand ) {
-			return "playerHand";
-		}
-		if ( cardLocation == CardLocation.HAND && card instanceof PlayerDeckCard && dest == R.id.playerFieldAttack ) {
-			return "playerFieldAttack";
-		}
-		if ( cardLocation == CardLocation.HAND && card instanceof PlayerDeckCard && dest == R.id.playerFieldDefense ) {
-			return "playerFieldDefense";
-		}
-		if ( cardLocation == CardLocation.FIELD_ATTACK && card instanceof PlayerDeckCard && dest == R.id.opponentField ) {
-			return "opponentField";
-		}
-		if ( cardLocation == CardLocation.FIELD_DEFENSE && card instanceof PlayerDeckCard && dest == R.id.opponentField ) {
-			return "opponentField";
-		}
-		
-		return null;
-		
-	}
-
 	public String getPossibleSource(int id) {
 		
 		if ( id == R.id.playerField ) {
@@ -283,9 +258,9 @@ public class CardLayout extends RelativeLayout {
 		else if ( id == R.id.playerFieldAttack ) {
 			return "playerFieldAttack";
 		}
-		else if ( id == R.id.playerFieldDefense ) {
-			return "playerFieldDefense";
-		}
+//		else if ( id == R.id.playerFieldDefense ) {
+//			return "playerFieldDefense";
+//		}
 		else if ( id == R.id.opponentField ) {
 			return "opponentField";
 		}

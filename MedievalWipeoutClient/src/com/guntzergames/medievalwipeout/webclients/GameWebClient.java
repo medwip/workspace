@@ -65,8 +65,8 @@ public class GameWebClient {
 		get("http://" + ip + ":8080/MedievalWipeout/rest/game/nextPhase/" + gameId + "/" + callbackable.getFacebookUserId(), ResponseType.GET_GAME);
 	}
 
-	public void playCard(long gameId, String sourceLayout, String destinationLayout, long cardId) {
-		get("http://" + ip + ":8080/MedievalWipeout/rest/game/play/" + callbackable.getFacebookUserId() + "/" + gameId + "/" + sourceLayout + "/" + destinationLayout + "/" + cardId, ResponseType.GET_GAME);
+	public void playCard(long gameId, String sourceLayout, long sourceCardId, String destinationLayout, long destinationCardId) {
+		get("http://" + ip + ":8080/MedievalWipeout/rest/game/play/" + callbackable.getFacebookUserId() + "/" + gameId + "/" + sourceLayout + "/" + sourceCardId + "/" + destinationLayout + "/" + destinationCardId, ResponseType.GET_GAME);
 	}
 
 	public void deleteGame(long gameId) {

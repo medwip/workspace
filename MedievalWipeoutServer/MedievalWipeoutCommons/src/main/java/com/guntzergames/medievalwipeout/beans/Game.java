@@ -1,5 +1,8 @@
 package com.guntzergames.medievalwipeout.beans;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,21 +19,26 @@ import com.guntzergames.medievalwipeout.views.GameView;
 @Entity
 @Table(name = "GAME")
 public class Game {
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
-    @Column(name = "ID")
+	@Basic(optional = false)
+	@Column(name = "ID")
 	private long id;
-	
+
 	private Player creator;
 	private Player joiner;
+	private List<Player> players = new ArrayList<Player>();
+	private Player activePlayer;
+
+	private int numberOfPlayers;
+
 	private GameState gameState = GameState.WAITING_FOR_JOINER;
 	private Phase phase;
 	private ResourceDeck resourceDeck = new ResourceDeck();
 	private ResourceDeckCard resourceCard1, resourceCard2;
 	private int turn;
-	
+
 	private int trade;
 	private int defense;
 	private int faith;
@@ -66,40 +74,46 @@ public class Game {
 	public void setGameState(GameState gameState) {
 		this.gameState = gameState;
 	}
-	
+
 	public Player selectPlayer(Player player) throws PlayerNotInGameException {
-		
+
 		return selectPlayer(player.getAccount().getFacebookUserId());
 	}
 
-	public Player selectOpponent(Player player) throws PlayerNotInGameException {
+	public List<Player> selectOpponents(Player player) throws PlayerNotInGameException {
+
+		List<Player> opponents = new ArrayList<Player>();
 		
-		return selectOpponent(player.getAccount().getFacebookUserId());
+		for ( Player currentPlayer : players ) {
+			if ( !currentPlayer.hasSameAccount(player) ) {
+				opponents.add(currentPlayer);
+			}
+		}
+		
+		return opponents;
 	}
 
 	public Player selectPlayer(String userName) throws PlayerNotInGameException {
-		
-		if ( creator.getAccount().getFacebookUserId().equals(userName) ) {
-			return creator;
-		}
-		
-		if ( joiner != null && joiner.getAccount().getFacebookUserId().equals(userName) ) {
-			return joiner;
+
+		for ( Player player : players ) {
+			if ( player.getAccount().getFacebookUserId().equals(userName) ) {
+				return player;
+			}
 		}
 		
 		throw new PlayerNotInGameException();
 	}
 
 	public Player selectOpponent(String userName) throws PlayerNotInGameException {
-		
-		if ( creator.getAccount().getFacebookUserId().equals(userName) ) {
+
+		if (creator.getAccount().getFacebookUserId().equals(userName)) {
 			return joiner;
 		}
-		
-		if ( joiner != null && joiner.getAccount().getFacebookUserId().equals(userName) ) {
+
+		if (joiner != null && joiner.getAccount().getFacebookUserId().equals(userName)) {
 			return creator;
 		}
-		
+
 		throw new PlayerNotInGameException();
 	}
 
@@ -132,7 +146,48 @@ public class Game {
 		this.turn = turn;
 	}
 
-		public ResourceDeckCard getResourceCard1() {
+	public List<Player> getPlayers() {
+		return players;
+	}
+
+	public void setPlayers(List<Player> players) {
+		this.players = players;
+	}
+	
+	public void addPlayer(Player player) {
+		players.add(player);
+	}
+	
+	public boolean isPlayerRegistered(String facebookUserId) {
+		boolean found = false;
+		
+		for ( Player currentPlayer : players ) {
+			if ( currentPlayer.getAccount().getFacebookUserId().equals(facebookUserId) ) {
+				found = true;
+				break;
+			}
+		}
+		
+		return found;
+	}
+
+	public Player getActivePlayer() {
+		return activePlayer;
+	}
+
+	public void setActivePlayer(Player activePlayer) {
+		this.activePlayer = activePlayer;
+	}
+
+	public int getNumberOfPlayers() {
+		return numberOfPlayers;
+	}
+
+	public void setNumberOfPlayers(int numberOfPlayers) {
+		this.numberOfPlayers = numberOfPlayers;
+	}
+
+	public ResourceDeckCard getResourceCard1() {
 		return resourceCard1;
 	}
 
@@ -149,28 +204,25 @@ public class Game {
 	}
 
 	public GameView buildGameView(Player player) throws PlayerNotInGameException {
-		
+
 		GameView gameClientView = new GameView();
 		gameClientView.setId(id);
-		
+
 		gameClientView.setPlayer(selectPlayer(player));
-		gameClientView.setOpponent(selectOpponent(player));
-		if ( player.getAccount().getFacebookUserId().equals(creator.getAccount().getFacebookUserId()) ) {
-			gameClientView.setCreator(true);
-			gameClientView.setJoiner(false);
+		gameClientView.setOpponents(selectOpponents(player));
+		if (player.getAccount().getFacebookUserId().equals(getActivePlayer().getAccount().getFacebookUserId())) {
+			gameClientView.setActivePlayer(true);
+		} else {
+			gameClientView.setActivePlayer(false);
 		}
-		else {
-			gameClientView.setCreator(false);
-			gameClientView.setJoiner(true);
-		}
-		
+
 		gameClientView.setResourceCard1(resourceCard1);
 		gameClientView.setResourceCard2(resourceCard2);
-		
+
 		gameClientView.setPlayerHand(player.getPlayerHand());
 		gameClientView.setPlayerFieldAttack(player.getPlayerFieldAttack());
 		gameClientView.setPlayerFieldDefense(player.getPlayerFieldDefense());
-		
+
 		gameClientView.setGameState(gameState);
 		gameClientView.setTurn(turn);
 		gameClientView.setPhase(phase);
@@ -178,40 +230,61 @@ public class Game {
 		gameClientView.setTrade(trade);
 		gameClientView.setDefense(defense);
 		gameClientView.setFaith(faith);
-		
+
 		return gameClientView;
-		
+
 	}
-	
+
 	public void nextTurn() {
-		
+
 		turn += 1;
 		resetPlayable();
 		adjustResources();
-		
+		selectNextActivePlayer();
+
 	}
-	
+
 	private void resetPlayable(PlayerField playerField) {
-		
-		for ( PlayerFieldCard card : playerField.getCards() ) {
+
+		for (PlayerFieldCard card : playerField.getCards()) {
 			card.setPlayed(false);
+		}
+
+	}
+
+	public void resetPlayable() {
+
+		for ( Player player : getPlayers() ) {
+			resetPlayable(player.getPlayerFieldAttack());
+			resetPlayable(player.getPlayerFieldDefense());
 		}
 		
 	}
-	
-	public void resetPlayable() {
-		
-		resetPlayable(creator.getPlayerFieldAttack());
-		resetPlayable(creator.getPlayerFieldDefense());
-		resetPlayable(joiner.getPlayerFieldAttack());
-		resetPlayable(joiner.getPlayerFieldDefense());
-		
+
+	public void adjustResources() {
+
+		for ( Player player : getPlayers() ) {
+			player.adjustResources();
+		}
+
 	}
 	
-	public void adjustResources() {
+	public void selectNextActivePlayer() {
 		
-		creator.adjustResources();
-		joiner.adjustResources();
+		int i = 0;
+		
+		for ( Player player : getPlayers() ) {
+			if ( player == activePlayer ) {
+				if ( i < players.size() - 1 ) {
+					activePlayer = players.get(i + 1);
+				}
+				else {
+					activePlayer = players.get(0);
+				}
+				break;
+			}
+			i++;
+		}
 		
 	}
 
@@ -222,7 +295,7 @@ public class Game {
 	public void setTrade(int trade) {
 		this.trade = trade;
 	}
-	
+
 	public void addTrade(int trade) {
 		this.trade += trade;
 	}
@@ -234,7 +307,7 @@ public class Game {
 	public void setDefense(int defense) {
 		this.defense = defense;
 	}
-	
+
 	public void addDefense(int defense) {
 		this.defense += defense;
 	}
@@ -246,9 +319,9 @@ public class Game {
 	public void setFaith(int faith) {
 		this.faith = faith;
 	}
-	
+
 	public void addFaith(int faith) {
 		this.faith += faith;
 	}
-	
+
 }
