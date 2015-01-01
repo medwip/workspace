@@ -22,18 +22,19 @@ import com.guntzergames.medievalwipeout.beans.ResourceDeckCard;
 import com.guntzergames.medievalwipeout.enums.CardLocation;
 
 public class CardLayout extends RelativeLayout {
+	
+	protected static LayoutInflater layoutInflater;
+	
+	protected AbstractCard card;
+	protected Context context;
+	protected boolean detailShown = false;
+	protected int seqNum;
+	protected CardLocation cardLocation;
+	
+	protected ImageView image;
 
-	private static LayoutInflater layoutInflater;
-	
-	private AbstractCard card;
-	private Context context;
-	private boolean detailShown = false;
-	private int seqNum;
-	private CardLocation cardLocation;
 	private LinearLayout rootView;
-	private TextView name, attack, lifePoints, trade, defense, faith, numberOfCards;
-	
-	private ImageView image;
+	private TextView name, attack, lifePoints, currentLifePoints, trade, defense, faith, numberOfCards;
 
 	public void hide() {
 		this.setVisibility(View.INVISIBLE);
@@ -46,13 +47,13 @@ public class CardLayout extends RelativeLayout {
 	public CardLayout(Context context) {
 		super(context);
 		this.context = context;
-		init();
+//		init();
 	}
 
 	public CardLayout(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		this.context = context;
-		init();
+//		init();
 	}
 	
 	public void setup(Context context, AbstractCard card, int seqNum, CardLocation cardLocation) {
@@ -106,14 +107,14 @@ public class CardLayout extends RelativeLayout {
 		this.removeAllViews();
 	}
 	
+	@SuppressWarnings("deprecation")
 	public void setup() {
+		
+		init();
 		
 		if (card instanceof PlayerDeckCard) {
 			
 			PlayerDeckCard playerDeckCard = (PlayerDeckCard)card;
-			if (!detailShown) {
-				lifePoints.setVisibility(View.INVISIBLE);
-			}
 
 			if ( detailShown ) {
 				try {
@@ -145,9 +146,17 @@ public class CardLayout extends RelativeLayout {
 			}
 			
 			Log.d("CardLayout", String.format("detailShown: %s", detailShown));
-			if (detailShown) {
-				lifePoints.setText(String.format("%s", playerDeckCard.getLifePoints()));
+			
+			lifePoints.setText(String.format("%s", playerDeckCard.getLifePoints()));
+			
+			if ( playerDeckCard instanceof PlayerFieldCard ) {
+				PlayerFieldCard playerFieldCard = (PlayerFieldCard)playerDeckCard;
+				currentLifePoints.setText(String.format("%s", playerFieldCard.getCurrentLifePoints()));
 			}
+			else {
+				currentLifePoints.setVisibility(View.INVISIBLE);
+			}
+			
 			if ( card instanceof PlayerFieldCard && !detailShown ) {
 				PlayerFieldCard playerFieldCard = (PlayerFieldCard)card;
 				if ( !playerFieldCard.isPlayed() ) {
@@ -270,25 +279,6 @@ public class CardLayout extends RelativeLayout {
 		
 	}
 
-	private void init() {
-		
-		layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		rootView = (LinearLayout)layoutInflater.inflate(R.layout.card, null);
-		
-		reset();
-		image = (ImageView)rootView.findViewById(R.id.cardLayoutImage);
-		name = (TextView)rootView.findViewById(R.id.cardLayoutName);
-		attack = (TextView)rootView.findViewById(R.id.cardLayoutAttack);
-		lifePoints = (TextView)rootView.findViewById(R.id.cardLayoutLifePoints);
-		numberOfCards = (TextView)rootView.findViewById(R.id.cardLayoutNumberOfCards);
-		trade = (TextView)rootView.findViewById(R.id.cardLayoutTrade);
-		defense = (TextView)rootView.findViewById(R.id.cardLayoutDefense);
-		faith = (TextView)rootView.findViewById(R.id.cardLayoutFaith);
-		
-		this.addView(rootView);
-
-	}
-
 	public PlayerDeckCard getPlayerDeckCard() {
 		return (PlayerDeckCard)card;
 	}
@@ -324,5 +314,35 @@ public class CardLayout extends RelativeLayout {
 	public void setCardLocation(CardLocation cardLocation) {
 		this.cardLocation = cardLocation;
 	}
-
+	
+	private void init() {
+		
+		layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		
+		if ( card instanceof ResourceDeckCard ) {
+			rootView = (LinearLayout)layoutInflater.inflate(R.layout.card_resource, null);
+			
+			reset();
+			image = (ImageView)rootView.findViewById(R.id.cardLayoutImage);
+			name = (TextView)rootView.findViewById(R.id.cardLayoutName);
+			trade = (TextView)rootView.findViewById(R.id.cardLayoutTrade);
+			defense = (TextView)rootView.findViewById(R.id.cardLayoutDefense);
+			faith = (TextView)rootView.findViewById(R.id.cardLayoutFaith);
+		}
+		else {
+			rootView = (LinearLayout)layoutInflater.inflate(R.layout.card_creature, null);
+			
+			reset();
+			image = (ImageView)rootView.findViewById(R.id.cardLayoutImage);
+			name = (TextView)rootView.findViewById(R.id.cardLayoutName);
+			attack = (TextView)rootView.findViewById(R.id.cardLayoutAttack);
+			lifePoints = (TextView)rootView.findViewById(R.id.cardLayoutLifePoints);
+			currentLifePoints = (TextView)rootView.findViewById(R.id.cardLayoutCurrentLifePoints);
+			numberOfCards = (TextView)rootView.findViewById(R.id.cardLayoutNumberOfCards);
+		}
+		
+		this.addView(rootView);			
+		
+	}
+	
 }

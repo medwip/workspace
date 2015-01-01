@@ -2,10 +2,10 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <style name="Button">
-        <item name="android:background">@drawable/button_border</item>
-        <item name="android:textSize">@dimen/buttonTextSize</item>
-        <item name="android:textColor">@color/buttonTextColor</item>
-        <item name="android:layout_margin">3dip</item>
+<!--         <item name="android:background">@drawable/button_border</item> -->
+<!--         <item name="android:textSize">@dimen/buttonTextSize</item> -->
+<!--         <item name="android:textColor">@color/buttonTextColor</item> -->
+<!--         <item name="android:layout_margin">3dip</item> -->
     </style>
 
     <style name="CardStyle">

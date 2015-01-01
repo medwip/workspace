@@ -10,6 +10,7 @@ com\guntzergames\medievalwipeout\beans\DeckTemplate.class
 com\guntzergames\medievalwipeout\beans\Player.class
 com\guntzergames\medievalwipeout\beans\PlayerHandCard.class
 com\guntzergames\medievalwipeout\enums\GameEventType.class
+com\guntzergames\medievalwipeout\beans\GameEventPlayCard$EventType.class
 com\guntzergames\medievalwipeout\beans\CardModelList.class
 com\guntzergames\medievalwipeout\beans\GameEventPlayCard.class
 com\guntzergames\medievalwipeout\beans\PlayerDiscard.class

@@ -36,6 +36,7 @@ import com.guntzergames.medievalwipeout.abstracts.AbstractCard;
 import com.guntzergames.medievalwipeout.abstracts.AbstractCardList;
 import com.guntzergames.medievalwipeout.beans.GameEvent;
 import com.guntzergames.medievalwipeout.beans.GameEventPlayCard;
+import com.guntzergames.medievalwipeout.beans.GameEventPlayCard.EventType;
 import com.guntzergames.medievalwipeout.beans.GameEventPlayCard.PlayerType;
 import com.guntzergames.medievalwipeout.beans.Player;
 import com.guntzergames.medievalwipeout.beans.PlayerDeckCard;
@@ -311,48 +312,23 @@ public class GameActivity extends ApplicationActivity {
 		
 	}
 
-//	 @SuppressWarnings("deprecation")
-	private void startHighlightAnimation(View view) {
+	public void startHighlightAnimation(View view) {
 
-		/*
-		 * LinearLayout highLightLayout = (LinearLayout)view;
-		 * highLightLayout.setBackgroundDrawable
-		 * (getResources().getDrawable(R.drawable.highlight)); final
-		 * TransitionDrawable background = (TransitionDrawable)
-		 * highLightLayout.getBackground(); background.startTransition(2000);
-		 */
-		/*
-		 * AnimationSet animationSet = (AnimationSet)
-		 * AnimationUtils.loadAnimation(this, R.anim.highlight_animation);
-		 * view.startAnimation(animationSet);
-		 */
-
-		/*
-		LayoutParams layoutParams = new LayoutParams(view.getWidth(), view.getHeight());
-		highlightLayout.setLayoutParams(layoutParams);
-
-		int[] sourceCoordinates = new int[2];
-		highlightLayout.getLocationInWindow(sourceCoordinates);
-		int[] destinationCoordinates = new int[2];
-		view.getLocationInWindow(destinationCoordinates);
-
-		highlightAnimationSet.getAnimations().set(
-				0,
-				new TranslateAnimation(destinationCoordinates[0] - sourceCoordinates[0], destinationCoordinates[0] - sourceCoordinates[0], destinationCoordinates[1]
-						- sourceCoordinates[1], destinationCoordinates[1] - sourceCoordinates[1]));
-
-		highlightLayout.startAnimation(highlightAnimationSet);
-		*/
-		
 		AnimationDrawable animationDrawable = getAnimationDrawable(view);
-		if ( animationDrawable != null ) animationDrawable.start();
+		if ( animationDrawable != null ) {
+			animationDrawable.setAlpha(255);
+			animationDrawable.start();
+		}
 		
 	}
 	
-	private void stopHightlightAnimation(View view) {
+	public void stopHightlightAnimation(View view) {
 		
 		AnimationDrawable animationDrawable = getAnimationDrawable(view);
-		if ( animationDrawable != null ) animationDrawable.stop();
+		if ( animationDrawable != null ) {
+			animationDrawable.setAlpha(0);
+			animationDrawable.stop();
+		}
 		
 	}
 
@@ -373,6 +349,7 @@ public class GameActivity extends ApplicationActivity {
 		playerChoicesLayout.setVisibility(View.INVISIBLE);
 		stopHightlightAnimation(playerHandLayout);
 		stopHightlightAnimation(gameResourcesLayout);
+		stopHightlightAnimation(playerChoicesLayout);
 		
 		if (gameView.isActivePlayer()) {
 
@@ -385,6 +362,7 @@ public class GameActivity extends ApplicationActivity {
 					playerDeckCard1Layout.show();
 					playerDeckCard2Layout.setup(this, player.getPlayerDeckCard2(), 2, CardLocation.MODAL);
 					playerDeckCard2Layout.show();
+					startHighlightAnimation(playerChoicesLayout);
 					break;
 				case DURING_PLAY:
 					initOpponentDragListener();
@@ -395,10 +373,10 @@ public class GameActivity extends ApplicationActivity {
 					resourceCard1Layout.show();
 					resourceCard2Layout.setup(this, gameView.getResourceCard2(), 2, CardLocation.MODAL);
 					resourceCard2Layout.show();
-					startHighlightAnimation(playerHandLayout);
+					startHighlightAnimation(playerChoicesLayout);
 					break;
 				case DURING_RESOURCE_SELECT:
-					startHighlightAnimation((LinearLayout) (layout.findViewById(R.id.gameResources)));
+					startHighlightAnimation(gameResourcesLayout);
 					break;
 				default:
 					onError(String.format("Unsupported phase: %s", phase));
@@ -455,7 +433,6 @@ public class GameActivity extends ApplicationActivity {
 		opponentFieldDefenseLayout = (LinearLayout) layout.findViewById(R.id.opponentFieldDefense);
 		opponentFieldAttackLayout = (LinearLayout) layout.findViewById(R.id.opponentFieldAttack);
 		playerChoicesLayout = (RelativeLayout) layout.findViewById(R.id.playerChoices);
-		highlightLayout = (LinearLayout) layout.findViewById(R.id.highlightLayout);
 		gameResourcesLayout = (LinearLayout) layout.findViewById(R.id.gameResources);
 
 		gameTradeRow = (LinearLayout) layout.findViewById(R.id.gameTradeRow);
@@ -628,7 +605,19 @@ public class GameActivity extends ApplicationActivity {
 						Log.i("TEST", String.format("playerFieldCard=%s, location=%s, playerFieldCard.getField()=%s", playerFieldCardSource, playerFieldCardSource.getLocation(),
 								playerFieldCardSource.getField()));
 						handleUpdateDisplay = true;
-						animateCardEvent(sourceCardLayout.getCard(), (View) sourceCardLayout.getParent(), destinationCardLayout);
+						
+						View destinationView = destinationCardLayout;
+						
+						if ( gameEventPlayCard.getEventType() == EventType.ATTACK_DEFENSE_FIELD ) {
+							destinationView = opponentFieldDefenseLayout;
+						}
+						else if ( gameEventPlayCard.getEventType() == EventType.ATTACK_ATTACK_CARD ) {
+							destinationView = (CardLayout) layout.findViewById(
+									CardLayout.getCardFromId("opponentFieldAttack",
+									gameEventPlayCard.getDestinationIndex()));
+						}
+						
+						animateCardEvent(sourceCardLayout.getCard(), (View) sourceCardLayout.getParent(), destinationView);
 
 					} else if (type == PlayerType.OPPONENT && source instanceof PlayerHandCard && destination instanceof PlayerFieldCard) {
 

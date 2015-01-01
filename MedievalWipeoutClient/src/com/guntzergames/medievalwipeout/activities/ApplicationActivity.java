@@ -17,6 +17,7 @@ public class ApplicationActivity extends FragmentActivity implements GameWebClie
 	protected GameWebClient gameWebClient;
 	protected GameView gameView;
 	protected boolean httpRequestBeingExecuted = false;
+	protected int currentRequestPriority;
 	
 	public GameWebClient getGameWebClient() {
 		return gameWebClient;
@@ -36,6 +37,14 @@ public class ApplicationActivity extends FragmentActivity implements GameWebClie
 
 	public boolean isHttpRequestBeingExecuted() {
 		return httpRequestBeingExecuted;
+	}
+	
+	public int getCurrentRequestPriority() {
+		return currentRequestPriority;
+	}
+	
+	public void setCurrentRequestPriority(int currentRequestPriority) {
+		this.currentRequestPriority = currentRequestPriority;
 	}
 
 	@Override

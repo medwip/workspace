@@ -9,6 +9,7 @@ import com.guntzergames.medievalwipeout.beans.Account;
 import com.guntzergames.medievalwipeout.beans.DeckTemplate;
 import com.guntzergames.medievalwipeout.beans.Game;
 import com.guntzergames.medievalwipeout.beans.GameEventPlayCard;
+import com.guntzergames.medievalwipeout.beans.GameEventPlayCard.EventType;
 import com.guntzergames.medievalwipeout.beans.GameEventPlayCard.PlayerType;
 import com.guntzergames.medievalwipeout.beans.Player;
 import com.guntzergames.medievalwipeout.beans.PlayerDeckCard;
@@ -274,6 +275,7 @@ public class GameManager {
 					if ( destinationLayout.equals("opponentFieldDefense") ) {
 						playerEvent.setDestination(new PlayerFieldCard(sourceCard));
 						playerEvent.setDestinationIndex(sourceCardId);
+						playerEvent.setEventType(EventType.ATTACK_DEFENSE_FIELD);
 						if (opponent.getCurrentDefense() > sourceCard.getAttack()) {
 							opponent.removeCurrentDefense(sourceCard.getAttack());
 						} else {
@@ -284,6 +286,7 @@ public class GameManager {
 					
 					if ( destinationLayout.startsWith("opponentCard") ) {
 						PlayerFieldCard destinationCard = null;
+						playerEvent.setEventType(EventType.ATTACK_ATTACK_CARD);
 						if ( destinationLayout.endsWith("Attack") ) {
 							destinationCard = opponent.getPlayerFieldAttack().getCards().get(destinationCardId);
 						}

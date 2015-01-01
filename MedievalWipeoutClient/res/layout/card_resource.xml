@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/cardTradeRow"
+        android:layout_width="80dp"
+        android:layout_height="match_parent"
+        android:background="@drawable/card_border"
+        android:orientation="horizontal"
+        android:paddingBottom="5dp"
+        android:paddingLeft="10dp"
+        android:paddingTop="5dp" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/trade" />
+
+        <TextView
+            android:id="@+id/cardLayoutTrade"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/not_initialized" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/cardDefenseRow"
+        android:layout_width="80dp"
+        android:layout_height="match_parent"
+        android:background="@drawable/card_border"
+        android:orientation="horizontal"
+        android:paddingBottom="5dp"
+        android:paddingLeft="10dp"
+        android:paddingTop="5dp" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/defense" />
+
+        <TextView
+            android:id="@+id/cardLayoutDefense"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/not_initialized" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/cardFaithRow"
+        android:layout_width="80dp"
+        android:layout_height="match_parent"
+        android:background="@drawable/card_border"
+        android:orientation="horizontal"
+        android:paddingBottom="5dp"
+        android:paddingLeft="10dp"
+        android:paddingTop="5dp" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/faith" />
+
+        <TextView
+            android:id="@+id/cardLayoutFaith"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/not_initialized" />
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/cardLayoutImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/not_initialized"
+        android:visibility="invisible" />
+
+    <TextView
+        android:id="@+id/cardLayoutName"
+        style="@style/CardStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible" />
+
+</LinearLayout>

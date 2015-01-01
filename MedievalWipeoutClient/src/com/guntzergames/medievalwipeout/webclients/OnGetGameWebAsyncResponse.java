@@ -12,11 +12,29 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 
 public class OnGetGameWebAsyncResponse extends AsyncHttpResponseHandler {
 
+	private static final String TAG = "OnGetGameWebAsyncResponse";
+	
 	private GameWebClientCallbackable callbackable;
 	private ResponseType responseType;
 
 	public enum ResponseType {
-		GET_GAME, JOIN_GAME, CHECK_GAME, DELETE_GAME, GET_ACCOUNT, GET_CARD_MODELS
+		
+		GET_GAME(0), JOIN_GAME(1), CHECK_GAME(0), DELETE_GAME(1), GET_ACCOUNT(1), GET_CARD_MODELS(1);
+		
+		private int priority;
+		
+		private ResponseType(int priotity) {
+			this.priority = priotity;
+		}
+
+		public int getPriority() {
+			return priority;
+		}
+
+		public void setPriority(int priority) {
+			this.priority = priority;
+		}
+
 	};
 
 	public OnGetGameWebAsyncResponse(GameWebClientCallbackable callbackable) {
@@ -43,6 +61,7 @@ public class OnGetGameWebAsyncResponse extends AsyncHttpResponseHandler {
 	public void onStart() {
 		super.onStart();
 		callbackable.setHttpRequestBeingExecuted(true);
+		callbackable.setCurrentRequestPriority(responseType.getPriority());
 	}
 
 	@Override
@@ -53,29 +72,31 @@ public class OnGetGameWebAsyncResponse extends AsyncHttpResponseHandler {
 
 	@Override
 	public void onSuccess(String response) {
-		Log.i("GameWebClient", "Success");
-		switch (responseType) {
-		case GET_ACCOUNT:
-			callbackable.onGetAccount(Account.fromJson(response));
-			break;
-		case GET_GAME:
-			callbackable.onGetGame(GameView.fromJson(response));
-			break;
-		case JOIN_GAME:
-			callbackable.onGameJoined(GameView.fromJson(response));
-			break;
-		case DELETE_GAME:
-			callbackable.onDeleteGame();
-			break;
-		case CHECK_GAME:
-			callbackable.onCheckGame(GameView.fromJson(response));
-			break;
-		case GET_CARD_MODELS:
-			callbackable.onGetCardModels(CardModelList.fromJson(response).getCardModels());
-			break;
-		default:
-			break;
 		
+		Log.i(TAG, "Success");
+		
+		switch (responseType) {
+			case GET_ACCOUNT:
+				callbackable.onGetAccount(Account.fromJson(response));
+				break;
+			case GET_GAME:
+				callbackable.onGetGame(GameView.fromJson(response));
+				break;
+			case JOIN_GAME:
+				callbackable.onGameJoined(GameView.fromJson(response));
+				break;
+			case DELETE_GAME:
+				callbackable.onDeleteGame();
+				break;
+			case CHECK_GAME:
+				callbackable.onCheckGame(GameView.fromJson(response));
+				break;
+			case GET_CARD_MODELS:
+				callbackable.onGetCardModels(CardModelList.fromJson(response).getCardModels());
+				break;
+			default:
+				break;
+
 		}
 	}
 

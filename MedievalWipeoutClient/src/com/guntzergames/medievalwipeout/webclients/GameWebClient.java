@@ -17,11 +17,11 @@ public class GameWebClient {
 
 		onGetGameWebAsyncResponse.setResponseType(responseType);
 		
-		if ( !callbackable.isHttpRequestBeingExecuted() ) {
+		if ( !(callbackable.isHttpRequestBeingExecuted() && responseType.getPriority() < callbackable.getCurrentRequestPriority()) ) {
 			client.get(url,	null, onGetGameWebAsyncResponse);
 		}
 		else {
-			callbackable.onError("HTTP request already begin executed, aborted...");
+			callbackable.onError("Another HTTP request with a highest priority is already begin executed, transaction aborted...");
 		}
 		
 	}

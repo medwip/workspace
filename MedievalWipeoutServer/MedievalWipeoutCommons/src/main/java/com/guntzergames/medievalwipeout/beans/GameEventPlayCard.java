@@ -6,9 +6,14 @@ public class GameEventPlayCard extends GameEvent {
 		PLAYER, OPPONENT;
 	}
 	
+	public enum EventType {
+		ATTACK_ATTACK_CARD, ATTACK_DEFENSE_FIELD;
+	}
+	
 	private PlayerDeckCard source;
 	private PlayerDeckCard destination;
 	private PlayerType playerType;
+	private EventType eventType;
 	private int sourceIndex, destinationIndex;
 	
 	public GameEventPlayCard() {
@@ -39,6 +44,14 @@ public class GameEventPlayCard extends GameEvent {
 		this.playerType = playerType;
 	}
 	
+	public EventType getEventType() {
+		return eventType;
+	}
+
+	public void setEventType(EventType eventType) {
+		this.eventType = eventType;
+	}
+
 	public int getSourceIndex() {
 		return sourceIndex;
 	}
@@ -60,6 +73,7 @@ public class GameEventPlayCard extends GameEvent {
 		event.setPlayerType(playerType == PlayerType.PLAYER ? PlayerType.OPPONENT : PlayerType.PLAYER);
 		event.setSource(source);
 		event.setDestination(destination);
+		event.setEventType(eventType);
 		return event;
 	}
 	
