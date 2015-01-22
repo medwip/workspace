@@ -25,7 +25,7 @@ public class BotAccountSingleton {
 			Account botAccount = accountManager.getAccount("BOT " + i, true);
 			botAccount.setBotAccount(true);
 			Player botPlayer = new Player();
-			botPlayer.setAccount(botAccount);
+//			botPlayer.setAccount(botAccount);
 			botPlayers.put(ai, botPlayer);
 		}
 		return botPlayers.get(ai);

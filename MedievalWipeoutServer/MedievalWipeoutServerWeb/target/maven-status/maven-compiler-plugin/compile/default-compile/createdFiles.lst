@@ -1,5 +1,4 @@
 com\guntzergames\medievalwipeout\persistence\AccountDao.class
-com\guntzergames\medievalwipeout\managers\PlayerManager.class
 com\guntzergames\medievalwipeout\managers\GameManager$1.class
 com\guntzergames\medievalwipeout\managed\GameMB.class
 com\guntzergames\medievalwipeout\singletons\BotAccountSingleton.class

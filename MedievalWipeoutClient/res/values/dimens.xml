@@ -5,6 +5,10 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="text_size_title">5dp</dimen>
     
+    <dimen name="elementPaddingRight">12dp</dimen>
+    <dimen name="elementPaddingRightInternal">6dp</dimen>
+    <dimen name="elementPaddingRightLeft">3dp</dimen>
+    
     <dimen name="buttonTextSize">10sp</dimen>
     
     <dimen name="fieldHeight">60dp</dimen>

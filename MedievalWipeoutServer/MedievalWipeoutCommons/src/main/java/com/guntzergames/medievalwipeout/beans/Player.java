@@ -2,29 +2,74 @@ package com.guntzergames.medievalwipeout.beans;
 
 import java.util.LinkedList;
 
+import javax.persistence.Basic;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.codehaus.jackson.annotate.JsonIgnore;
+
+@Entity
+@Table(name = "PLAYER")
 public class Player {
 
-	private Account account;
-	private PlayerDeck playerDeck = new PlayerDeck();
-	private PlayerHand playerHand = new PlayerHand();
-	private PlayerField playerFieldAttack = new PlayerField(), playerFieldDefense = new PlayerField();
-	private PlayerDiscard playerDiscard = new PlayerDiscard();
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Basic(optional = false)
+	@Column(name = "ID")
+	private long id;
+	
+	@ManyToOne(targetEntity = DeckTemplate.class)
+	@JoinColumn(name = "DECK_TEMPLATE_KEY")
 	private DeckTemplate deckTemplate;
+	
+	@JsonIgnore
+	@ManyToOne(targetEntity = Game.class, cascade=CascadeType.ALL)
+	@JoinColumn(name = "GAME_KEY")
+	private Game game;
+	
+	@Transient
+	private PlayerDeck playerDeck = new PlayerDeck();
+	@Transient
+	private PlayerHand playerHand = new PlayerHand();
+	@Transient
+	private PlayerField playerFieldAttack = new PlayerField(), playerFieldDefense = new PlayerField();
+	@Transient
+	private PlayerDiscard playerDiscard = new PlayerDiscard();
+	@Transient
 	private PlayerDeckCard playerDeckCard1, playerDeckCard2;
+	@Transient
 	private LinkedList<GameEvent> events = new LinkedList<GameEvent>();
+	@Transient
 	private int lifePoints;
+	@Transient
 	private int trade;
+	@Transient
 	private int gold;
+	@Transient
 	private int defense;
+	@Transient
 	private int currentDefense;
+	@Transient
 	private int faith;
 
 	public Account getAccount() {
-		return account;
+		return deckTemplate != null ? deckTemplate.getAccount() : null;
 	}
 
-	public void setAccount(Account account) {
-		this.account = account;
+	public Game getGame() {
+		return game;
+	}
+
+	public void setGame(Game game) {
+		this.game = game;
 	}
 
 	public PlayerDeck getplayerDeck() {
@@ -168,10 +213,9 @@ public class Player {
 	}
 	
 	public boolean hasSameAccount(Player player) {
-		return player != null && account.getFacebookUserId().equals(player.getAccount().getFacebookUserId());
+		return player != null && getAccount().getFacebookUserId().equals(player.getAccount().getFacebookUserId());
 	}
 
-//	@JsonIgnore
 	public void setEvents(LinkedList<GameEvent> events) {
 		this.events = events;
 	}
@@ -188,10 +232,10 @@ public class Player {
 		currentDefense = defense;
 		
 	}
-
+	
 	@Override
 	public String toString() {
-		return String.format("Account: %s", account.getFacebookUserId());
+		return String.format("Id: %s, account: %s", id, getAccount() != null ? getAccount().getFacebookUserId() : "null");
 	}
 	
 }

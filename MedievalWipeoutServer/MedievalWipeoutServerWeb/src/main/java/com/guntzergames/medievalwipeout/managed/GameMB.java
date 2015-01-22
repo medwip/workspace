@@ -22,7 +22,7 @@ public class GameMB  {
 	private AccountManager accountManager;
 	
 	public List<Game> getAllGames() {
-		return gameManager.getAllOngoingGames();
+		return gameManager.getAllGames();
 	}
 	
 	public void deleteGame(long gameId) {
@@ -37,9 +37,15 @@ public class GameMB  {
 		gameManager.joinGame(getBotPlayer(gameId));
 	}
 	
-	public void createGame() throws PlayerNotInGameException {
-		long gameId = 10000 + (long)(Math.random() * 10000);
-		gameManager.joinGame(getBotPlayer(gameId));
+	public String getPlayers(long gameId) {
+		String ret = "";
+		Game game = gameManager.getGame(gameId);
+		
+		for ( Player player : game.getPlayers() ) {
+			ret += player + ", ";
+		}
+		
+		return ret;
 	}
 	
 	public void refresh() {

@@ -1,9 +1,12 @@
 package com.guntzergames.medievalwipeout.managers;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+
+import org.apache.log4j.Logger;
 
 import com.guntzergames.medievalwipeout.beans.Account;
 import com.guntzergames.medievalwipeout.beans.DeckTemplate;
@@ -22,7 +25,9 @@ import com.guntzergames.medievalwipeout.beans.ResourceDeck;
 import com.guntzergames.medievalwipeout.beans.ResourceDeckCard;
 import com.guntzergames.medievalwipeout.enums.GameState;
 import com.guntzergames.medievalwipeout.enums.Phase;
+import com.guntzergames.medievalwipeout.exceptions.GameException;
 import com.guntzergames.medievalwipeout.exceptions.PlayerNotInGameException;
+import com.guntzergames.medievalwipeout.exceptions.UnsupportedPhaseException;
 import com.guntzergames.medievalwipeout.interfaces.CommonConstants;
 import com.guntzergames.medievalwipeout.persistence.GameDao;
 import com.guntzergames.medievalwipeout.singletons.GameSingleton;
@@ -30,10 +35,10 @@ import com.guntzergames.medievalwipeout.singletons.GameSingleton;
 @Stateless
 public class GameManager {
 
+	private final static Logger LOGGER = Logger.getLogger(GameManager.class);
+
 	@EJB
 	private GameSingleton gameSingleton;
-	@EJB
-	private PlayerManager playerManager;
 	@EJB
 	private GameDao gameDao;
 
@@ -53,22 +58,37 @@ public class GameManager {
 
 	}
 
+	public Game mergeGame(Game game) {
+		Game dbGame = gameDao.mergeGame(game);
+		dbGame.setTransientFields(game);
+		return dbGame;
+	}
+
 	public Game joinGame(Player player) throws PlayerNotInGameException {
 
 		Game game = findGameToJoin(player);
 
 		if (game == null) {
 			game = new Game();
-			game.setId((long) (Math.random() * 10000));
+			LOGGER.info(String.format("Player %s joining game: %s", player, game));
+			// game.setId((long) (Math.random() * 10000));
 			game.addPlayer(player);
 			game.setActivePlayer(player);
+			player.setGame(game);
+			game = mergeGame(game);
 			game.setGameState(GameState.WAITING_FOR_JOINER);
-			gameSingleton.addGame(game);
+			game = gameSingleton.addGame(game);
+			// player = game.getActivePlayer();
+			LOGGER.info(String.format("Game created, player=%s", player));
 		} else {
 			game.addPlayer(player);
+			game.setActivePlayer(player);
+			player.setGame(game);
+			LOGGER.info(String.format("Player %s joining game: %s", player, game));
 			game.setGameState(GameState.INITIALIZING_CREATOR_HAND);
 			initializeGame(game);
 			game.setGameState(GameState.STARTED);
+			game = mergeGame(game);
 		}
 
 		return game;
@@ -84,15 +104,18 @@ public class GameManager {
 		}
 
 		ResourceDeck resourceDeck = game.getResourceDeck();
-		resourceDeck.addCard(new ResourceDeckCard(1, 0, 0));
-		resourceDeck.addCard(new ResourceDeckCard(1, 0, 0));
-		resourceDeck.addCard(new ResourceDeckCard(1, 0, 0));
-		resourceDeck.addCard(new ResourceDeckCard(1, 0, 0));
-		resourceDeck.addCard(new ResourceDeckCard(0, 1, 0));
-		resourceDeck.addCard(new ResourceDeckCard(0, 1, 0));
-		resourceDeck.addCard(new ResourceDeckCard(0, 1, 0));
-		resourceDeck.addCard(new ResourceDeckCard(0, 1, 0));
+		resourceDeck.addCard(new ResourceDeckCard(3, 0, 0));
+		resourceDeck.addCard(new ResourceDeckCard(2, 1, 0));
+		resourceDeck.addCard(new ResourceDeckCard(3, 0, 0));
 		resourceDeck.addCard(new ResourceDeckCard(0, 0, 1));
+		resourceDeck.addCard(new ResourceDeckCard(3, 0, 0));
+		resourceDeck.addCard(new ResourceDeckCard(0, 3, 0));
+		resourceDeck.addCard(new ResourceDeckCard(1, 2, 0));
+		resourceDeck.addCard(new ResourceDeckCard(1, 2, 0));
+		resourceDeck.addCard(new ResourceDeckCard(0, 0, 1));
+		resourceDeck.addCard(new ResourceDeckCard(0, 3, 0));
+		resourceDeck.addCard(new ResourceDeckCard(0, 0, 1));
+		Collections.shuffle(resourceDeck.getCards());
 		game.setTurn(1);
 		game.setPhase(Phase.BEFORE_RESOURCE_CHOOSE);
 		game.setActivePlayer(game.getPlayers().get(0));
@@ -197,7 +220,7 @@ public class GameManager {
 
 		}
 
-		System.out.println("After nextPhase : " + game);
+		LOGGER.info("After nextPhase : " + game);
 
 		return game;
 
@@ -228,10 +251,10 @@ public class GameManager {
 
 	}
 
-	public Game playCard(String userName, long gameId, String sourceLayout, int sourceCardId, String destinationLayout, int destinationCardId) throws PlayerNotInGameException {
+	public Game playCard(String userName, long gameId, String sourceLayout, int sourceCardId, String destinationLayout, int destinationCardId) throws GameException {
 
 		Game game = getGame(gameId);
-		Player player = playerManager.selectPlayer(game, userName);
+		Player player = selectPlayer(game, userName);
 		List<Player> opponents = game.selectOpponents(player);
 		// TODO
 		Player opponent = opponents.get(0);
@@ -252,9 +275,11 @@ public class GameManager {
 					if (destinationLayout.endsWith("Attack")) {
 						playerField = player.getPlayerFieldAttack();
 						fieldCard.setLocation(Location.ATTACK);
+						fieldCard.setPlayed(false);
 					} else {
 						playerField = player.getPlayerFieldDefense();
 						fieldCard.setLocation(Location.DEFENSE);
+						fieldCard.setPlayed(true);
 					}
 					playerEvent.setSource(card);
 					playerEvent.setSourceIndex(sourceCardId);
@@ -271,8 +296,8 @@ public class GameManager {
 
 					PlayerField playerField = player.getPlayerFieldAttack();
 					PlayerFieldCard sourceCard = playerField.getCards().get(sourceCardId);
-					
-					if ( destinationLayout.equals("opponentFieldDefense") ) {
+
+					if (destinationLayout.equals("opponentFieldDefense")) {
 						playerEvent.setDestination(new PlayerFieldCard(sourceCard));
 						playerEvent.setDestinationIndex(sourceCardId);
 						playerEvent.setEventType(EventType.ATTACK_DEFENSE_FIELD);
@@ -283,32 +308,35 @@ public class GameManager {
 							opponent.setCurrentDefense(0);
 						}
 					}
-					
-					if ( destinationLayout.startsWith("opponentCard") ) {
+
+					if (destinationLayout.startsWith("opponentCard")) {
 						PlayerFieldCard destinationCard = null;
 						playerEvent.setEventType(EventType.ATTACK_ATTACK_CARD);
-						if ( destinationLayout.endsWith("Attack") ) {
-							destinationCard = opponent.getPlayerFieldAttack().getCards().get(destinationCardId);
+						PlayerField destinationField = null;
+						if (destinationLayout.endsWith("Attack")) {
+							destinationField = opponent.getPlayerFieldAttack();
+						} else if (destinationLayout.endsWith("Defense")) {
+							destinationField = opponent.getPlayerFieldDefense();
+						} else {
+							throw new GameException(String.format("Unknown destination layout: %s", destinationLayout));
 						}
-						if ( destinationLayout.endsWith("Defense") ) {
-							destinationCard = opponent.getPlayerFieldDefense().getCards().get(destinationCardId);							
-						}
-						if ( destinationCard.getCurrentLifePoints() > sourceCard.getAttack() ) {
+						destinationCard = destinationField.getCards().get(destinationCardId);
+						if (destinationCard.getCurrentLifePoints() > sourceCard.getAttack()) {
 							destinationCard.removeCurrentLifePoints(sourceCard.getAttack());
-						}
-						else {
+						} else {
 							opponent.removeLifePoints(sourceCard.getAttack() - opponent.getCurrentDefense());
 							destinationCard.setCurrentLifePoints(0);
+							destinationField.getCards().remove(destinationCardId);
 						}
 						playerEvent.setDestination(destinationCard);
 						playerEvent.setDestinationIndex(destinationCardId);
 					}
-					
+
 					System.out.println(String.format("Source layout: %s", sourceLayout));
 					playerEvent.setSource(sourceCard);
 					playerEvent.setSourceIndex(sourceCardId);
 					sourceCard.setPlayed(true);
-					
+
 				}
 
 				player.getEvents().add(playerEvent);
@@ -356,7 +384,7 @@ public class GameManager {
 				break;
 
 			default:
-				break;
+				throw new UnsupportedPhaseException();
 
 		}
 
@@ -367,6 +395,8 @@ public class GameManager {
 	public void deleteGame(long gameId) {
 
 		gameSingleton.deleteGame(gameId);
+		Game game = gameDao.findGameById(gameId);
+		gameDao.deleteGame(game);
 
 	}
 
@@ -374,7 +404,7 @@ public class GameManager {
 
 		player = game.selectPlayer(player);
 		for (int i = 0; i < 5; i++) {
-			System.out.println(String.format("Player: %s, player.getHand(): %s, player.getDeck(): %s", player, player.getPlayerHand(), player.getplayerDeck()));
+			LOGGER.info(String.format("Player: %s, player.getHand(): %s, player.getDeck(): %s", player, player.getPlayerHand(), player.getplayerDeck()));
 			player.getPlayerHand().addCard(new PlayerHandCard(player.getplayerDeck().pop(), player));
 		}
 		game.setGameState(GameState.INITIALIZING_JOINER_HAND);
@@ -393,8 +423,19 @@ public class GameManager {
 
 	}
 
-	public List<Game> getAllOngoingGames() {
-		return gameSingleton.getAllOngoingGames();
+	public List<Game> getAllGames() {
+		return gameDao.findAllGames();
+	}
+
+	public Player selectPlayer(Game game, String facebookUserId) throws PlayerNotInGameException {
+
+		for (Player player : game.getPlayers()) {
+			if (player.getAccount().getFacebookUserId().equals(facebookUserId))
+				return player;
+		}
+
+		throw new PlayerNotInGameException();
+
 	}
 
 }

@@ -4,12 +4,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.guntzergames.medievalwipeout.enums.GameState;
 import com.guntzergames.medievalwipeout.enums.Phase;
@@ -18,7 +28,14 @@ import com.guntzergames.medievalwipeout.views.GameView;
 
 @Entity
 @Table(name = "GAME")
+@NamedQueries({
+	@NamedQuery(name = Game.NQ_FIND_BY_GAME_STATE, query = "SELECT g FROM Game g WHERE g.gameState = :gameState"),
+	@NamedQuery(name = Game.NQ_FIND_ALL, query = "SELECT g FROM Game g")
+})
 public class Game {
+
+	public final static String NQ_FIND_BY_GAME_STATE = "NQ_FIND_GAMES_BY_GAME_STATE";
+	public final static String NQ_FIND_ALL = "NQ_FIND_ALL_GAMES";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,38 +43,37 @@ public class Game {
 	@Column(name = "ID")
 	private long id;
 
-	private Player creator;
-	private Player joiner;
+	@OneToMany(mappedBy = "game", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	private List<Player> players = new ArrayList<Player>();
+	
+	@OneToOne(targetEntity = Player.class, cascade=CascadeType.ALL)
+	@JoinColumn(name = "ACTIVE_PLAYER_KEY")
 	private Player activePlayer;
 
+	@Transient
 	private int numberOfPlayers;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "GAME_STATE")
 	private GameState gameState = GameState.WAITING_FOR_JOINER;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "PHASE")
 	private Phase phase;
+    
+	@Transient
 	private ResourceDeck resourceDeck = new ResourceDeck();
+	@Transient
 	private ResourceDeckCard resourceCard1, resourceCard2;
+	@Transient
 	private int turn;
 
+	@Transient
 	private int trade;
+	@Transient
 	private int defense;
+	@Transient
 	private int faith;
-
-	public Player getCreator() {
-		return creator;
-	}
-
-	public void setCreator(Player creator) {
-		this.creator = creator;
-	}
-
-	public Player getJoiner() {
-		return joiner;
-	}
-
-	public void setJoiner(Player joiner) {
-		this.joiner = joiner;
-	}
 
 	public long getId() {
 		return id;
@@ -101,19 +117,6 @@ public class Game {
 			}
 		}
 		
-		throw new PlayerNotInGameException();
-	}
-
-	public Player selectOpponent(String userName) throws PlayerNotInGameException {
-
-		if (creator.getAccount().getFacebookUserId().equals(userName)) {
-			return joiner;
-		}
-
-		if (joiner != null && joiner.getAccount().getFacebookUserId().equals(userName)) {
-			return creator;
-		}
-
 		throw new PlayerNotInGameException();
 	}
 
@@ -254,10 +257,7 @@ public class Game {
 
 	public void resetPlayable() {
 
-		for ( Player player : getPlayers() ) {
-			resetPlayable(player.getPlayerFieldAttack());
-			resetPlayable(player.getPlayerFieldDefense());
-		}
+		resetPlayable(activePlayer.getPlayerFieldAttack());
 		
 	}
 
@@ -322,6 +322,12 @@ public class Game {
 
 	public void addFaith(int faith) {
 		this.faith += faith;
+	}
+	
+	public void setTransientFields(Game model) {
+		
+		// TODO
+		
 	}
 
 }

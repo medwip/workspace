@@ -3,6 +3,8 @@ package com.guntzergames.medievalwipeout.layouts;
 import java.lang.reflect.Field;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,15 +25,17 @@ import com.guntzergames.medievalwipeout.enums.CardLocation;
 
 public class CardLayout extends RelativeLayout {
 	
-	protected static LayoutInflater layoutInflater;
+	private static final String TAG = "CardLayout";
+
+	private static LayoutInflater layoutInflater;
 	
-	protected AbstractCard card;
-	protected Context context;
-	protected boolean detailShown = false;
-	protected int seqNum;
-	protected CardLocation cardLocation;
+	private AbstractCard card;
+	private Context context;
+	private boolean detailShown = false;
+	private int seqNum;
+	private CardLocation cardLocation;
 	
-	protected ImageView image;
+	private ImageView image;
 
 	private LinearLayout rootView;
 	private TextView name, attack, lifePoints, currentLifePoints, trade, defense, faith, numberOfCards;
@@ -47,13 +51,11 @@ public class CardLayout extends RelativeLayout {
 	public CardLayout(Context context) {
 		super(context);
 		this.context = context;
-//		init();
 	}
 
 	public CardLayout(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		this.context = context;
-//		init();
 	}
 	
 	public void setup(Context context, AbstractCard card, int seqNum, CardLocation cardLocation) {
@@ -107,7 +109,46 @@ public class CardLayout extends RelativeLayout {
 		this.removeAllViews();
 	}
 	
-	@SuppressWarnings("deprecation")
+	private Drawable getActiveDrawable() {
+		
+		Drawable background = this.getBackground();
+		
+		if ( background instanceof LayerDrawable ) {
+			return ((LayerDrawable)background).getDrawable(1);
+		}
+		else {
+			return null;
+		}
+		
+	}
+
+	private Drawable getHighlightDrawable() {
+		
+		Drawable background = this.getBackground();
+		
+		if ( background instanceof LayerDrawable ) {
+			return ((LayerDrawable)background).getDrawable(2);
+		}
+		else {
+			return null;
+		}
+		
+	}
+
+	public void activeCardLayout() {
+		
+		Drawable activeDrawable = getActiveDrawable();
+		if ( activeDrawable != null ) activeDrawable.setAlpha(255);
+		
+	}
+
+	public void unactiveCardLayout() {
+		
+		Drawable activeDrawable = getActiveDrawable();
+		if ( activeDrawable != null ) activeDrawable.setAlpha(0);
+		
+	}
+
 	public void setup() {
 		
 		init();
@@ -138,7 +179,7 @@ public class CardLayout extends RelativeLayout {
 				}
 			}
 			
-			name.setText(String.format("[%d] %s", seqNum, playerDeckCard.getName()));
+			name.setText(String.format("[%d] %s playable=%s", seqNum, playerDeckCard.getName(), (card instanceof PlayerHandCard ? ((PlayerHandCard)card).isPlayable() : "NA")));
 			attack.setText(String.format("%s", playerDeckCard.getAttack()));
 			
 			if ( card instanceof PlayerFieldCard ) {
@@ -160,19 +201,21 @@ public class CardLayout extends RelativeLayout {
 			if ( card instanceof PlayerFieldCard && !detailShown ) {
 				PlayerFieldCard playerFieldCard = (PlayerFieldCard)card;
 				if ( !playerFieldCard.isPlayed() ) {
-					this.setBackgroundDrawable(getResources().getDrawable(R.drawable.card_border_highlight));
+					activeCardLayout();
+//					this.setBackgroundDrawable(getResources().getDrawable(R.drawable.card_border_active_highlightable));
 				}
 				else {
-					this.setBackgroundDrawable(getResources().getDrawable(R.drawable.card_border));
+					unactiveCardLayout();
+//					this.setBackgroundDrawable(getResources().getDrawable(R.drawable.card_border_highlightable));
 				}
 			}
 			if ( card instanceof PlayerHandCard && !detailShown ) {
 				PlayerHandCard playerHandCard = (PlayerHandCard)card;
 				if ( playerHandCard.isPlayable() ) {
-					this.setBackgroundDrawable(getResources().getDrawable(R.drawable.card_border_highlight));
+					activeCardLayout();
 				}
 				else {
-					this.setBackgroundDrawable(getResources().getDrawable(R.drawable.card_border));
+					unactiveCardLayout();
 				}
 			}
 			
@@ -216,19 +259,19 @@ public class CardLayout extends RelativeLayout {
 			if ( card instanceof PlayerFieldCard && !detailShown ) {
 				PlayerFieldCard playerFieldCard = (PlayerFieldCard)card;
 				if ( !playerFieldCard.isPlayed() ) {
-					this.setBackgroundDrawable(getResources().getDrawable(R.drawable.card_border_highlight));
+					activeCardLayout();
 				}
 				else {
-					this.setBackgroundDrawable(getResources().getDrawable(R.drawable.card_border));
+					unactiveCardLayout();
 				}
 			}
 			if ( card instanceof PlayerHandCard && !detailShown ) {
 				PlayerHandCard playerHandCard = (PlayerHandCard)card;
 				if ( playerHandCard.isPlayable() ) {
-					this.setBackgroundDrawable(getResources().getDrawable(R.drawable.card_border_highlight));
+					activeCardLayout();
 				}
 				else {
-					this.setBackgroundDrawable(getResources().getDrawable(R.drawable.card_border));
+					unactiveCardLayout();
 				}
 			}
 			
@@ -339,6 +382,11 @@ public class CardLayout extends RelativeLayout {
 			lifePoints = (TextView)rootView.findViewById(R.id.cardLayoutLifePoints);
 			currentLifePoints = (TextView)rootView.findViewById(R.id.cardLayoutCurrentLifePoints);
 			numberOfCards = (TextView)rootView.findViewById(R.id.cardLayoutNumberOfCards);
+		}
+		
+		Drawable highlightDrawable = getHighlightDrawable();
+		if ( highlightDrawable != null ) {
+			highlightDrawable.setAlpha(0);
 		}
 		
 		this.addView(rootView);			

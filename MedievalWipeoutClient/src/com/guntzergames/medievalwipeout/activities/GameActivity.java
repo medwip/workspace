@@ -48,6 +48,7 @@ import com.guntzergames.medievalwipeout.enums.CardLocation;
 import com.guntzergames.medievalwipeout.enums.Phase;
 import com.guntzergames.medievalwipeout.interfaces.ClientConstants;
 import com.guntzergames.medievalwipeout.layouts.CardLayout;
+import com.guntzergames.medievalwipeout.layouts.PlayerLayout;
 import com.guntzergames.medievalwipeout.listeners.GameAnimationListener;
 import com.guntzergames.medievalwipeout.listeners.GameDragListener;
 import com.guntzergames.medievalwipeout.listeners.GameResourceListener;
@@ -68,6 +69,7 @@ public class GameActivity extends ApplicationActivity {
 	private MainGameCheckerThread mainGameCheckerThread;
 	private boolean beingModified = false;
 	private CardLayout cardLayoutDetail = null;
+	private PlayerLayout playerPlayerLayout, opponentPlayerLayout;
 	
 	private CardDetailListener cardDetailListener;
 	private GameResourceListener gameResourceListener;
@@ -331,10 +333,10 @@ public class GameActivity extends ApplicationActivity {
 		}
 		
 	}
-
+	
 	public void updateCardsDisplay() {
 
-		player.updatePlayableHandCards();
+		if ( gameView.isActivePlayer() ) player.updatePlayableHandCards();
 
 		setupField(opponent.getPlayerFieldDefense(), "opponentFieldDefense", 5, CardLocation.FIELD_DEFENSE);
 		setupField(opponent.getPlayerFieldAttack(), "opponentFieldAttack", 5, CardLocation.FIELD_ATTACK);
@@ -351,7 +353,7 @@ public class GameActivity extends ApplicationActivity {
 		stopHightlightAnimation(gameResourcesLayout);
 		stopHightlightAnimation(playerChoicesLayout);
 		
-		if (gameView.isActivePlayer()) {
+		if ( gameView.isActivePlayer() ) {
 
 			Phase phase = gameView.getPhase();
 
@@ -426,6 +428,8 @@ public class GameActivity extends ApplicationActivity {
 		hideCardLayoutDetail();
 		gameEventLayout = (CardLayout) layout.findViewById(R.id.gameEvent);
 		gameEventLayout.setVisibility(View.INVISIBLE);
+		opponentPlayerLayout = (PlayerLayout) layout.findViewById(R.id.opponentPlayerLayout);
+		playerPlayerLayout = (PlayerLayout) layout.findViewById(R.id.playerPlayerLayout);
 
 		playerHandLayout = (LinearLayout) layout.findViewById(R.id.playerHand);
 		playerFieldDefenseLayout = (LinearLayout) layout.findViewById(R.id.playerFieldDefense);
@@ -700,7 +704,7 @@ public class GameActivity extends ApplicationActivity {
 	@Override
 	public void onGetGame(GameView game) {
 
-		Log.i("GameActivity", " ---> GET GAME <--- ");
+		Log.i(TAG, "onGetGame");
 
 		if (game == null) {
 			Toast.makeText(this, String.format("Unable to get game"), Toast.LENGTH_LONG).show();
@@ -708,25 +712,18 @@ public class GameActivity extends ApplicationActivity {
 		}
 
 		gameInfos = (TextView) layout.findViewById(R.id.gameInfos);
-		TextView playerTradeValue = (TextView) layout.findViewById(R.id.playerTradeValue);
-		TextView playerGoldValue = (TextView) layout.findViewById(R.id.playerGoldValue);
-		TextView playerDefenseValue = (TextView) layout.findViewById(R.id.playerDefenseValue);
-		TextView playerFaithValue = (TextView) layout.findViewById(R.id.playerFaithValue);
-		TextView playerLifePointsValue = (TextView) layout.findViewById(R.id.playerLifePointsValue);
-		TextView opponentTradeValue = (TextView) layout.findViewById(R.id.opponentTradeValue);
-		TextView opponentGoldValue = (TextView) layout.findViewById(R.id.opponentGoldValue);
-		TextView opponentDefenseValue = (TextView) layout.findViewById(R.id.opponentDefenseValue);
-		TextView opponentFaithValue = (TextView) layout.findViewById(R.id.opponentFaithValue);
-		TextView opponentLifePointsValue = (TextView) layout.findViewById(R.id.opponentLifePointsValue);
 		TextView gameTrade = (TextView) layout.findViewById(R.id.gameTrade);
 		TextView gameDefense = (TextView) layout.findViewById(R.id.gameDefense);
 		TextView gameFaith = (TextView) layout.findViewById(R.id.gameFaith);
 
 		this.gameView = game;
+		
 		player = game.getPlayer();
 		opponent = game.getOpponents().get(0);
+		opponentPlayerLayout.setup(opponent);
+		playerPlayerLayout.setup(player);
 
-		Log.d("onGetGame", String.format("Entering onGetGame: state=%s", game.getGameState()));
+		Log.d(TAG, String.format("Entering onGetGame: state=%s", game.getGameState()));
 
 		switch (game.getGameState()) {
 
@@ -743,16 +740,6 @@ public class GameActivity extends ApplicationActivity {
 		}
 
 		gameInfos.setText(String.format("%s [%s / %s]", game.toString(), ++httpCallsDone, httpCallsAborted));
-		playerTradeValue.setText(String.format("%s", player.getTrade()));
-		playerGoldValue.setText(String.format("%s", player.getGold()));
-		playerDefenseValue.setText(String.format("%s (%s)", player.getCurrentDefense(), player.getDefense()));
-		playerFaithValue.setText(String.format("%s", player.getFaith()));
-		playerLifePointsValue.setText(String.format("%s", player.getLifePoints()));
-		opponentTradeValue.setText(String.format("%s", opponent.getTrade()));
-		opponentGoldValue.setText(String.format("%s", opponent.getGold()));
-		opponentDefenseValue.setText(String.format("%s (%s)", opponent.getCurrentDefense(), opponent.getDefense()));
-		opponentFaithValue.setText(String.format("%s", opponent.getFaith()));
-		opponentLifePointsValue.setText(String.format("%s", opponent.getLifePoints()));
 		gameTrade.setText(String.format("%s", game.getTrade()));
 		gameDefense.setText(String.format("%s", game.getDefense()));
 		gameFaith.setText(String.format("%s", game.getFaith()));

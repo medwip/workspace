@@ -4,6 +4,7 @@ import java.util.List;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.widget.Toast;
 
 import com.guntzergames.medievalwipeout.beans.Account;
 import com.guntzergames.medievalwipeout.beans.CardModel;
@@ -61,8 +62,7 @@ public class ApplicationActivity extends FragmentActivity implements GameWebClie
 
 	@Override
 	public void onError(String err) {
-		// TODO Auto-generated method stub
-		
+		Toast.makeText(this, String.format("Error occured: %s", err), Toast.LENGTH_LONG).show();
 	}
 
 	@Override

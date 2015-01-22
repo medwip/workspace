@@ -10,12 +10,12 @@ http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
 		<class>com.guntzergames.medievalwipeout.beans.Account</class>
 		<class>com.guntzergames.medievalwipeout.beans.CardModel</class>
 		<class>com.guntzergames.medievalwipeout.beans.CollectionElement</class>
-				<class>com.guntzergames.medievalwipeout.beans.DeckTemplate</class>
+		<class>com.guntzergames.medievalwipeout.beans.DeckTemplate</class>
 		<class>com.guntzergames.medievalwipeout.beans.DeckTemplateElement</class>
+		<class>com.guntzergames.medievalwipeout.beans.Game</class>
+		<class>com.guntzergames.medievalwipeout.beans.Player</class>
 		<class>com.guntzergames.medievalwipeout.beans.PlayerDeckCard</class>
 		<properties>
-			<!-- Properties for Hibernate -->
-			<!-- <property name="hibernate.hbm2ddl.auto" value="create-drop" /> -->
 			<property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect" />
 			<property name="hibernate.show_sql" value="true" />
 			<property name="hibernate.hbm2ddl.auto" value="none" />
