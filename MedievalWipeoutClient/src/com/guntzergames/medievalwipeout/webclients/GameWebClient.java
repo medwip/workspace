@@ -61,6 +61,10 @@ public class GameWebClient {
 		get("http://" + ip + ":8080/MedievalWipeout/rest/account/addDeckTemplateElement/" + callbackable.getFacebookUserId() + "/" + deckTemplateId + "/" + collectionElementId, ResponseType.GET_ACCOUNT);
 	}
 
+	public void openPacket() {
+		get("http://" + ip + ":8080/MedievalWipeout/rest/account/openPacket/" + callbackable.getFacebookUserId(), ResponseType.GET_ACCOUNT);
+	}
+
 	public void nextPhase(long gameId) {
 		get("http://" + ip + ":8080/MedievalWipeout/rest/game/nextPhase/" + gameId + "/" + callbackable.getFacebookUserId(), ResponseType.GET_GAME);
 	}

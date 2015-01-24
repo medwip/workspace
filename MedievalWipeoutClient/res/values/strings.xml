@@ -13,6 +13,7 @@
     <string name="next_phase">Next Phase</string>
     <string name="refresh_game">Refresh Game</string>
     <string name="resume_game">Resume Game</string>
+    <string name="open_packet">Open Packet</string>
     <string name="home">Home</string>
     <string name="new_deck">New Deck</string>
     <string name="preferences">Preferences</string>

@@ -134,6 +134,14 @@
             android:layout_height="@dimen/cardModelListHeight" />
 
         <Button
+            android:id="@+id/openPacketButton"
+            style="@style/Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/open_packet"
+            android:text="@string/open_packet" />
+        
+        <Button
             android:id="@+id/homeButton"
             style="@style/Button"
             android:layout_width="wrap_content"

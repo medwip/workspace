@@ -23,6 +23,7 @@ C:\dev\workspace\MedievalWipeoutServer\MedievalWipeoutCommons\src\main\java\com\
 C:\dev\workspace\MedievalWipeoutServer\MedievalWipeoutCommons\src\main\java\com\guntzergames\medievalwipeout\enums\CardLocation.java
 C:\dev\workspace\MedievalWipeoutServer\MedievalWipeoutCommons\src\main\java\com\guntzergames\medievalwipeout\beans\DeckTemplate.java
 C:\dev\workspace\MedievalWipeoutServer\MedievalWipeoutCommons\src\main\java\com\guntzergames\medievalwipeout\abstracts\AbstractCardList.java
+C:\dev\workspace\MedievalWipeoutServer\MedievalWipeoutCommons\src\main\java\com\guntzergames\medievalwipeout\beans\Packet.java
 C:\dev\workspace\MedievalWipeoutServer\MedievalWipeoutCommons\src\main\java\com\guntzergames\medievalwipeout\beans\PlayerDiscard.java
 C:\dev\workspace\MedievalWipeoutServer\MedievalWipeoutCommons\src\main\java\com\guntzergames\medievalwipeout\exceptions\PlayerNotInGameException.java
 C:\dev\workspace\MedievalWipeoutServer\MedievalWipeoutCommons\src\main\java\com\guntzergames\medievalwipeout\enums\GameEventType.java

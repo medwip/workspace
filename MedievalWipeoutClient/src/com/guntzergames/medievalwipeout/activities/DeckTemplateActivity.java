@@ -35,7 +35,7 @@ public class DeckTemplateActivity extends ApplicationActivity {
 	private long deckTemplateId;
 	private String facebookUserId;
 	private LinearLayout layout;
-	private Button homeButton, newDeckButton;
+	private Button homeButton, newDeckButton, openPacketButton;
 	private EditText newDeckLibelEditText;
 	private ListView cardModelListView;
 	private Spinner deckTemplateSpinner;
@@ -55,6 +55,7 @@ public class DeckTemplateActivity extends ApplicationActivity {
 
 		homeButton = (Button) layout.findViewById(R.id.homeButton);
 		newDeckButton = (Button) layout.findViewById(R.id.newDeckButton);
+		openPacketButton = (Button) layout.findViewById(R.id.openPacketButton);
 		cardModelListView = (ListView) layout.findViewById(R.id.cardModelList);
 		deckTemplateSpinner = (Spinner) layout.findViewById(R.id.deckTemplateSpinner);
 		cardGridView = (GridLayout) layout.findViewById(R.id.cardGrid);

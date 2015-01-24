@@ -23,10 +23,13 @@ import com.guntzergames.medievalwipeout.beans.DeckTemplate;
 import com.guntzergames.medievalwipeout.exceptions.PlayerNotInGameException;
 import com.guntzergames.medievalwipeout.managers.AccountManager;
 import com.guntzergames.medievalwipeout.managers.GameManager;
+import org.apache.log4j.Logger;
 
 @Stateless
 @Path("/account")
 public class AccountResource {
+	
+	private static final Logger LOGGER = Logger.getLogger(AccountResource.class);
 
 	@EJB
 	private GameManager gameManager;
@@ -79,6 +82,42 @@ public class AccountResource {
 		accountManager.addDeckTemplateElement(collectionElement, deckTemplate);
 		
 		System.out.println("After resource Number of elements: " + account.getCollectionElements().size());
+		
+		ObjectMapper mapper = new ObjectMapper();
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		try {
+			mapper.writeValue(out, account);
+		} catch (JsonGenerationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		String ret = new String(out.toByteArray());
+		try {
+			out.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        return ret;
+	}
+	
+	@GET
+	@Path("openPacket/{facebookUserId}")
+    @Produces("text/plain")
+	public String openPacket(@PathParam("facebookUserId") String facebookUserId) {
+		
+		// TODO: Verification that classes are linked
+		Account account = accountManager.getAccount(facebookUserId, false);
+		LOGGER.info("Before resource Number of elements: " + account.getCollectionElements().size());
+		accountManager.drawPacket(5, account);
+		
+		LOGGER.info("After resource Number of elements: " + account.getCollectionElements().size());
 		
 		ObjectMapper mapper = new ObjectMapper();
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
