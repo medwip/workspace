@@ -16,7 +16,10 @@
     <dimen name="cardHeight">120dp</dimen>
     <dimen name="cardDetailWidth">160dp</dimen>
     <dimen name="cardDetailHeight">240dp</dimen>
+    <dimen name="cardImageWidth">40dp</dimen>
     <dimen name="collectionElementRowText">10sp</dimen>
+    <dimen name="cardModelImageWidth">50dp</dimen>
+    <dimen name="cardModelNameWidth">50dp</dimen>
     <dimen name="cardModelListWidth">120dp</dimen>
     <dimen name="cardModelListHeight">200dp</dimen>
     

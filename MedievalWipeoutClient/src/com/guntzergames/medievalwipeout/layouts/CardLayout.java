@@ -16,12 +16,14 @@ import android.widget.TextView;
 
 import com.guntzergames.medievalwipeout.abstracts.AbstractCard;
 import com.guntzergames.medievalwipeout.activities.R;
+import com.guntzergames.medievalwipeout.beans.CollectionElement;
 import com.guntzergames.medievalwipeout.beans.DeckTemplateElement;
 import com.guntzergames.medievalwipeout.beans.PlayerDeckCard;
 import com.guntzergames.medievalwipeout.beans.PlayerFieldCard;
 import com.guntzergames.medievalwipeout.beans.PlayerHandCard;
 import com.guntzergames.medievalwipeout.beans.ResourceDeckCard;
 import com.guntzergames.medievalwipeout.enums.CardLocation;
+import com.guntzergames.medievalwipeout.interfaces.ICard;
 
 public class CardLayout extends RelativeLayout {
 	
@@ -29,7 +31,7 @@ public class CardLayout extends RelativeLayout {
 
 	private static LayoutInflater layoutInflater;
 	
-	private AbstractCard card;
+	private ICard card;
 	private Context context;
 	private boolean detailShown = false;
 	private int seqNum;
@@ -38,7 +40,8 @@ public class CardLayout extends RelativeLayout {
 	private ImageView image;
 
 	private LinearLayout rootView;
-	private TextView name, attack, lifePoints, currentLifePoints, trade, defense, faith, numberOfCards;
+	private ElementLayout nameLayout, numberOfCardsLayout;
+	private TextView name, attack, lifePoints, currentLifePoints, trade, defense, faith;
 
 	public void hide() {
 		this.setVisibility(View.INVISIBLE);
@@ -58,7 +61,7 @@ public class CardLayout extends RelativeLayout {
 		this.context = context;
 	}
 	
-	public void setup(Context context, AbstractCard card, int seqNum, CardLocation cardLocation) {
+	public void setup(Context context, ICard card, int seqNum, CardLocation cardLocation) {
 		this.context = context;
 		this.card = card;
 		this.seqNum = seqNum;
@@ -179,7 +182,8 @@ public class CardLayout extends RelativeLayout {
 				}
 			}
 			
-			name.setText(String.format("[%d] %s playable=%s", seqNum, playerDeckCard.getName(), (card instanceof PlayerHandCard ? ((PlayerHandCard)card).isPlayable() : "NA")));
+			nameLayout.setup("", playerDeckCard.getName());
+//			name.setText(String.format("[%d] %s playable=%s", seqNum, playerDeckCard.getName(), (card instanceof PlayerHandCard ? ((PlayerHandCard)card).isPlayable() : "NA")));
 			attack.setText(String.format("%s", playerDeckCard.getAttack()));
 			
 			if ( card instanceof PlayerFieldCard ) {
@@ -224,7 +228,7 @@ public class CardLayout extends RelativeLayout {
 		if (card instanceof DeckTemplateElement) {
 			
 			DeckTemplateElement deckTemplateElement = (DeckTemplateElement)card;
-			numberOfCards.setVisibility(View.VISIBLE);
+			numberOfCardsLayout.setVisibility(View.VISIBLE);
 
 			if ( detailShown ) {
 				try {
@@ -248,9 +252,9 @@ public class CardLayout extends RelativeLayout {
 				}
 			}
 			
-			name.setText(String.format("[%d] %s", seqNum, deckTemplateElement.getName()));
+			nameLayout.setup("", deckTemplateElement.getName());
 			attack.setText(String.format("%s", deckTemplateElement.getAttack()));
-			numberOfCards.setText(String.format("%s", deckTemplateElement.getNumberOfCards()));
+			numberOfCardsLayout.setup(getResources().getString(R.string.number_of_cards), String.format("%s", deckTemplateElement.getNumberOfCards()));
 			
 			Log.d("CardLayout", String.format("detailShown: %s", detailShown));
 			if (detailShown) {
@@ -273,6 +277,42 @@ public class CardLayout extends RelativeLayout {
 				else {
 					unactiveCardLayout();
 				}
+			}
+			
+		}
+		
+		if (card instanceof CollectionElement) {
+			
+			CollectionElement collectionElement = (CollectionElement)card;
+
+			if ( detailShown ) {
+				try {
+					image.setImageDrawable(getResources().getDrawable(getResourceFromName("card_" + collectionElement.getDrawableResourceName() + "_large")));
+				} catch (Exception e) {
+					Log.i("CardLayout", "Large image not found");
+					try {
+						image.setImageDrawable(getResources().getDrawable(getResourceFromName(("card_" + collectionElement.getDrawableResourceName()))));
+					} catch (Exception e2) {
+						e2.printStackTrace();
+						image.setImageDrawable(getResources().getDrawable(R.drawable.card_unknown));
+					}
+				}
+			}
+			else {
+				try {
+					image.setImageDrawable(getResources().getDrawable(getResourceFromName("card_" + collectionElement.getDrawableResourceName())));
+				} catch (Exception e) {
+					e.printStackTrace();
+					image.setImageDrawable(getResources().getDrawable(R.drawable.card_unknown));
+				}
+			}
+			
+			nameLayout.setup("", collectionElement.getName());
+			attack.setText(String.format("%s", collectionElement.getAttack()));
+			
+			Log.d("CardLayout", String.format("detailShown: %s", detailShown));
+			if (detailShown) {
+				lifePoints.setText(String.format("%s", collectionElement.getLifePoints()));
 			}
 			
 		}
@@ -334,11 +374,11 @@ public class CardLayout extends RelativeLayout {
 		this.detailShown = detailShown;
 	}
 
-	public AbstractCard getCard() {
+	public ICard getCard() {
 		return card;
 	}
 
-	public void setCard(AbstractCard card) {
+	public void setCard(ICard card) {
 		this.card = card;
 	}
 
@@ -378,10 +418,11 @@ public class CardLayout extends RelativeLayout {
 			reset();
 			image = (ImageView)rootView.findViewById(R.id.cardLayoutImage);
 			name = (TextView)rootView.findViewById(R.id.cardLayoutName);
+			nameLayout = (ElementLayout)rootView.findViewById(R.id.nameLayout);
 			attack = (TextView)rootView.findViewById(R.id.cardLayoutAttack);
 			lifePoints = (TextView)rootView.findViewById(R.id.cardLayoutLifePoints);
 			currentLifePoints = (TextView)rootView.findViewById(R.id.cardLayoutCurrentLifePoints);
-			numberOfCards = (TextView)rootView.findViewById(R.id.cardLayoutNumberOfCards);
+			numberOfCardsLayout = (ElementLayout)rootView.findViewById(R.id.cardLayoutNumberOfCardsLayout);
 		}
 		
 		Drawable highlightDrawable = getHighlightDrawable();

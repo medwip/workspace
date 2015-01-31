@@ -5,13 +5,13 @@ import android.view.DragEvent;
 import android.view.View;
 import android.view.View.OnDragListener;
 
-import com.guntzergames.medievalwipeout.abstracts.AbstractCard;
 import com.guntzergames.medievalwipeout.activities.GameActivity;
 import com.guntzergames.medievalwipeout.activities.R;
 import com.guntzergames.medievalwipeout.beans.PlayerDeckCard;
 import com.guntzergames.medievalwipeout.beans.PlayerFieldCard;
 import com.guntzergames.medievalwipeout.beans.ResourceDeckCard;
 import com.guntzergames.medievalwipeout.enums.CardLocation;
+import com.guntzergames.medievalwipeout.interfaces.ICard;
 import com.guntzergames.medievalwipeout.layouts.CardLayout;
 import com.guntzergames.medievalwipeout.webclients.GameWebClient;
 
@@ -35,7 +35,7 @@ public class GameDragListener implements OnDragListener {
 
 		Log.i(TAG, "event=" + cardLayout);
 		CardLocation cardLocation = cardLayout.getCardLocation();
-		AbstractCard card = cardLayout.getCard();
+		ICard card = cardLayout.getCard();
 
 		if (cardLocation == CardLocation.MODAL && card instanceof ResourceDeckCard && dest.getId() == R.id.playerHand) {
 			return "playerHand";

@@ -12,11 +12,13 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.Table;
 
+import com.guntzergames.medievalwipeout.interfaces.ICard;
+
 @Entity
 @Table(name = "DECK_TEMPLATE_ELEMENT")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "TYPE", discriminatorType = DiscriminatorType.STRING, length = 64)
-public abstract class AbstractCard {
+public abstract class AbstractCard implements ICard {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

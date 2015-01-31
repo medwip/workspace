@@ -27,6 +27,7 @@ com\guntzergames\medievalwipeout\beans\PlayerDeck.class
 com\guntzergames\medievalwipeout\interfaces\CommonConstants.class
 com\guntzergames\medievalwipeout\beans\DeckTemplateElement.class
 com\guntzergames\medievalwipeout\beans\Account.class
+com\guntzergames\medievalwipeout\interfaces\ICard.class
 com\guntzergames\medievalwipeout\beans\PlayerDeckCard.class
 com\guntzergames\medievalwipeout\beans\Game.class
 com\guntzergames\medievalwipeout\beans\GameEventPlayCard$PlayerType.class

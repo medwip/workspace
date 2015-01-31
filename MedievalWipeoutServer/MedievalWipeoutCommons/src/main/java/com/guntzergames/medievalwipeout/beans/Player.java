@@ -60,6 +60,7 @@ public class Player {
 	@Transient
 	private int faith;
 
+	@JsonIgnore
 	public Account getAccount() {
 		return deckTemplate != null ? deckTemplate.getAccount() : null;
 	}

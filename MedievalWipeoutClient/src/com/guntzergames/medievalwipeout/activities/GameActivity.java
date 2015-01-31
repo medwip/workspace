@@ -47,6 +47,7 @@ import com.guntzergames.medievalwipeout.beans.ResourceDeckCard;
 import com.guntzergames.medievalwipeout.enums.CardLocation;
 import com.guntzergames.medievalwipeout.enums.Phase;
 import com.guntzergames.medievalwipeout.interfaces.ClientConstants;
+import com.guntzergames.medievalwipeout.interfaces.ICard;
 import com.guntzergames.medievalwipeout.layouts.CardLayout;
 import com.guntzergames.medievalwipeout.layouts.PlayerLayout;
 import com.guntzergames.medievalwipeout.listeners.GameAnimationListener;
@@ -127,7 +128,7 @@ public class GameActivity extends ApplicationActivity {
 			setBeingModified(true);
 
 			CardLayout cardLayout = ((CardLayout) v);
-			AbstractCard card = cardLayout.getCard();
+			ICard card = cardLayout.getCard();
 
 			Log.d(TAG, String.format("onTouch event detected: %s for event %s", event.getAction(), v.getClass().getName()));
 
@@ -670,7 +671,7 @@ public class GameActivity extends ApplicationActivity {
 
 	}
 
-	private void animateCardEvent(AbstractCard card, View sourceLayout, View destinationLayout) {
+	private void animateCardEvent(ICard card, View sourceLayout, View destinationLayout) {
 
 		int[] sourceCoordinates = new int[2];
 		sourceLayout.getLocationInWindow(sourceCoordinates);

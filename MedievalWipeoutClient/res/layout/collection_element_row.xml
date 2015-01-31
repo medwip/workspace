@@ -14,7 +14,7 @@
 
         <ImageView
             android:id="@+id/cardLayoutImage"
-            android:layout_width="wrap_content"
+            android:layout_width="@dimen/cardModelImageWidth"
             android:layout_height="wrap_content"
             android:layout_gravity="left|top"
             android:scaleType="centerCrop"
@@ -22,7 +22,7 @@
 
         <TextView
             android:id="@+id/name"
-            android:layout_width="wrap_content"
+            android:layout_width="@dimen/cardModelNameWidth"
             android:layout_height="wrap_content"
             android:layout_gravity="left|center_vertical"
             android:layout_marginLeft="10dip"
@@ -33,7 +33,7 @@
 
         <TextView
             android:id="@+id/numberOfCards"
-            android:layout_width="wrap_content"
+            android:layout_width="@dimen/cardModelNameWidth"
             android:layout_height="wrap_content"
             android:layout_gravity="left|center_vertical"
             android:layout_marginLeft="10dip"

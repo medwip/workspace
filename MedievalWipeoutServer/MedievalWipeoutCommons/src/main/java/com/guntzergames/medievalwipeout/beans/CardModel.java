@@ -12,9 +12,12 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "CARD_MODEL")
-@NamedQueries({ @NamedQuery(name = CardModel.NQ_FIND_ALL, query = "SELECT c FROM CardModel c"),
-		@NamedQuery(name = CardModel.NQ_FIND_BY_REQUIRED_LEVEL, query = "SELECT c FROM CardModel c WHERE c.requiredLevel <= :requiredLevel"), })
-public class CardModel {
+@NamedQueries(
+{
+	@NamedQuery(name = CardModel.NQ_FIND_ALL, query = "SELECT c FROM CardModel c"),
+	@NamedQuery(name = CardModel.NQ_FIND_BY_REQUIRED_LEVEL, query = "SELECT c FROM CardModel c WHERE c.requiredLevel <= :requiredLevel"),
+})
+public class CardModel implements Comparable<CardModel> {
 
 	public static final String NQ_FIND_ALL = "NQ_FIND_ALL_CARD_MODELS";
 	public static final String NQ_FIND_BY_REQUIRED_LEVEL = "NQ_FIND_CARD_MODELS_BY_REQUIRED_LEVEL";
@@ -125,10 +128,19 @@ public class CardModel {
 	public void setRequiredLevel(int requiredLevel) {
 		this.requiredLevel = requiredLevel;
 	}
+	
+	public int compareTo(CardModel o) {
+		return (new Integer(id)).compareTo(new Integer(((CardModel)o).getId()));
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return (new Integer(id)).equals(new Integer(((CardModel)obj).getId()));
+	}
 
 	@Override
 	public String toString() {
-		return String.format("%s: Attack = %s, Life Points = %s", name, attack, lifePoints);
+		return String.format("[%s: Id=%s, Attack=%s, Life Points=%s]", name, id, attack, lifePoints);
 	}
 
 }

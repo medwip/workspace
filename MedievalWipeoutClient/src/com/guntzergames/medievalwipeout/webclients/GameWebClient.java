@@ -62,7 +62,7 @@ public class GameWebClient {
 	}
 
 	public void openPacket() {
-		get("http://" + ip + ":8080/MedievalWipeout/rest/account/openPacket/" + callbackable.getFacebookUserId(), ResponseType.GET_ACCOUNT);
+		get("http://" + ip + ":8080/MedievalWipeout/rest/account/openPacket/" + callbackable.getFacebookUserId(), ResponseType.OPEN_PACKET);
 	}
 
 	public void nextPhase(long gameId) {

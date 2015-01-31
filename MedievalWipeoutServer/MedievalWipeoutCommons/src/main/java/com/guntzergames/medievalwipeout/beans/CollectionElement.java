@@ -14,13 +14,15 @@ import javax.persistence.Table;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 
+import com.guntzergames.medievalwipeout.interfaces.ICard;
+
 @Entity
 @Table(name = "COLLECTION_ELEMENT")
 @NamedQueries({ 
 	@NamedQuery(name = CollectionElement.NQ_FIND_BY_ACCOUNT, query = "SELECT c FROM CollectionElement c WHERE c.account = :account"),
 	@NamedQuery(name = CollectionElement.NQ_FIND_BY_ACCOUNT_AND_CARD_MODEL, query = "SELECT c FROM CollectionElement c WHERE c.account = :account AND c.cardModel = :cardModel")	
 })
-public class CollectionElement {
+public class CollectionElement implements ICard {
 	
 	public static final String NQ_FIND_BY_ACCOUNT = "NQ_FIND_COLLECTION_ELEMENTS_BY_ACCOUNT";
 	public static final String NQ_FIND_BY_ACCOUNT_AND_CARD_MODEL = "NQ_FIND_COLLECTION_ELEMENTS_BY_ACCOUNT_AND_CARD_MODEL";

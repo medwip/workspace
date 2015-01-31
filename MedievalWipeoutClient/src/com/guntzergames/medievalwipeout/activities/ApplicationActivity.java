@@ -8,6 +8,7 @@ import android.widget.Toast;
 
 import com.guntzergames.medievalwipeout.beans.Account;
 import com.guntzergames.medievalwipeout.beans.CardModel;
+import com.guntzergames.medievalwipeout.beans.Packet;
 import com.guntzergames.medievalwipeout.interfaces.ClientConstants;
 import com.guntzergames.medievalwipeout.interfaces.GameWebClientCallbackable;
 import com.guntzergames.medievalwipeout.views.GameView;
@@ -72,44 +73,35 @@ public class ApplicationActivity extends FragmentActivity implements GameWebClie
 
 	@Override
 	public String getFacebookUserId() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public void onGetGame(GameView gameView) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void onCheckGame(GameView gameView) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void onGameJoined(GameView gameView) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void onDeleteGame() {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void onGetAccount(Account account) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void onGetCardModels(List<CardModel> cardModels) {
-		// TODO Auto-generated method stub
-		
+	}
+
+	@Override
+	public void onOpenPacket(Packet packet) {
 	}
 
 }
