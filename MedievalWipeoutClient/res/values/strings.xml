@@ -16,6 +16,7 @@
     <string name="home">Home</string>
     <string name="new_deck">New Deck</string>
     <string name="preferences">Preferences</string>
+    <string name="attack">Attack</string>
     <string name="trade">Trade</string>
     <string name="defense">Defense</string>
     <string name="faith">Faith</string>

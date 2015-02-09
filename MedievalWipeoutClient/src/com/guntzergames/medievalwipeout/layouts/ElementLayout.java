@@ -5,6 +5,7 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -20,6 +21,7 @@ public class ElementLayout extends LinearLayout {
 	private View root;
 
 	private TextView elementLibelView, elementValueView;
+	private ImageView elementImageView;
 
 	public ElementLayout(Context context) {
 		super(context);
@@ -36,12 +38,34 @@ public class ElementLayout extends LinearLayout {
 	public void init() {
 		layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		root = (LinearLayout) layoutInflater.inflate(R.layout.element, (ViewGroup) this);
+		elementLibelView = (TextView) root.findViewById(R.id.elementLibel);
+		elementImageView = (ImageView) root.findViewById(R.id.elementImage);		
+		elementValueView = (TextView) root.findViewById(R.id.elementValue);
+	}
+	
+	public void setup(int imageId, int value) {
+		
+		setup(imageId, String.format("%d", value));
+		
+	}
+
+	public void setup(int imageId, String value) {
+		
+		elementImageView.setImageResource(imageId);
+		elementLibelView.setVisibility(View.INVISIBLE);
+		elementValueView.setText(value);
+		
+	}
+	
+	public void setup(String libel, int value) {
+		
+		setup(libel, String.format("%d", value));
+		
 	}
 
 	public void setup(String libel, String value) {
 		
-		elementLibelView = (TextView) root.findViewById(R.id.elementLibel);
-		elementValueView = (TextView) root.findViewById(R.id.elementValue);
+		elementImageView.setVisibility(View.INVISIBLE);
 		elementLibelView.setText(libel);
 		elementValueView.setText(value);
 

@@ -15,14 +15,21 @@
         app:layout_columnSpan="3"
         android:text="@string/not_initialized" >
     </TextView>
+    
+    <FrameLayout
+        android:id="@+id/facebookLoginFragment"
+        app:layout_column="4"
+        app:layout_row="0"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
     <Button
         android:id="@+id/preferences"
         style="@style/Button"
+        app:layout_column="4"
+        app:layout_row="1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_column="4"
-        app:layout_row="0"
         android:text="@string/preferences" />
 
     <TextView
@@ -40,8 +47,8 @@
         style="@style/Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_row="1"
         app:layout_column="4"
+        app:layout_row="2"
         android:text="@string/resume_game" />
 
     <Button

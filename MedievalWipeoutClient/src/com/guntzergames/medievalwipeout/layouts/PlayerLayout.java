@@ -20,7 +20,7 @@ public class PlayerLayout extends LinearLayout {
 	private View root;
 	private Player player;
 	
-	private ElementLayout tradeLayout, goldLayout, defenseLayout, faithLayout, lifePointsLayout;
+	private ElementLayout tradeLayout, goldLayout, defenseLayout, faithLayout, playerLifePointsLayout;
 
 	public PlayerLayout(Context context) {
 		super(context);
@@ -50,13 +50,13 @@ public class PlayerLayout extends LinearLayout {
 		goldLayout = (ElementLayout) root.findViewById(R.id.goldLayout);
 		defenseLayout = (ElementLayout) root.findViewById(R.id.defenseLayout);
 		faithLayout = (ElementLayout) root.findViewById(R.id.faithLayout);
-		lifePointsLayout = (ElementLayout) root.findViewById(R.id.lifePointsLayout);
+		playerLifePointsLayout = (ElementLayout) root.findViewById(R.id.playerLifePointsLayout);
 		
 		tradeLayout.setup(context.getResources().getString(R.string.trade), String.format("%s", player.getTrade()));
 		goldLayout.setup(context.getResources().getString(R.string.gold), String.format("%s", player.getGold()));
 		defenseLayout.setup(context.getResources().getString(R.string.defense), String.format("%s | %s", player.getDefense(), player.getCurrentDefense()));
 		faithLayout.setup(context.getResources().getString(R.string.faith), String.format("%s", player.getFaith()));
-		lifePointsLayout.setup(context.getResources().getString(R.string.life_points), String.format("%s", player.getLifePoints()));
+		playerLifePointsLayout.setup(context.getResources().getString(R.string.life_points), String.format("%s", player.getLifePoints()));
 		
 	}
 	

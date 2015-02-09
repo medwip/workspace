@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:background="@drawable/frame_player_choices_highlightable" >
+
+        <com.guntzergames.medievalwipeout.layouts.CardLayout
+            android:id="@+id/playerChoiceCard0"
+            style="@style/CardStyle"
+            android:layout_width="@dimen/cardDetailWidth"
+            android:layout_height="@dimen/cardDetailWidth"
+            android:background="@drawable/card_border_highlightable"
+            android:padding="10dp" >
+        </com.guntzergames.medievalwipeout.layouts.CardLayout>
+
+        <com.guntzergames.medievalwipeout.layouts.CardLayout
+            android:id="@+id/playerChoiceCard1"
+            style="@style/CardStyle"
+            android:layout_width="@dimen/cardDetailWidth"
+            android:layout_height="@dimen/cardDetailWidth"
+            android:background="@drawable/card_border_highlightable"
+            android:padding="10dp" >
+        </com.guntzergames.medievalwipeout.layouts.CardLayout>
+    </LinearLayout>
+
+</RelativeLayout>

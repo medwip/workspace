@@ -2,6 +2,7 @@ package com.guntzergames.medievalwipeout.activities;
 
 import java.util.LinkedList;
 
+import android.app.Dialog;
 import android.content.ClipData;
 import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
@@ -19,6 +20,7 @@ import android.view.View;
 import android.view.View.DragShadowBuilder;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
+import android.view.Window;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
@@ -54,6 +56,7 @@ import com.guntzergames.medievalwipeout.listeners.GameAnimationListener;
 import com.guntzergames.medievalwipeout.listeners.GameDragListener;
 import com.guntzergames.medievalwipeout.listeners.GameResourceListener;
 import com.guntzergames.medievalwipeout.listeners.HighlightAnimationListener;
+import com.guntzergames.medievalwipeout.listeners.PlayerChoiceListener;
 import com.guntzergames.medievalwipeout.services.MainGameCheckerThread;
 import com.guntzergames.medievalwipeout.views.GameView;
 import com.guntzergames.medievalwipeout.webclients.GameWebClient;
@@ -74,6 +77,7 @@ public class GameActivity extends ApplicationActivity {
 	
 	private CardDetailListener cardDetailListener;
 	private GameResourceListener gameResourceListener;
+	private PlayerChoiceListener playerResourceListener;
 	private GameDragListener gameDragListener;
 
 	private GameAnimationListener gameAnimationListener;
@@ -85,8 +89,10 @@ public class GameActivity extends ApplicationActivity {
 	private LinearLayout playerHandLayout, opponentFieldDefenseLayout, opponentFieldAttackLayout, playerFieldDefenseLayout, playerFieldAttackLayout, highlightLayout, gameTradeRow,
 			gameDefenseRow, gameFaithRow, gameResourcesLayout;
 	private int httpCallsDone = 0, httpCallsAborted = 0, touchEvents = 0;
-	private CardLayout resourceCard1Layout, resourceCard2Layout, playerDeckCard1Layout, playerDeckCard2Layout, gameEventLayout;
+	private CardLayout playerChoiceCard1Layout, playerChoiceCard2Layout, gameEventLayout;
 
+	private Dialog resourceDialog;
+	
 	private TextView gameInfos;
 
 	final private Handler checkGameHandler = new Handler() {
@@ -345,10 +351,10 @@ public class GameActivity extends ApplicationActivity {
 		setupField(player.getPlayerFieldAttack(), "playerFieldAttack", 5, CardLocation.FIELD_ATTACK);
 		setupField(player.getPlayerHand(), "playerHand", 10, CardLocation.HAND);
 
-		playerDeckCard1Layout.hide();
-		playerDeckCard2Layout.hide();
-		resourceCard1Layout.hide();
-		resourceCard2Layout.hide();
+		playerChoiceCard1Layout.hide();
+		playerChoiceCard2Layout.hide();
+		stopHightlightAnimation(playerChoiceCard1Layout);
+		stopHightlightAnimation(playerChoiceCard2Layout);
 		playerChoicesLayout.setVisibility(View.INVISIBLE);
 		stopHightlightAnimation(playerHandLayout);
 		stopHightlightAnimation(gameResourcesLayout);
@@ -361,22 +367,17 @@ public class GameActivity extends ApplicationActivity {
 			switch (phase) {
 				case DURING_DECK_DRAW:
 					playerChoicesLayout.setVisibility(View.VISIBLE);
-					playerDeckCard1Layout.setup(this, player.getPlayerDeckCard1(), 1, CardLocation.MODAL);
-					playerDeckCard1Layout.show();
-					playerDeckCard2Layout.setup(this, player.getPlayerDeckCard2(), 2, CardLocation.MODAL);
-					playerDeckCard2Layout.show();
+					playerChoiceCard1Layout.setup(this, player.getPlayerDeckCard1(), 1, CardLocation.MODAL);
+					playerChoiceCard1Layout.show();
+					playerChoiceCard2Layout.setup(this, player.getPlayerDeckCard2(), 2, CardLocation.MODAL);
+					playerChoiceCard2Layout.show();
 					startHighlightAnimation(playerChoicesLayout);
 					break;
 				case DURING_PLAY:
 					initOpponentDragListener();
 					break;
 				case DURING_RESOURCE_CHOOSE:
-					playerChoicesLayout.setVisibility(View.VISIBLE);
-					resourceCard1Layout.setup(this, gameView.getResourceCard1(), 1, CardLocation.MODAL);
-					resourceCard1Layout.show();
-					resourceCard2Layout.setup(this, gameView.getResourceCard2(), 2, CardLocation.MODAL);
-					resourceCard2Layout.show();
-					startHighlightAnimation(playerChoicesLayout);
+					displayPlayerChoices();
 					break;
 				case DURING_RESOURCE_SELECT:
 					startHighlightAnimation(gameResourcesLayout);
@@ -388,6 +389,28 @@ public class GameActivity extends ApplicationActivity {
 
 		}
 
+	}
+	
+	private void displayPlayerChoices() {
+		
+//		resourceDialog.setTitle("Choose a resource");
+		playerChoicesLayout.setVisibility(View.VISIBLE);
+		
+		playerChoiceCard1Layout.setup(this, gameView.getResourceCard1(), 1, CardLocation.MODAL);
+		playerChoiceCard1Layout.show();
+		startHighlightAnimation(playerChoiceCard1Layout);
+		playerChoiceCard2Layout.setup(this, gameView.getResourceCard2(), 2, CardLocation.MODAL);
+		playerChoiceCard2Layout.show();
+		startHighlightAnimation(playerChoiceCard2Layout);
+		
+//		resourceDialog.show();
+		
+	}
+	
+	public void hideResourceDialog() {
+		resourceDialog.hide();
+		stopHightlightAnimation(playerChoicesLayout);
+		playerChoicesLayout.setVisibility(View.INVISIBLE);
 	}
 
 	public GameWebClient getGameWebClient() {
@@ -446,6 +469,7 @@ public class GameActivity extends ApplicationActivity {
 
 		cardDetailListener = new CardDetailListener();
 		gameResourceListener = new GameResourceListener(this);
+		playerResourceListener = new PlayerChoiceListener(this);
 		gameDragListener = new GameDragListener(this);
 
 		gameAnimationListener = new GameAnimationListener(this);
@@ -509,15 +533,24 @@ public class GameActivity extends ApplicationActivity {
 		playerFieldAttackLayout.setOnDragListener(gameDragListener);
 		opponentFieldDefenseLayout.setOnDragListener(gameDragListener);
 		opponentFieldAttackLayout.setOnDragListener(gameDragListener);
+		
+		resourceDialog = new Dialog(this);
+		resourceDialog.hide();
+		resourceDialog.setContentView(R.layout.dialog_player_choices);
+		resourceDialog.getWindow().setFlags(Window.FEATURE_NO_TITLE, 0);
 
-		resourceCard1Layout = (CardLayout) layout.findViewById(CardLayout.getCardFromId("resource", 0));
-		resourceCard1Layout.setOnTouchListener(cardDetailListener);
-		resourceCard2Layout = (CardLayout) layout.findViewById(CardLayout.getCardFromId("resource", 1));
-		resourceCard2Layout.setOnTouchListener(cardDetailListener);
-		playerDeckCard1Layout = (CardLayout) layout.findViewById(CardLayout.getCardFromId("playerDeck", 0));
-		playerDeckCard1Layout.setOnTouchListener(cardDetailListener);
-		playerDeckCard2Layout = (CardLayout) layout.findViewById(CardLayout.getCardFromId("playerDeck", 1));
-		playerDeckCard2Layout.setOnTouchListener(cardDetailListener);
+//		resourceCard1Layout = (CardLayout) resourceDialog.findViewById(CardLayout.getCardFromId("resource", 0));
+		playerChoiceCard1Layout = (CardLayout) layout.findViewById(CardLayout.getCardFromId("playerChoice", 0));
+		playerChoiceCard1Layout.setOnClickListener(playerResourceListener);
+		playerChoiceCard1Layout.setDetailShown(true);
+//		resourceCard2Layout = (CardLayout) resourceDialog.findViewById(CardLayout.getCardFromId("resource", 1));
+		playerChoiceCard2Layout = (CardLayout) layout.findViewById(CardLayout.getCardFromId("playerChoice", 1));
+		playerChoiceCard2Layout.setOnClickListener(playerResourceListener);
+		playerChoiceCard2Layout.setDetailShown(true);
+//		playerDeckCard1Layout = (CardLayout) layout.findViewById(CardLayout.getCardFromId("playerDeck", 0));
+//		playerDeckCard1Layout.setOnTouchListener(cardDetailListener);
+//		playerDeckCard2Layout = (CardLayout) layout.findViewById(CardLayout.getCardFromId("playerDeck", 1));
+//		playerDeckCard2Layout.setOnTouchListener(cardDetailListener);
 
 		mainGameCheckerThread = new MainGameCheckerThread(checkGameHandler, gameId, this);
 		mainGameCheckerThread.start();

@@ -40,8 +40,8 @@ public class CardLayout extends RelativeLayout {
 	private ImageView image;
 
 	private LinearLayout rootView;
-	private ElementLayout nameLayout, numberOfCardsLayout;
-	private TextView name, attack, lifePoints, currentLifePoints, trade, defense, faith;
+	private ElementLayout nameLayout, defenseLayout, faithLayout, numberOfCardsLayout;
+	private TextView attack, lifePoints, name, trade, defense, faith;
 
 	public void hide() {
 		this.setVisibility(View.INVISIBLE);
@@ -182,24 +182,21 @@ public class CardLayout extends RelativeLayout {
 				}
 			}
 			
-			nameLayout.setup("", playerDeckCard.getName());
-//			name.setText(String.format("[%d] %s playable=%s", seqNum, playerDeckCard.getName(), (card instanceof PlayerHandCard ? ((PlayerHandCard)card).isPlayable() : "NA")));
+			name.setText(playerDeckCard.getName());
 			attack.setText(String.format("%s", playerDeckCard.getAttack()));
-			
-			if ( card instanceof PlayerFieldCard ) {
-				attack.setText(String.format("%s %s", ((PlayerFieldCard) card).getLocation() , playerDeckCard.getAttack()));
-			}
+//			attackLayout.setup(getResources().getString(R.string.attack), playerDeckCard.getAttack());
 			
 			Log.d("CardLayout", String.format("detailShown: %s", detailShown));
 			
-			lifePoints.setText(String.format("%s", playerDeckCard.getLifePoints()));
-			
 			if ( playerDeckCard instanceof PlayerFieldCard ) {
 				PlayerFieldCard playerFieldCard = (PlayerFieldCard)playerDeckCard;
-				currentLifePoints.setText(String.format("%s", playerFieldCard.getCurrentLifePoints()));
+				lifePoints.setText(String.format("%s/%s", playerFieldCard.getCurrentLifePoints(), playerDeckCard.getLifePoints()));
+//				lifePointsLayout.setup(getResources().getString(R.string.life_points),
+//						String.format("%s (%s)", playerFieldCard.getCurrentLifePoints(), playerDeckCard.getLifePoints()));
 			}
 			else {
-				currentLifePoints.setVisibility(View.INVISIBLE);
+				lifePoints.setText(String.format("%s", playerDeckCard.getLifePoints()));
+//				lifePointsLayout.setup(getResources().getString(R.string.life_points), playerDeckCard.getLifePoints());
 			}
 			
 			if ( card instanceof PlayerFieldCard && !detailShown ) {
@@ -252,14 +249,12 @@ public class CardLayout extends RelativeLayout {
 				}
 			}
 			
-			nameLayout.setup("", deckTemplateElement.getName());
+			name.setText(deckTemplateElement.getName());
 			attack.setText(String.format("%s", deckTemplateElement.getAttack()));
 			numberOfCardsLayout.setup(getResources().getString(R.string.number_of_cards), String.format("%s", deckTemplateElement.getNumberOfCards()));
+			lifePoints.setText(String.format("%s", deckTemplateElement.getLifePoints()));
 			
 			Log.d("CardLayout", String.format("detailShown: %s", detailShown));
-			if (detailShown) {
-				lifePoints.setText(String.format("%s", deckTemplateElement.getLifePoints()));
-			}
 			if ( card instanceof PlayerFieldCard && !detailShown ) {
 				PlayerFieldCard playerFieldCard = (PlayerFieldCard)card;
 				if ( !playerFieldCard.isPlayed() ) {
@@ -307,13 +302,11 @@ public class CardLayout extends RelativeLayout {
 				}
 			}
 			
-			nameLayout.setup("", collectionElement.getName());
+			name.setText(collectionElement.getName());
 			attack.setText(String.format("%s", collectionElement.getAttack()));
+			lifePoints.setText(String.format("%s", collectionElement.getLifePoints()));
 			
 			Log.d("CardLayout", String.format("detailShown: %s", detailShown));
-			if (detailShown) {
-				lifePoints.setText(String.format("%s", collectionElement.getLifePoints()));
-			}
 			
 		}
 		
@@ -417,12 +410,11 @@ public class CardLayout extends RelativeLayout {
 			
 			reset();
 			image = (ImageView)rootView.findViewById(R.id.cardLayoutImage);
-			name = (TextView)rootView.findViewById(R.id.cardLayoutName);
-			nameLayout = (ElementLayout)rootView.findViewById(R.id.nameLayout);
-			attack = (TextView)rootView.findViewById(R.id.cardLayoutAttack);
-			lifePoints = (TextView)rootView.findViewById(R.id.cardLayoutLifePoints);
-			currentLifePoints = (TextView)rootView.findViewById(R.id.cardLayoutCurrentLifePoints);
-			numberOfCardsLayout = (ElementLayout)rootView.findViewById(R.id.cardLayoutNumberOfCardsLayout);
+			name = (TextView)rootView.findViewById(R.id.cardName);
+			attack = (TextView)rootView.findViewById(R.id.cardAttackText);
+			lifePoints = (TextView)rootView.findViewById(R.id.cardLifePointsText);
+//			currentLifePoints = (TextView)rootView.findViewById(R.id.cardLayoutCurrentLifePoints);
+			numberOfCardsLayout = (ElementLayout)rootView.findViewById(R.id.numberOfCardsLayout);
 		}
 		
 		Drawable highlightDrawable = getHighlightDrawable();

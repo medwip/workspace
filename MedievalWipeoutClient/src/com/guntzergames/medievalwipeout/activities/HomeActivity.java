@@ -105,10 +105,10 @@ public class HomeActivity extends ApplicationActivity {
 		if (savedInstanceState == null) {
 			// Add the fragment on initial activity setup
 			loginFragment = new LoginFragment(this);
-			getSupportFragmentManager().beginTransaction().add(android.R.id.content, loginFragment).commit();
+			getSupportFragmentManager().beginTransaction().add(R.id.facebookLoginFragment, loginFragment).commit();
 		} else {
 			// Or set the fragment from restored state info
-			loginFragment = (LoginFragment) getSupportFragmentManager().findFragmentById(android.R.id.content);
+			loginFragment = (LoginFragment) getSupportFragmentManager().findFragmentById(R.id.facebookLoginFragment);
 			loginFragment.setHomeActivity(this);
 		}
 
