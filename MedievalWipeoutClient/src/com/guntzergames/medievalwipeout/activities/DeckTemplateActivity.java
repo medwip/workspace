@@ -24,7 +24,6 @@ import android.widget.Toast;
 
 import com.guntzergames.medievalwipeout.adapters.CollectionElementAdapter;
 import com.guntzergames.medievalwipeout.beans.Account;
-import com.guntzergames.medievalwipeout.beans.CardModel;
 import com.guntzergames.medievalwipeout.beans.CollectionElement;
 import com.guntzergames.medievalwipeout.beans.DeckTemplate;
 import com.guntzergames.medievalwipeout.beans.DeckTemplateElement;
@@ -36,7 +35,6 @@ import com.guntzergames.medievalwipeout.layouts.CardLayout;
 public class DeckTemplateActivity extends ApplicationActivity {
 
 	private long deckTemplateId;
-	private String facebookUserId;
 	private LinearLayout layout;
 	private Button homeButton, newDeckButton, openPacketButton;
 	private EditText newDeckLibelEditText;
@@ -139,7 +137,7 @@ public class DeckTemplateActivity extends ApplicationActivity {
 
 		});
 
-		gameWebClient.getAccount(facebookUserId);
+		gameWebClient.getAccount();
 
 	}
 
@@ -247,7 +245,7 @@ public class DeckTemplateActivity extends ApplicationActivity {
 	public void onOpenPacket(Packet packet) {
 
 		displayPacket(packet);
-		gameWebClient.getAccount(facebookUserId);
+		gameWebClient.getAccount();
 
 	}
 

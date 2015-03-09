@@ -7,7 +7,7 @@ import android.util.Log;
 import com.guntzergames.medievalwipeout.activities.GameActivity;
 import com.guntzergames.medievalwipeout.views.GameView;
 
-public class MainGameCheckerThread extends Thread {
+public class GameCheckerThread extends Thread {
 	
 	private Handler checkGameHandler;
 	private long gameId;
@@ -22,7 +22,7 @@ public class MainGameCheckerThread extends Thread {
 		this.interruptedSignalSent = interruptedSignalSent;
 	}
 
-	public MainGameCheckerThread(Handler checkGameHandler, long gameId, GameActivity gameActivity) {
+	public GameCheckerThread(Handler checkGameHandler, long gameId, GameActivity gameActivity) {
 		this.checkGameHandler = checkGameHandler;
 		this.gameId = gameId;
 		this.gameActivity = gameActivity;

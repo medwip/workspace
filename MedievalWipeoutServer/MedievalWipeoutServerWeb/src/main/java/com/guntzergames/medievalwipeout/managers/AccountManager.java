@@ -18,8 +18,10 @@ import com.guntzergames.medievalwipeout.beans.DeckTemplate;
 import com.guntzergames.medievalwipeout.beans.DeckTemplateElement;
 import com.guntzergames.medievalwipeout.beans.Packet;
 import com.guntzergames.medievalwipeout.beans.Player;
+import com.guntzergames.medievalwipeout.exceptions.PlayerNotInGameException;
 import com.guntzergames.medievalwipeout.persistence.AccountDao;
 import com.guntzergames.medievalwipeout.singletons.BotAccountSingleton;
+import com.guntzergames.medievalwipeout.views.GameView;
 
 @Stateless
 public class AccountManager {
@@ -137,6 +139,26 @@ public class AccountManager {
 	
 	public DeckTemplate findDeckTemplateById(long id) {
 		return accountDao.findDeckTemplateById(id);
+	}
+	
+	public List<Player> findPlayersByAccount(Account account) {
+		return accountDao.findPlayersByAccount(account);
+	}
+	
+	public List<GameView> findGameViewsByAccount(Account account) {
+		
+		List<GameView> games = new ArrayList<GameView>();
+		
+		for ( Player player : findPlayersByAccount(account) ) {
+			try {
+				games.add(player.getGame().buildGameView(player));
+			} catch (PlayerNotInGameException e) {
+				LOGGER.warn("Was not able to select player...");
+			}
+		}
+		
+		return games;
+		
 	}
 	
 	public CollectionElement findCollectionElementById(long id) {

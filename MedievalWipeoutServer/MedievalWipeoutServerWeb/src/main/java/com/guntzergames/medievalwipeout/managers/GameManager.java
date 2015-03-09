@@ -29,6 +29,7 @@ import com.guntzergames.medievalwipeout.exceptions.GameException;
 import com.guntzergames.medievalwipeout.exceptions.PlayerNotInGameException;
 import com.guntzergames.medievalwipeout.exceptions.UnsupportedPhaseException;
 import com.guntzergames.medievalwipeout.interfaces.CommonConstants;
+import com.guntzergames.medievalwipeout.persistence.AccountDao;
 import com.guntzergames.medievalwipeout.persistence.GameDao;
 import com.guntzergames.medievalwipeout.singletons.GameSingleton;
 
@@ -41,6 +42,8 @@ public class GameManager {
 	private GameSingleton gameSingleton;
 	@EJB
 	private GameDao gameDao;
+	@EJB
+	private AccountDao accountDao;
 
 	public Game findGameToJoin(Player player) {
 
@@ -57,10 +60,11 @@ public class GameManager {
 		return ret;
 
 	}
-
+	
 	public Game mergeGame(Game game) {
 		Game dbGame = gameDao.mergeGame(game);
 		dbGame.setTransientFields(game);
+		gameSingleton.addGame(dbGame);
 		return dbGame;
 	}
 
@@ -85,18 +89,23 @@ public class GameManager {
 			game.setActivePlayer(player);
 			player.setGame(game);
 			LOGGER.info(String.format("Player %s joining game: %s", player, game));
+			game = mergeGame(game);
+			LOGGER.info(String.format("After merge, game=%s", game));
 			game.setGameState(GameState.INITIALIZING_CREATOR_HAND);
 			initializeGame(game);
 			game.setGameState(GameState.STARTED);
 			game = mergeGame(game);
 		}
 
+		LOGGER.info(String.format("Before return in join, game=%s", game));
 		return game;
 
 	}
 
 	public void initializeGame(Game game) throws PlayerNotInGameException {
 
+		LOGGER.info(String.format("Before initialize game, game=%s", game));
+		
 		for (Player player : game.getPlayers()) {
 			player.setPlayerDeck(player.getDeckTemplate().toDeck());
 			initPlayer(player);
@@ -148,7 +157,7 @@ public class GameManager {
 
 		Game game = getGame(gameId);
 
-		System.out.println(String.format("nextPhase : %s", game));
+		LOGGER.info(String.format("nextPhase : %s", game));
 
 		switch (game.getPhase()) {
 
@@ -220,6 +229,9 @@ public class GameManager {
 
 		}
 
+		// Save game state in the database
+		game = gameDao.saveGame(game);
+		
 		LOGGER.info("After nextPhase : " + game);
 
 		return game;
@@ -410,16 +422,50 @@ public class GameManager {
 		game.setGameState(GameState.INITIALIZING_JOINER_HAND);
 
 	}
+	
+	public Game loadDump(Game game) {
+		
+		String json = game.getDataDump();
+		if ( json != null ) {
+			game = Game.fromJson(json);
+			LOGGER.info(String.format("Loaded game %s from JSON dump", game.getId()));
+		}
+		
+		for ( Player player : game.getPlayers() ) {
+			
+			DeckTemplate deckTemplate = player.getDeckTemplate();
+			deckTemplate = accountDao.findDeckTemplateById(deckTemplate.getId());
+			player.setDeckTemplate(deckTemplate);
+			player.setGame(game);
+			if ( game.getActivePlayer() != null && game.getActivePlayer().getId() == player.getId() ) {
+				game.setActivePlayer(player);
+			}
+			LOGGER.info(String.format("Loaded deck template %s", deckTemplate));
+			
+		}
+		LOGGER.info("game.getResourceCard2() " + game.getResourceCard2());
+		LOGGER.info("game.getPlayers().get(0).getAccount() " + game.getPlayers().get(0).getAccount());
+		
+		return game;
+		
+	}
 
 	public Game getGame(long gameId) {
 
-		for (Game game : gameSingleton.getAllOngoingGames()) {
-			if (game.getId() == gameId) {
-				return game;
-			}
+		// Try to get the get from the memory cache first
+		Game game = gameSingleton.getGame(gameId);
+		
+		// If game is not cached, load it from database
+		if ( game == null ) {
+			game = gameDao.findGameById(gameId);
+			game = loadDump(game);
 		}
-
-		return null;
+		LOGGER.info("game.getResourceCard2() " + game.getResourceCard2());
+		LOGGER.info("game.getPlayers().get(0).getAccount() " + game.getPlayers().get(0).getAccount());
+		
+		gameSingleton.addGame(game);
+		
+		return game;
 
 	}
 
@@ -429,6 +475,8 @@ public class GameManager {
 
 	public Player selectPlayer(Game game, String facebookUserId) throws PlayerNotInGameException {
 
+		LOGGER.info("game.getPlayers().get(0).getAccount() " + game.getPlayers().get(0).getAccount());
+		LOGGER.info("game.getPlayers().get(0).getAccount().getFacebookUserId() " + game.getPlayers().get(0).getAccount().getFacebookUserId());
 		for (Player player : game.getPlayers()) {
 			if (player.getAccount().getFacebookUserId().equals(facebookUserId))
 				return player;

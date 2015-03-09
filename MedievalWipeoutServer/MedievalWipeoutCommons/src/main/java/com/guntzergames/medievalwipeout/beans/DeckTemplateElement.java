@@ -50,6 +50,8 @@ public class DeckTemplateElement extends AbstractCard {
 		playerDeckCard.setGoldCost(getGoldCost());
 		playerDeckCard.setLifePoints(getLifePoints());
 		playerDeckCard.setName(getName());
+		playerDeckCard.setArcher(isArcher());
+		playerDeckCard.setDefensor(isDefensor());
 		return playerDeckCard;
 	}
 	
@@ -109,6 +111,16 @@ public class DeckTemplateElement extends AbstractCard {
 	@JsonIgnore
 	public int getFaithCost() {
 		return collectionElement.getFaithCost();
+	}
+	
+	@JsonIgnore
+	public boolean isDefensor() {
+		return collectionElement.isDefensor();
+	}
+
+	@JsonIgnore
+	public boolean isArcher() {
+		return collectionElement.isArcher();
 	}
 
 	public int getNumberOfCards() {

@@ -1,6 +1,8 @@
 package com.guntzergames.medievalwipeout.activities;
 
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Set;
 
 import android.app.Dialog;
 import android.content.ClipData;
@@ -57,7 +59,7 @@ import com.guntzergames.medievalwipeout.listeners.GameDragListener;
 import com.guntzergames.medievalwipeout.listeners.GameResourceListener;
 import com.guntzergames.medievalwipeout.listeners.HighlightAnimationListener;
 import com.guntzergames.medievalwipeout.listeners.PlayerChoiceListener;
-import com.guntzergames.medievalwipeout.services.MainGameCheckerThread;
+import com.guntzergames.medievalwipeout.services.GameCheckerThread;
 import com.guntzergames.medievalwipeout.views.GameView;
 import com.guntzergames.medievalwipeout.webclients.GameWebClient;
 
@@ -70,8 +72,8 @@ public class GameActivity extends ApplicationActivity {
 	private String gameCommand;
 	private Player player, opponent;
 	private String facebookUserId;
-	private MainGameCheckerThread mainGameCheckerThread;
-	private boolean beingModified = false;
+	private GameCheckerThread gameCheckerThread;
+	private boolean beingModified = false, opponentDefenseDown = false;
 	private CardLayout cardLayoutDetail = null;
 	private PlayerLayout playerPlayerLayout, opponentPlayerLayout;
 	
@@ -94,6 +96,8 @@ public class GameActivity extends ApplicationActivity {
 	private Dialog resourceDialog;
 	
 	private TextView gameInfos;
+	
+	private Set<View> dragableRegisteredViews = new HashSet<View>();
 
 	final private Handler checkGameHandler = new Handler() {
 
@@ -227,6 +231,14 @@ public class GameActivity extends ApplicationActivity {
 		return this;
 	}
 
+	public Set<View> getDragableRegisteredViews() {
+		return dragableRegisteredViews;
+	}
+
+	public void setDragableRegisteredViews(Set<View> dragableRegisteredViews) {
+		this.dragableRegisteredViews = dragableRegisteredViews;
+	}
+
 	public void hideCardLayoutDetail() {
 		cardLayoutDetail.hide();
 	}
@@ -251,13 +263,31 @@ public class GameActivity extends ApplicationActivity {
 
 	private void initOpponentDragListener() {
 		
+		if ( opponentDefenseDown ) {
+			unregisterDragListener(opponentFieldDefenseLayout);
+		}
+		else {
+			registerDragListener(opponentFieldDefenseLayout);
+		}
+		
 		int len = opponent.getPlayerFieldAttack().getCards().size();
 
 		for (int i = 0; i < Math.min(opponentFieldAttackLayout.getChildCount(), len); i++) {
 
 			CardLayout cardInFieldLayout = (CardLayout) opponentFieldAttackLayout.getChildAt(i);
-			cardInFieldLayout.setOnDragListener(gameDragListener);
+			registerDragListener(cardInFieldLayout);
 
+		}
+
+		if ( opponentDefenseDown ) {
+			len = opponent.getPlayerFieldDefense().getCards().size();
+			
+			for (int i = 0; i < Math.min(opponentFieldDefenseLayout.getChildCount(), len); i++) {
+	
+				CardLayout cardInFieldLayout = (CardLayout) opponentFieldDefenseLayout.getChildAt(i);
+				registerDragListener(cardInFieldLayout);
+	
+			}
 		}
 
 	}
@@ -297,20 +327,23 @@ public class GameActivity extends ApplicationActivity {
 
 	}
 	
-	private AnimationDrawable getAnimationDrawable(View view) {
+	private AnimationDrawable getAnimationDrawable(View view, int index) {
 		
 		Drawable background = view.getBackground();
 		
 		if ( background instanceof LayerDrawable ) {
 			
 			LayerDrawable layerDrawable = (LayerDrawable)background;
+			int num = 0;
 			
 			for ( int i = 0; i < layerDrawable.getNumberOfLayers(); i++ ) {
 				
 				Drawable drawable = layerDrawable.getDrawable(i);
 				if ( drawable instanceof AnimationDrawable ) {
 					AnimationDrawable animationDrawable = (AnimationDrawable)drawable;
-					return animationDrawable;
+					if ( num++ == index ) {
+						return animationDrawable;
+					}
 				}
 				
 			}
@@ -320,24 +353,62 @@ public class GameActivity extends ApplicationActivity {
 		return null;
 		
 	}
-
-	public void startHighlightAnimation(View view) {
-
-		AnimationDrawable animationDrawable = getAnimationDrawable(view);
+	
+	public void startAnimation(View view, int index) {
+		
+		AnimationDrawable animationDrawable = getAnimationDrawable(view, index);
 		if ( animationDrawable != null ) {
 			animationDrawable.setAlpha(255);
 			animationDrawable.start();
 		}
 		
 	}
-	
-	public void stopHightlightAnimation(View view) {
+
+	public void stopAnimation(View view, int index) {
 		
-		AnimationDrawable animationDrawable = getAnimationDrawable(view);
+		AnimationDrawable animationDrawable = getAnimationDrawable(view, index);
 		if ( animationDrawable != null ) {
 			animationDrawable.setAlpha(0);
 			animationDrawable.stop();
 		}
+		
+	}
+	
+	public void startHighlightAnimation(View view) {
+
+		startAnimation(view, 0);
+		
+	}
+	
+	public void stopHightlightAnimation(View view) {
+		
+		stopAnimation(view, 0);
+		
+	}
+	
+	public void startTargetAnimation(View view) {
+
+		startAnimation(view, 1);
+		
+	}
+	
+	public void stopTargetAnimation(View view) {
+		
+		stopAnimation(view, 1);
+		
+	}
+	
+	private void registerDragListener(View view) {
+		
+		view.setOnDragListener(gameDragListener);
+		dragableRegisteredViews.add(view);
+		
+	}
+	
+	private void unregisterDragListener(View view) {
+		
+		view.setOnDragListener(null);
+		dragableRegisteredViews.remove(view);
 		
 	}
 	
@@ -422,10 +493,19 @@ public class GameActivity extends ApplicationActivity {
 
 		super.onResume();
 
-		Log.i("MainActivity", "onResume");
-		mainGameCheckerThread.setPaused(false);
-		mainGameCheckerThread.getGame(gameId);
+		initIntentExtras();
+		Log.i(TAG, String.format("onResume, gameId=%s", gameId));
+		gameCheckerThread.setPaused(false);
+		gameCheckerThread.getGame(gameId);
 
+	}
+	
+	@Override
+	protected void onNewIntent(Intent intent) {
+		
+		super.onNewIntent(intent);
+		Log.i(TAG, String.format("onNewIntent, gameId=%s", gameId));
+		
 	}
 
 	@Override
@@ -433,8 +513,8 @@ public class GameActivity extends ApplicationActivity {
 
 		super.onPause();
 
-		Log.i("MainActivity", "onPause");
-		mainGameCheckerThread.setPaused(true);
+		Log.i(TAG, "onPause");
+		gameCheckerThread.setPaused(true);
 
 	}
 
@@ -443,7 +523,7 @@ public class GameActivity extends ApplicationActivity {
 
 		super.onCreate(savedInstanceState);
 
-		Log.d("MainActivity", "onCreate");
+		Log.d(TAG, "onCreate");
 
 		init();
 
@@ -489,7 +569,7 @@ public class GameActivity extends ApplicationActivity {
 			@Override
 			public void onClick(View v) {
 				Log.d("MainActivity", "Clicker on delete for game " + gameId);
-				mainGameCheckerThread.setInterruptedSignalSent(true);
+				gameCheckerThread.setInterruptedSignalSent(true);
 				gameWebClient.deleteGame(gameId);
 			}
 		});
@@ -527,13 +607,13 @@ public class GameActivity extends ApplicationActivity {
 		gameDefenseRow.setOnClickListener(gameResourceListener);
 		gameFaithRow.setOnClickListener(gameResourceListener);
 
-		layout.setOnDragListener(gameDragListener);
-		playerHandLayout.setOnDragListener(gameDragListener);
-		playerFieldDefenseLayout.setOnDragListener(gameDragListener);
-		playerFieldAttackLayout.setOnDragListener(gameDragListener);
-		opponentFieldDefenseLayout.setOnDragListener(gameDragListener);
-		opponentFieldAttackLayout.setOnDragListener(gameDragListener);
-		
+		registerDragListener(layout);
+		registerDragListener(playerHandLayout);
+		registerDragListener(playerFieldDefenseLayout);
+		registerDragListener(playerFieldAttackLayout);
+		registerDragListener(opponentFieldDefenseLayout);
+		registerDragListener(opponentFieldAttackLayout);
+
 		resourceDialog = new Dialog(this);
 		resourceDialog.hide();
 		resourceDialog.setContentView(R.layout.dialog_player_choices);
@@ -552,8 +632,8 @@ public class GameActivity extends ApplicationActivity {
 //		playerDeckCard2Layout = (CardLayout) layout.findViewById(CardLayout.getCardFromId("playerDeck", 1));
 //		playerDeckCard2Layout.setOnTouchListener(cardDetailListener);
 
-		mainGameCheckerThread = new MainGameCheckerThread(checkGameHandler, gameId, this);
-		mainGameCheckerThread.start();
+		gameCheckerThread = new GameCheckerThread(checkGameHandler, gameId, this);
+		gameCheckerThread.start();
 		hideCardLayoutDetail();
 
 	}
@@ -561,16 +641,23 @@ public class GameActivity extends ApplicationActivity {
 	@Override
 	protected void onStop() {
 		super.onStop();
+		gameCheckerThread.setInterruptedSignalSent(true);
 	}
-
-	private void init() {
-
+	
+	private void initIntentExtras() {
+		
 		gameId = getIntent().getExtras().getLong(ClientConstants.GAME_ID);
 		gameCommand = getIntent().getExtras().getString(ClientConstants.GAME_COMMAND);
 		facebookUserId = getIntent().getExtras().getString(ClientConstants.FACEBOOK_USER_ID);
 
 		Toast.makeText(this, String.format("Command %s for game ID: %s, userName=%s", gameCommand, gameId, facebookUserId), Toast.LENGTH_SHORT).show();
+		
+	}
 
+	private void init() {
+
+		initIntentExtras();
+		
 		layout = (RelativeLayout) LinearLayout.inflate(this, R.layout.activity_game, null);
 
 		setContentView(layout);
@@ -589,6 +676,8 @@ public class GameActivity extends ApplicationActivity {
 		intent.putExtra(ClientConstants.GAME_STATE, status);
 		intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 		startActivity(intent);
+		gameCheckerThread.setInterruptedSignalSent(true);
+		finish();
 	}
 
 	public String getFacebookUserId() {
@@ -738,8 +827,6 @@ public class GameActivity extends ApplicationActivity {
 	@Override
 	public void onGetGame(GameView game) {
 
-		Log.i(TAG, "onGetGame");
-
 		if (game == null) {
 			Toast.makeText(this, String.format("Unable to get game"), Toast.LENGTH_LONG).show();
 			return;
@@ -756,6 +843,7 @@ public class GameActivity extends ApplicationActivity {
 		opponent = game.getOpponents().get(0);
 		opponentPlayerLayout.setup(opponent);
 		playerPlayerLayout.setup(player);
+		opponentDefenseDown = opponent.getCurrentDefense() > 0 ? false : true;
 
 		Log.d(TAG, String.format("Entering onGetGame: state=%s", game.getGameState()));
 

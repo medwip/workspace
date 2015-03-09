@@ -62,6 +62,12 @@ public class CardModel implements Comparable<CardModel> {
 	@Column(name = "FAITH_COST")
 	private int faithCost;
 
+	@Column(name = "DEFENSOR")
+	private boolean defensor;
+
+	@Column(name = "ARCHER")
+	private boolean archer;
+
 	@Column(name = "REQUIRED_LEVEL")
 	private int requiredLevel;
 
@@ -119,6 +125,22 @@ public class CardModel implements Comparable<CardModel> {
 
 	public void setFaithCost(int faithCost) {
 		this.faithCost = faithCost;
+	}
+
+	public boolean isDefensor() {
+		return defensor;
+	}
+
+	public void setDefensor(boolean defensor) {
+		this.defensor = defensor;
+	}
+
+	public boolean isArcher() {
+		return archer;
+	}
+
+	public void setArcher(boolean archer) {
+		this.archer = archer;
 	}
 
 	public int getRequiredLevel() {

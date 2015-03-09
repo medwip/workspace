@@ -1,12 +1,16 @@
 package com.guntzergames.medievalwipeout.activities;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import android.content.Intent;
+import android.content.res.AssetManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -31,8 +35,8 @@ import com.guntzergames.medievalwipeout.beans.Account;
 import com.guntzergames.medievalwipeout.beans.DeckTemplate;
 import com.guntzergames.medievalwipeout.enums.GameState;
 import com.guntzergames.medievalwipeout.interfaces.ClientConstants;
-import com.guntzergames.medievalwipeout.interfaces.CommonConstants;
-import com.guntzergames.medievalwipeout.services.HomeGameCheckerThread;
+import com.guntzergames.medievalwipeout.services.HomeCheckerThread;
+import com.guntzergames.medievalwipeout.utils.VersionUtils;
 import com.guntzergames.medievalwipeout.views.GameView;
 
 public class HomeActivity extends ApplicationActivity {
@@ -46,10 +50,11 @@ public class HomeActivity extends ApplicationActivity {
 	private TextView debugTextView = null;
 	private ProgressBar loader;
 	private int gameCheckAttempts;
-	private HomeGameCheckerThread gameCheckerThread = null;
+	private HomeCheckerThread gameCheckerThread = null;
 	private LoginFragment loginFragment;
 	private List<DeckTemplate> deckTemplates = new ArrayList<DeckTemplate>();
-	private ListView deckTemplateListView;
+	private List<GameView> gameViews;
+	private ListView deckTemplateListView, gameListView;
 	private DeckTemplate selectedDeckTemplate;
 	private Account account;
 
@@ -76,12 +81,16 @@ public class HomeActivity extends ApplicationActivity {
 
 		// New intent
 		Intent intent = getIntent();
+		
+		// Check if there is a more recent version
+		gameWebClient.getVersion();
 
 		resumeGameButton = (Button) layout.findViewById(R.id.resumeGame);
 		editDeckButton = (Button) layout.findViewById(R.id.editDeck);
 		debugTextView = (TextView) layout.findViewById(R.id.debug);
 		loader = (ProgressBar) layout.findViewById(R.id.progressBar);
 		deckTemplateListView = (ListView) layout.findViewById(R.id.deckTemplatesList);
+		gameListView = (ListView) layout.findViewById(R.id.gamesList);
 
 		gameId = intent.getLongExtra(ClientConstants.GAME_ID, 0);
 		int gameState = intent.getIntExtra(ClientConstants.GAME_STATE, ClientConstants.GAME_NOT_STARTED);
@@ -98,8 +107,8 @@ public class HomeActivity extends ApplicationActivity {
 			resumeGameButton.setEnabled(false);
 		} else if (gameState == ClientConstants.GAME_NOT_STARTED) {
 			resumeGameButton.setEnabled(false);
-		} else {
-			Toast.makeText(this, String.format("Unknown state... %s", gameId), Toast.LENGTH_SHORT).show();
+		} else { 
+			onError(String.format("Unknown state... %s", gameId));
 		}
 
 		if (savedInstanceState == null) {
@@ -165,11 +174,11 @@ public class HomeActivity extends ApplicationActivity {
 		NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
 		if (!(networkInfo != null && networkInfo.isAvailable() && networkInfo.isConnected())) {
-			Toast.makeText(this, String.format("No access to Internet"), Toast.LENGTH_LONG).show();
+			onError("No access to internet");
 			createGameButton.setEnabled(false);
 		}
 
-		gameCheckerThread = new HomeGameCheckerThread(this);
+		gameCheckerThread = new HomeCheckerThread(this);
 		gameCheckerThread.start();
 
 		deckTemplateListView.setOnItemClickListener(new OnItemClickListener() {
@@ -177,6 +186,15 @@ public class HomeActivity extends ApplicationActivity {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				onDeckSelected(id);
+			}
+
+		});
+
+		gameListView.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				onGameViewSelected(id);
 			}
 
 		});
@@ -198,7 +216,8 @@ public class HomeActivity extends ApplicationActivity {
 		TextView welcome = (TextView) layout.findViewById(R.id.welcome);
 		welcome.setText("Welcome, " + user.getName() + " [id=" + user.getId() + "]!");
 		this.user = user;
-		gameWebClient.getAccount(user.getId());
+		this.facebookUserId = user.getId();
+		gameWebClient.getAccount();
 	}
 
 	public void setDebugText(String debugText) {
@@ -227,6 +246,19 @@ public class HomeActivity extends ApplicationActivity {
 
 	}
 	
+	public void onGameViewSelected(long id) {
+
+		Log.i(TAG, String.format("id: %d", id));
+		GameView gameView = gameViews.get((int) id);
+		if ( gameView.getGameState() == GameState.STARTED ) {
+			startGameActivity(gameView);
+		}
+		else {
+			onError(String.format("Game %s cannot be joined (not started)", gameView.getId()));
+		}
+
+	}
+	
 	@Override
 	public void onDeleteGame() {
 		onError(String.format("onDeleteGame not supported in class %s", HomeActivity.class.getSimpleName()));
@@ -243,7 +275,18 @@ public class HomeActivity extends ApplicationActivity {
 
 		this.account = account;
 		updateDeckTemplates();
+		
+		gameWebClient.getOngoingGames();
 
+	}
+
+	@Override
+	public void onGetGames(List<GameView> gameViews) {
+		super.onGetGames(gameViews);
+
+		this.gameViews = gameViews;
+		updateGameViews();
+		
 	}
 
 	@Override
@@ -271,6 +314,7 @@ public class HomeActivity extends ApplicationActivity {
 				break;
 
 			case STARTED:
+				Toast.makeText(this, String.format("Just joined game %s", gameView.getId()), Toast.LENGTH_LONG).show();
 				gameCheckerThread.setCheckActivated(false);
 				startGameActivity(gameView);
 				break;
@@ -284,6 +328,30 @@ public class HomeActivity extends ApplicationActivity {
 		} else {
 			Toast.makeText(this, "Game is null", Toast.LENGTH_LONG).show();
 		}
+	}
+
+	@Override
+	public void onGetVersion(String version) {
+		onError(version);
+		
+		try {
+			AssetManager assetManager = getAssets();
+			InputStream in = assetManager.open("version");
+			String currentVersion = VersionUtils.getVersion(in);
+			onError("cur = " + currentVersion);
+			
+			// New version detected!
+			if ( version.compareTo(currentVersion) > 0 ) {
+				Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://guntzergames.ddns.net:8080/MedievalWipeout/rest/client/package"));
+				onError("Installing new version");
+				startActivity(intent);
+			}
+			
+		}
+		catch ( IOException ioe ) {
+			onError(ioe.getMessage());
+		}
+			
 	}
 
 	public void onWaitingForGameCreation() {
@@ -315,15 +383,39 @@ public class HomeActivity extends ApplicationActivity {
 		deckTemplateListView.setAdapter(adapter);
 
 	}
+	
+	public void updateGameViews() {
+		
+		List<HashMap<String, String>> listElements = new ArrayList<HashMap<String, String>>();
+		if ( gameViews == null ) gameViews = new ArrayList<GameView>();
+
+		HashMap<String, String> element;
+		
+		for (GameView currentGameView : gameViews) {
+
+			element = new HashMap<String, String>();
+			element.put("id", String.format("%s %s", currentGameView.getId(), currentGameView.getGameState()));
+			element.put("libel", String.format("%s %s", currentGameView.getTurn(), currentGameView.getPhase()));
+			listElements.add(element);
+
+		}
+
+		ListAdapter adapter = new SimpleAdapter(this, listElements, android.R.layout.simple_list_item_2, new String[] { "id", "libel" }, new int[] { android.R.id.text1,
+				android.R.id.text2 });
+
+		gameListView.setAdapter(adapter);
+		
+	}
 
 	public void startGameActivity(GameView gameView) {
 		this.gameView = gameView;
 		Intent intent = new Intent(HomeActivity.this, GameActivity.class);
 		intent.putExtra(ClientConstants.GAME_ID, gameView.getId());
 		intent.putExtra(ClientConstants.GAME_COMMAND, "GAME_START");
-		Log.i("startGameActivity", user.getName());
-		intent.putExtra(ClientConstants.FACEBOOK_USER_ID, user.getId());
-		intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+		Log.i(TAG, String.format("Starting GameActivity, facebookId=%s and gameId=%s", facebookUserId, gameView.getId()));
+		intent.putExtra(ClientConstants.FACEBOOK_USER_ID, facebookUserId);
+		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+//		intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 		// startActivityForResult(intent, MAIN_ACTIVITY);
 		startActivity(intent);
 	}

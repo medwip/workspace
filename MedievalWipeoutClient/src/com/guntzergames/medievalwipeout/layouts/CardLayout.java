@@ -37,11 +37,11 @@ public class CardLayout extends RelativeLayout {
 	private int seqNum;
 	private CardLocation cardLocation;
 	
-	private ImageView image;
+	private ImageView image, defensorImage, archerImage;
 
 	private LinearLayout rootView;
 	private ElementLayout nameLayout, defenseLayout, faithLayout, numberOfCardsLayout;
-	private TextView attack, lifePoints, name, trade, defense, faith;
+	private TextView attack, lifePoints, name, trade, defense, gold, faith;
 
 	public void hide() {
 		this.setVisibility(View.INVISIBLE);
@@ -164,7 +164,7 @@ public class CardLayout extends RelativeLayout {
 				try {
 					image.setImageDrawable(getResources().getDrawable(getResourceFromName("card_" + playerDeckCard.getDrawableResourceName() + "_large")));
 				} catch (Exception e) {
-					Log.i("CardLayout", "Large image not found");
+					Log.i(TAG, "Large image not found");
 					try {
 						image.setImageDrawable(getResources().getDrawable(getResourceFromName(("card_" + playerDeckCard.getDrawableResourceName()))));
 					} catch (Exception e2) {
@@ -186,7 +186,7 @@ public class CardLayout extends RelativeLayout {
 			attack.setText(String.format("%s", playerDeckCard.getAttack()));
 //			attackLayout.setup(getResources().getString(R.string.attack), playerDeckCard.getAttack());
 			
-			Log.d("CardLayout", String.format("detailShown: %s", detailShown));
+			Log.d(TAG, String.format("detailShown: %s", detailShown));
 			
 			if ( playerDeckCard instanceof PlayerFieldCard ) {
 				PlayerFieldCard playerFieldCard = (PlayerFieldCard)playerDeckCard;
@@ -196,8 +196,22 @@ public class CardLayout extends RelativeLayout {
 			}
 			else {
 				lifePoints.setText(String.format("%s", playerDeckCard.getLifePoints()));
+				gold.setVisibility(View.VISIBLE);
+				gold.setText(String.format("%s", playerDeckCard.getGoldCost()));
+				faith.setVisibility(View.VISIBLE);
+				faith.setText(String.format("%s", playerDeckCard.getFaithCost()));
 //				lifePointsLayout.setup(getResources().getString(R.string.life_points), playerDeckCard.getLifePoints());
 			}
+			
+			if ( !playerDeckCard.isArcher() ) {
+				archerImage.setVisibility(View.INVISIBLE);
+			}
+			if ( !playerDeckCard.isDefensor() ) {
+				defensorImage.setVisibility(View.INVISIBLE);
+			}
+			
+			Log.i(TAG, String.format("Card=%s, archer=%s, defensor=%s", playerDeckCard.getName(),
+					playerDeckCard.isArcher(), playerDeckCard.isDefensor()));
 			
 			if ( card instanceof PlayerFieldCard && !detailShown ) {
 				PlayerFieldCard playerFieldCard = (PlayerFieldCard)card;
@@ -254,6 +268,17 @@ public class CardLayout extends RelativeLayout {
 			numberOfCardsLayout.setup(getResources().getString(R.string.number_of_cards), String.format("%s", deckTemplateElement.getNumberOfCards()));
 			lifePoints.setText(String.format("%s", deckTemplateElement.getLifePoints()));
 			
+			if ( !deckTemplateElement.isArcher() ) {
+				archerImage.setVisibility(View.INVISIBLE);
+			}
+			else {
+				Log.i(TAG, "Archer found: " + deckTemplateElement.getName());
+				archerImage.setVisibility(View.VISIBLE);
+			}
+			if ( !deckTemplateElement.isDefensor() ) {
+				defensorImage.setVisibility(View.INVISIBLE);
+			}
+			
 			Log.d("CardLayout", String.format("detailShown: %s", detailShown));
 			if ( card instanceof PlayerFieldCard && !detailShown ) {
 				PlayerFieldCard playerFieldCard = (PlayerFieldCard)card;
@@ -305,6 +330,13 @@ public class CardLayout extends RelativeLayout {
 			name.setText(collectionElement.getName());
 			attack.setText(String.format("%s", collectionElement.getAttack()));
 			lifePoints.setText(String.format("%s", collectionElement.getLifePoints()));
+			if ( !collectionElement.isArcher() ) {
+				archerImage.setVisibility(View.INVISIBLE);
+			}
+			if ( !collectionElement.isDefensor() ) {
+				defensorImage.setVisibility(View.INVISIBLE);
+			}
+			
 			
 			Log.d("CardLayout", String.format("detailShown: %s", detailShown));
 			
@@ -413,7 +445,10 @@ public class CardLayout extends RelativeLayout {
 			name = (TextView)rootView.findViewById(R.id.cardName);
 			attack = (TextView)rootView.findViewById(R.id.cardAttackText);
 			lifePoints = (TextView)rootView.findViewById(R.id.cardLifePointsText);
-//			currentLifePoints = (TextView)rootView.findViewById(R.id.cardLayoutCurrentLifePoints);
+			gold = (TextView)rootView.findViewById(R.id.cardGold);
+			faith = (TextView)rootView.findViewById(R.id.cardFaith);
+			defensorImage = (ImageView)rootView.findViewById(R.id.cardDefensorImage);
+			archerImage = (ImageView)rootView.findViewById(R.id.cardArcheryImage);
 			numberOfCardsLayout = (ElementLayout)rootView.findViewById(R.id.numberOfCardsLayout);
 		}
 		

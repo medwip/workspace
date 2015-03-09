@@ -2,7 +2,7 @@ package com.guntzergames.medievalwipeout.webclients;
 
 import com.guntzergames.medievalwipeout.activities.GameActivity;
 import com.guntzergames.medievalwipeout.interfaces.GameWebClientCallbackable;
-import com.guntzergames.medievalwipeout.services.MainGameCheckerThread;
+import com.guntzergames.medievalwipeout.services.GameCheckerThread;
 import com.guntzergames.medievalwipeout.webclients.OnGetGameWebAsyncResponse.ResponseType;
 import com.loopj.android.http.AsyncHttpClient;
 
@@ -49,12 +49,16 @@ public class GameWebClient {
 		get("http://" + ip + ":8080/MedievalWipeout/rest/game/get/" + gameId + "/" + callbackable.getFacebookUserId(), ResponseType.GET_GAME);
 	}
 
-	public void getGame(long gameId, final MainGameCheckerThread mainGameCheckerThread) {
-		get("http://" + ip + ":8080/MedievalWipeout/rest/game/get/" + gameId + "/" + mainGameCheckerThread.getFacebookUserId(), ResponseType.GET_GAME);
+	public void getGame(long gameId, final GameCheckerThread gameCheckerThread) {
+		get("http://" + ip + ":8080/MedievalWipeout/rest/game/get/" + gameId + "/" + gameCheckerThread.getFacebookUserId(), ResponseType.GET_GAME);
 	}
 
-	public void getAccount(String facebookUserId) {
-		get("http://" + ip + ":8080/MedievalWipeout/rest/account/get/" + facebookUserId, ResponseType.GET_ACCOUNT);
+	public void getAccount() {
+		get("http://" + ip + ":8080/MedievalWipeout/rest/account/get/" + callbackable.getFacebookUserId(), ResponseType.GET_ACCOUNT);
+	}
+
+	public void getOngoingGames() {
+		get("http://" + ip + ":8080/MedievalWipeout/rest/account/getGames/" + callbackable.getFacebookUserId(), ResponseType.GET_GAMES);
 	}
 
 	public void addDeckTemplateElement(long deckTemplateId, long collectionElementId) {
@@ -92,5 +96,9 @@ public class GameWebClient {
 	public void checkGame(long gameId) {
 		get("http://" + ip + ":8080/MedievalWipeout/rest/game/get/" + gameId + "/" + callbackable.getFacebookUserId(), ResponseType.CHECK_GAME);
 	}
-
+	
+	public void getVersion() {
+		get("http://" + ip + ":8080/MedievalWipeout/rest/client/version", ResponseType.GET_VERSION);
+	}
+	
 }

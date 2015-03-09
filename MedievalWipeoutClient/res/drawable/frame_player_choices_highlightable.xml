@@ -2,6 +2,6 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item android:drawable="@color/backgroundModal"/>
-    <item android:drawable="@drawable/highlight_animation"/>
+    <item android:drawable="@drawable/animation_highlight"/>
     
 </layer-list>

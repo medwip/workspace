@@ -1,5 +1,8 @@
 package com.guntzergames.medievalwipeout.listeners;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import android.util.Log;
 import android.view.DragEvent;
 import android.view.View;
@@ -17,9 +20,11 @@ import com.guntzergames.medievalwipeout.webclients.GameWebClient;
 
 public class GameDragListener implements OnDragListener {
 
-	private static final String TAG = "GameActivity";
+	private static final String TAG = "GameDragListener";
 
 	private GameActivity gameActivity;
+
+	private Set<View> targetViews = new HashSet<View>();
 
 	public GameDragListener(GameActivity gameActivity) {
 		this.gameActivity = gameActivity;
@@ -33,9 +38,10 @@ public class GameDragListener implements OnDragListener {
 
 	public String getPossibleTarget(CardLayout cardLayout, View dest) {
 
-		Log.i(TAG, "event=" + cardLayout);
+		Log.d(TAG, "event=" + cardLayout);
 		CardLocation cardLocation = cardLayout.getCardLocation();
 		ICard card = cardLayout.getCard();
+		View parent = (View) cardLayout.getParent();
 
 		if (cardLocation == CardLocation.MODAL && card instanceof ResourceDeckCard && dest.getId() == R.id.playerHand) {
 			return "playerHand";
@@ -51,18 +57,35 @@ public class GameDragListener implements OnDragListener {
 		}
 		// Select only player cards
 		if (cardLocation == CardLocation.FIELD_ATTACK && card instanceof PlayerFieldCard) {
-			
-			if (((View) cardLayout.getParent()).getId() == R.id.playerFieldAttack) {
-				if (dest.getId() == R.id.opponentFieldDefense) {
+
+			PlayerFieldCard playerFieldCard = (PlayerFieldCard) card;
+			Log.d(TAG, String.format("Attack card played, (parent.getId() == R.id.playerFieldDefense) == %s", (parent.getId() == R.id.playerFieldDefense)));
+
+			// Cards in attack field and cards with archer property can attack
+			if ((parent.getId() == R.id.playerFieldAttack) || ((parent.getId() == R.id.playerFieldDefense) && playerFieldCard.isArcher())) {
+
+				int opponentDefense = gameActivity.getGameView().getOpponents().get(0).getCurrentDefense();
+				Log.d(TAG, String.format("opponentDefense = %s, dest = %s", opponentDefense, dest));
+
+				// Opponent field defense can be targeted only if opponent's
+				// defense is greater than 0
+				if (dest.getId() == R.id.opponentFieldDefense && opponentDefense > 0) {
 					return "opponentFieldDefense";
 				}
 				if (dest instanceof CardLayout) {
+
+					CardLayout cardLayoutDest = (CardLayout) dest;
+					Log.i(TAG, String.format("dest instance of CardLayout %s", cardLayoutDest.getCard()));
+
 					if (((CardLayout) dest).getCardLocation() == CardLocation.FIELD_ATTACK) {
 						return "opponentCardAttack";
 					}
-					if (((CardLayout) dest).getCardLocation() == CardLocation.FIELD_DEFENSE) {
+					// Defense cards can be targeted only if opponent's defense
+					// is equal to 0
+					if ((((CardLayout) dest).getCardLocation() == CardLocation.FIELD_DEFENSE) && opponentDefense == 0) {
 						return "opponentCardDefense";
 					}
+
 				}
 			}
 		}
@@ -76,6 +99,27 @@ public class GameDragListener implements OnDragListener {
 
 	}
 
+	private void loadTargetViews(CardLayout cardLayout) {
+
+		for (View view : gameActivity.getDragableRegisteredViews()) {
+			if (getPossibleTarget(cardLayout, view) != null) {
+				targetViews.add(view);
+				gameActivity.startTargetAnimation(view);
+			}
+		}
+
+	}
+
+	private void unloadTargetViews(CardLayout cardLayout) {
+
+		for (View view : targetViews) {
+			gameActivity.stopTargetAnimation(view);
+		}
+		
+		targetViews.clear();
+
+	}
+
 	@Override
 	public boolean onDrag(View dest, DragEvent event) {
 
@@ -83,50 +127,62 @@ public class GameDragListener implements OnDragListener {
 		GameWebClient gameWebClient = gameActivity.getGameWebClient();
 
 		switch (event.getAction()) {
+
 			case DragEvent.ACTION_DRAG_STARTED:
 				gameActivity.setBeingModified(true);
-				break;
+				loadTargetViews(cardLayout);
+				return false;
+
 			case DragEvent.ACTION_DRAG_ENTERED:
 				if (getPossibleTarget(cardLayout, dest) != null) {
 					gameActivity.startHighlightAnimation(dest);
+					return true;
 				}
-				break;
+				return false;
 
 			case DragEvent.ACTION_DRAG_EXITED:
-				if (isPossibleDest(dest)) {
+				if (getPossibleTarget(cardLayout, dest) != null) {
 					gameActivity.stopHightlightAnimation(dest);
+					return true;
 				}
-				break;
+				return false;
 
 			case DragEvent.ACTION_DROP:
 
-				Log.i("PlayerFieldDragListener", String.format("ici, view = %h alors que field id = %h", dest.getId(), R.id.playerField));
+				Log.i(TAG, String.format("DROP, dest = %s", dest));
 				gameActivity.hideCardLayoutDetail();
-
-				if (isPossibleDest(dest)) {
-					gameActivity.stopHightlightAnimation(dest);
-				}
 
 				String source = cardLayout.getPossibleSource(((View) cardLayout.getParent()).getId());
 				String target = getPossibleTarget(cardLayout, dest);
+				if (target != null) {
+					gameActivity.stopHightlightAnimation(dest);
+				}
+
 				Log.i(TAG, String.format("source=%s, cardLayout.getId()=%s, target=%s, R.id.playerFieldDefense=%s", source, ((View) cardLayout.getParent()).getId(), target,
 						R.id.playerFieldDefense));
 
 				if (target != null) {
 					int destinationCardId = (dest instanceof CardLayout) ? ((CardLayout) dest).getSeqNum() : -1;
 					gameWebClient.playCard(gameActivity.getGameId(), source, cardLayout.getSeqNum(), target, destinationCardId);
+					return true;
 				}
 
 				break;
 
 			case DragEvent.ACTION_DRAG_ENDED:
 				gameActivity.setBeingModified(false);
-				break;
+				unloadTargetViews(cardLayout);
+				return false;
+
 			default:
-				break;
+				if (getPossibleTarget(cardLayout, dest) != null) {
+					return true;
+				}
+				return false;
+
 		}
 
-		return true;
+		return false;
 
 	}
 

@@ -8,6 +8,6 @@
             android:gravity="top|left"
             android:src="@drawable/background" />
     </item>
-    <item android:drawable="@drawable/highlight_animation"/>
+    <item android:drawable="@drawable/animation_highlight"/>
 
 </layer-list>

@@ -60,6 +60,12 @@ public class CollectionElement implements ICard {
 	@Column(name = "FAITH_COST")
 	protected int faithCost;
 	
+	@Column(name = "DEFENSOR")
+	private boolean defensor;
+
+	@Column(name = "ARCHER")
+	private boolean archer;
+
 	@Column(name = "NUMBER_OF_CARDS")
 	private int numberOfCards;
 	
@@ -74,6 +80,8 @@ public class CollectionElement implements ICard {
 		this.name = model.getName();
 		this.goldCost = model.getGoldCost();
 		this.faithCost = model.getFaithCost();
+		this.archer = model.isArcher();
+		this.defensor = model.isDefensor();
 		this.cardModel = model;
 	}
 	
@@ -147,6 +155,22 @@ public class CollectionElement implements ICard {
 
 	public void setFaithCost(int faithCost) {
 		this.faithCost = faithCost;
+	}
+
+	public boolean isDefensor() {
+		return defensor;
+	}
+
+	public void setDefensor(boolean defensor) {
+		this.defensor = defensor;
+	}
+
+	public boolean isArcher() {
+		return archer;
+	}
+
+	public void setArcher(boolean archer) {
+		this.archer = archer;
 	}
 
 	public int getNumberOfCards() {

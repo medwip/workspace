@@ -22,6 +22,8 @@ com\guntzergames\medievalwipeout\views\GameView.class
 com\guntzergames\medievalwipeout\exceptions\UnsupportedPhaseException.class
 com\guntzergames\medievalwipeout\abstracts\AbstractCard.class
 com\guntzergames\medievalwipeout\beans\Packet.class
+com\guntzergames\medievalwipeout\utils\JsonUtils.class
+com\guntzergames\medievalwipeout\beans\GameViewList.class
 com\guntzergames\medievalwipeout\beans\PlayerField.class
 com\guntzergames\medievalwipeout\beans\PlayerDeck.class
 com\guntzergames\medievalwipeout\interfaces\CommonConstants.class

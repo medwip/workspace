@@ -4,13 +4,13 @@ import com.guntzergames.medievalwipeout.activities.HomeActivity;
 import com.guntzergames.medievalwipeout.interfaces.ClientConstants;
 import com.guntzergames.medievalwipeout.webclients.GameWebClient;
 
-public class HomeGameCheckerThread extends Thread {
+public class HomeCheckerThread extends Thread {
 	
 	private GameWebClient gameWebClient;
 	private HomeActivity homeActivity = null;
 	private boolean checkActivated = false;
 	
-	public HomeGameCheckerThread(HomeActivity homeActivity) {
+	public HomeCheckerThread(HomeActivity homeActivity) {
 		this.homeActivity = homeActivity;
 		gameWebClient = new GameWebClient(ClientConstants.SERVER_IP_ADDRESS, homeActivity);
 	}

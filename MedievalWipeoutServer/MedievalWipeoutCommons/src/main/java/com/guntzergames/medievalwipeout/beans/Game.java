@@ -21,9 +21,12 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+
 import com.guntzergames.medievalwipeout.enums.GameState;
 import com.guntzergames.medievalwipeout.enums.Phase;
 import com.guntzergames.medievalwipeout.exceptions.PlayerNotInGameException;
+import com.guntzergames.medievalwipeout.utils.JsonUtils;
 import com.guntzergames.medievalwipeout.views.GameView;
 
 @Entity
@@ -60,6 +63,13 @@ public class Game {
     @Enumerated(EnumType.STRING)
     @Column(name = "PHASE")
 	private Phase phase;
+    
+    @JsonIgnore
+    @Column(name = "DATA_DUMP")
+    private String dataDump;
+    
+    @Column(name = "LIBEL")
+    private String libel;
     
 	@Transient
 	private ResourceDeck resourceDeck = new ResourceDeck();
@@ -182,6 +192,22 @@ public class Game {
 		this.activePlayer = activePlayer;
 	}
 
+	public String getDataDump() {
+		return dataDump;
+	}
+
+	public void setDataDump(String dataDump) {
+		this.dataDump = dataDump;
+	}
+
+	public String getLibel() {
+		return libel;
+	}
+
+	public void setLibel(String libel) {
+		this.libel = libel;
+	}
+
 	public int getNumberOfPlayers() {
 		return numberOfPlayers;
 	}
@@ -205,6 +231,14 @@ public class Game {
 	public void setResourceCard2(ResourceDeckCard resourceCard2) {
 		this.resourceCard2 = resourceCard2;
 	}
+	
+	public String toJson() {
+		return JsonUtils.toJson(this);
+	}
+	
+	public static Game fromJson(String json) {
+		return JsonUtils.fromJson(Game.class, json);
+	}
 
 	public GameView buildGameView(Player player) throws PlayerNotInGameException {
 
@@ -213,6 +247,7 @@ public class Game {
 
 		gameClientView.setPlayer(selectPlayer(player));
 		gameClientView.setOpponents(selectOpponents(player));
+		System.out.println("activePlayer : " + getActivePlayer());
 		if (player.getAccount().getFacebookUserId().equals(getActivePlayer().getAccount().getFacebookUserId())) {
 			gameClientView.setActivePlayer(true);
 		} else {
@@ -326,6 +361,7 @@ public class Game {
 	
 	public void setTransientFields(Game model) {
 		
+//		id = model.getId();
 		// TODO
 		
 	}

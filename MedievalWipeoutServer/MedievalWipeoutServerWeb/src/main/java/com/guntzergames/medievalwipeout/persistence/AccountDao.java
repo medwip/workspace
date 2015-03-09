@@ -12,6 +12,7 @@ import com.guntzergames.medievalwipeout.beans.CardModel;
 import com.guntzergames.medievalwipeout.beans.CollectionElement;
 import com.guntzergames.medievalwipeout.beans.DeckTemplate;
 import com.guntzergames.medievalwipeout.beans.DeckTemplateElement;
+import com.guntzergames.medievalwipeout.beans.Player;
 
 @Stateless
 public class AccountDao {
@@ -119,6 +120,18 @@ public class AccountDao {
 
 		return deckTemplateElement;
 
+	}
+	
+	public List<Player> findPlayersByAccount(Account account) {
+		
+		return em.createNamedQuery(Player.NQ_FIND_BY_ACCOUNT, Player.class)
+				.setParameter("account", account)
+				.getResultList();
+		
+	}
+
+	public Player findPlayerById(long id) {
+		return em.find(Player.class, id);
 	}
 
 	public void addDeckTemplateElement(CollectionElement collectionElement, DeckTemplate deckTemplate) {

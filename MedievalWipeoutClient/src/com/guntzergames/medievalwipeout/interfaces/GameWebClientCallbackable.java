@@ -25,6 +25,9 @@ public interface GameWebClientCallbackable {
 	
 	public void onGetAccount(Account account);
 	public void onGetCardModels(List<CardModel> cardModels);
+	public void onGetGames(List<GameView> gameViews);
 	public void onOpenPacket(Packet packet);
+	
+	public void onGetVersion(String version);
 	
 }

@@ -8,3 +8,4 @@ com\guntzergames\medievalwipeout\singletons\GameSingleton.class
 com\guntzergames\medievalwipeout\persistence\GameDao.class
 com\guntzergames\medievalwipeout\managers\AccountManager.class
 com\guntzergames\medievalwipeout\resources\GameResource.class
+com\guntzergames\medievalwipeout\resources\ClientResource.class

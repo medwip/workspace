@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.guntzergames.medievalwipeout.beans.Account;
 import com.guntzergames.medievalwipeout.beans.CardModelList;
+import com.guntzergames.medievalwipeout.beans.GameViewList;
 import com.guntzergames.medievalwipeout.beans.Packet;
 import com.guntzergames.medievalwipeout.interfaces.GameWebClientCallbackable;
 import com.guntzergames.medievalwipeout.views.GameView;
@@ -21,7 +22,8 @@ public class OnGetGameWebAsyncResponse extends AsyncHttpResponseHandler {
 	public enum ResponseType {
 		
 		GET_GAME(0), JOIN_GAME(1), CHECK_GAME(0), DELETE_GAME(1),
-		GET_ACCOUNT(1), GET_CARD_MODELS(1), OPEN_PACKET(1);
+		GET_ACCOUNT(1), GET_CARD_MODELS(1), GET_GAMES(1), OPEN_PACKET(1),
+		GET_VERSION(1), GET_PACKAGE(1);
 		
 		private int priority;
 		
@@ -96,8 +98,15 @@ public class OnGetGameWebAsyncResponse extends AsyncHttpResponseHandler {
 			case GET_CARD_MODELS:
 				callbackable.onGetCardModels(CardModelList.fromJson(response).getCardModels());
 				break;
+			case GET_GAMES:
+				callbackable.onGetGames(GameViewList.fromJson(response).getGameViews());
+				break;
 			case OPEN_PACKET:
 				callbackable.onOpenPacket(Packet.fromJson(response));
+				break;
+			case GET_VERSION:
+				callbackable.onGetVersion(response);
+				break;
 			default:
 				break;
 

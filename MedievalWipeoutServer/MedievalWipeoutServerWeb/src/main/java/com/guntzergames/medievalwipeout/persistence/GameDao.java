@@ -2,6 +2,7 @@ package com.guntzergames.medievalwipeout.persistence;
 
 import java.util.List;
 
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -22,9 +23,28 @@ public class GameDao {
 	@PersistenceContext(unitName = "mwpu")
     private EntityManager em;
 	
+	@EJB
+	private AccountDao accountDao;
+	
+	public Game saveGame(Game game) {
+		
+		game.setDataDump(game.toJson());
+		return mergeGame(game);
+		
+	}
+	
 	public Game mergeGame(Game game) {
 		
-		return em.merge(game);
+		for ( Player player : game.getPlayers() ) {
+			LOGGER.info(String.format("Just before merge, player in game: %s", player));
+			if ( game.getActivePlayer() != null && game.getActivePlayer().getId() == player.getId() ) {
+				game.setActivePlayer(player);
+			}
+		}
+		
+		game = em.merge(game);
+		em.flush();
+		return game;
 		
 	}
 	

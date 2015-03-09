@@ -29,6 +29,7 @@
 
     <style name="FieldStyle">
         <item name="android:background">@drawable/frame_border</item>
+        <item name="android:layout_height">@dimen/fieldHeight</item>
     </style>
 
     <style name="Section" parent="@android:style/TextAppearance.Large">

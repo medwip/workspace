@@ -6,11 +6,14 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -18,8 +21,13 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 
 @Entity
 @Table(name = "PLAYER")
+@NamedQueries({
+	@NamedQuery(name = Player.NQ_FIND_BY_ACCOUNT, query = "SELECT p FROM Player p WHERE p.deckTemplate.account = :account"),
+})
 public class Player {
 
+	public final static String NQ_FIND_BY_ACCOUNT = "NQ_FIND_PLAYERS_BY_ACCOUNT";
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)
@@ -31,7 +39,7 @@ public class Player {
 	private DeckTemplate deckTemplate;
 	
 	@JsonIgnore
-	@ManyToOne(targetEntity = Game.class, cascade=CascadeType.ALL)
+	@ManyToOne(targetEntity = Game.class, fetch=FetchType.LAZY, cascade=CascadeType.REFRESH)
 	@JoinColumn(name = "GAME_KEY")
 	private Game game;
 	
@@ -63,6 +71,14 @@ public class Player {
 	@JsonIgnore
 	public Account getAccount() {
 		return deckTemplate != null ? deckTemplate.getAccount() : null;
+	}
+
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
 	}
 
 	public Game getGame() {

@@ -20,6 +20,7 @@ public class ApplicationActivity extends FragmentActivity implements GameWebClie
 	protected GameView gameView;
 	protected boolean httpRequestBeingExecuted = false;
 	protected int currentRequestPriority;
+	protected String facebookUserId;
 	
 	public GameWebClient getGameWebClient() {
 		return gameWebClient;
@@ -101,7 +102,15 @@ public class ApplicationActivity extends FragmentActivity implements GameWebClie
 	}
 
 	@Override
+	public void onGetGames(List<GameView> gameViews) {
+	}
+
+	@Override
 	public void onOpenPacket(Packet packet) {
+	}
+
+	@Override
+	public void onGetVersion(String version) {
 	}
 
 }

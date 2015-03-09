@@ -79,11 +79,12 @@ public class GameResource {
 	
 
 	@GET
-	@Path("get/{gameId}/{userName}")
-    @Produces("text/plain")
-	public String getGame(@PathParam("gameId") long gameId, @PathParam("userName") String userName) throws PlayerNotInGameException {
+	@Path("get/{gameId}/{facebookUserId}")
+    @Produces("application/json")
+	public String getGame(@PathParam("gameId") long gameId, @PathParam("facebookUserId") String facebookUserId) throws PlayerNotInGameException {
 		Game game = gameManager.getGame(gameId);
-		Player player = gameManager.selectPlayer(game, userName);
+		LOGGER.info("game.getPlayers().get(0).getAccount() " + game.getPlayers().get(0).getAccount());
+		Player player = gameManager.selectPlayer(game, facebookUserId);
 		String ret = buildGameView(player, game);
         return ret;
 	}
