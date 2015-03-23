@@ -29,6 +29,7 @@ import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
 import android.view.animation.TranslateAnimation;
 import android.widget.Button;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -92,6 +93,8 @@ public class GameActivity extends ApplicationActivity {
 			gameDefenseRow, gameFaithRow, gameResourcesLayout;
 	private int httpCallsDone = 0, httpCallsAborted = 0, touchEvents = 0;
 	private CardLayout playerChoiceCard1Layout, playerChoiceCard2Layout, gameEventLayout;
+	
+	private HorizontalScrollView handScrollView;
 
 	private Dialog resourceDialog;
 	
@@ -153,6 +156,7 @@ public class GameActivity extends ApplicationActivity {
 				v.performClick();
 
 				if (gameView.isActivePlayer()) {
+					
 					if ((cardLayout.getCard() instanceof ResourceDeckCard) && gameView.getPhase() == getDuringPlayerResourceChoosePhase()) {
 						Log.i(TAG, "Drag initiated during player resource draw");
 						ClipData data = ClipData.newPlainText("", "");
@@ -180,6 +184,7 @@ public class GameActivity extends ApplicationActivity {
 						DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(v);
 						v.startDrag(data, shadowBuilder, v, 0);
 					}
+					
 				}
 
 				return true;
@@ -302,7 +307,7 @@ public class GameActivity extends ApplicationActivity {
 				AbstractCard card = cardList.getCards().get(i);
 				cardLayout.setup(this, card, i, cardLocation);
 				cardLayout.show();
-				Log.d("MainActivity", "Set view " + cardLayout + " visible " + cardLayout.getVisibility());
+				Log.d(TAG, "Set view " + cardLayout + " visible " + cardLayout.getVisibility());
 			} else {
 				cardLayout.hide();
 			}
@@ -392,6 +397,22 @@ public class GameActivity extends ApplicationActivity {
 		
 	}
 	
+	public void startTargetAnimationLayout(LinearLayout layout) {
+		
+		for ( int i = 0; i < layout.getChildCount(); i++ ) {
+			startTargetAnimation(layout.getChildAt(i));
+		}
+		
+	}
+	
+	public void stopTargetAnimationLayout(LinearLayout layout) {
+		
+		for ( int i = 0; i < layout.getChildCount(); i++ ) {
+			stopTargetAnimation(layout.getChildAt(i));
+		}
+		
+	}
+	
 	public void stopTargetAnimation(View view) {
 		
 		stopAnimation(view, 1);
@@ -428,8 +449,15 @@ public class GameActivity extends ApplicationActivity {
 		stopHightlightAnimation(playerChoiceCard2Layout);
 		playerChoicesLayout.setVisibility(View.INVISIBLE);
 		stopHightlightAnimation(playerHandLayout);
+		stopTargetAnimationLayout(playerHandLayout);
+		stopTargetAnimationLayout(playerFieldDefenseLayout);
+		stopTargetAnimationLayout(playerFieldAttackLayout);
+		stopTargetAnimationLayout(opponentFieldDefenseLayout);
+		stopTargetAnimationLayout(opponentFieldAttackLayout);
 		stopHightlightAnimation(gameResourcesLayout);
 		stopHightlightAnimation(playerChoicesLayout);
+		
+//		stopTargetAnimation(playerFieldDefenseLayout);
 		
 		if ( gameView.isActivePlayer() ) {
 
@@ -554,12 +582,16 @@ public class GameActivity extends ApplicationActivity {
 
 		gameAnimationListener = new GameAnimationListener(this);
 		highlightAnimationListener = new HighlightAnimationListener(highlightLayout);
+		
+		handScrollView = (HorizontalScrollView) layout.findViewById(R.id.handScrollView);
 
 		initField(playerHandLayout);
 		initField(opponentFieldDefenseLayout);
 		initField(opponentFieldAttackLayout);
 		initField(playerFieldDefenseLayout);
 		initField(playerFieldAttackLayout);
+		
+		// TODO: Verify if this is still needed
 		initHighlightLayout();
 		initCardEventAnimation();
 
@@ -568,7 +600,7 @@ public class GameActivity extends ApplicationActivity {
 
 			@Override
 			public void onClick(View v) {
-				Log.d("MainActivity", "Clicker on delete for game " + gameId);
+				Log.d(TAG, "Clicker on delete for game " + gameId);
 				gameCheckerThread.setInterruptedSignalSent(true);
 				gameWebClient.deleteGame(gameId);
 			}
@@ -610,6 +642,7 @@ public class GameActivity extends ApplicationActivity {
 		registerDragListener(layout);
 		registerDragListener(playerHandLayout);
 		registerDragListener(playerFieldDefenseLayout);
+		playerFieldDefenseLayout.setOnDragListener(gameDragListener);
 		registerDragListener(playerFieldAttackLayout);
 		registerDragListener(opponentFieldDefenseLayout);
 		registerDragListener(opponentFieldAttackLayout);
@@ -635,6 +668,18 @@ public class GameActivity extends ApplicationActivity {
 		gameCheckerThread = new GameCheckerThread(checkGameHandler, gameId, this);
 		gameCheckerThread.start();
 		hideCardLayoutDetail();
+		
+		handScrollView.setOnTouchListener(new OnTouchListener() {
+			
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				if ( event.getAction() == MotionEvent.ACTION_UP) {
+					hideCardLayoutDetail();
+				}
+				
+				return true;
+			}
+		});
 
 	}
 

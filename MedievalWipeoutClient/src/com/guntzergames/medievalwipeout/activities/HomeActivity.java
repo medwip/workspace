@@ -14,7 +14,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v7.widget.GridLayout;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -43,7 +42,7 @@ public class HomeActivity extends ApplicationActivity {
 
 	private static final String TAG = "HomeActivity";
 
-	private GridLayout layout = null;
+	private LinearLayout layout = null;
 	private long gameId, selectedDeckTemplateId;
 	private GraphUser user = null;
 	private Button createGameButton, resumeGameButton, editDeckButton;
@@ -75,7 +74,7 @@ public class HomeActivity extends ApplicationActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
-		layout = (GridLayout) LinearLayout.inflate(this, R.layout.activity_home, null);
+		layout = (LinearLayout) LinearLayout.inflate(this, R.layout.activity_home, null);
 
 		setContentView(layout);
 

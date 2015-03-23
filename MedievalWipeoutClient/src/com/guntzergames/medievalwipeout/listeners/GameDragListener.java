@@ -108,6 +108,8 @@ public class GameDragListener implements OnDragListener {
 			}
 		}
 
+		Log.i(TAG, String.format("Loaded target views: %s", targetViews));
+		
 	}
 
 	private void unloadTargetViews(CardLayout cardLayout) {
@@ -129,11 +131,15 @@ public class GameDragListener implements OnDragListener {
 		switch (event.getAction()) {
 
 			case DragEvent.ACTION_DRAG_STARTED:
+
+				Log.i(TAG, String.format("ACTION_DRAG_STARTED, dest = %s", dest));
 				gameActivity.setBeingModified(true);
 				loadTargetViews(cardLayout);
-				return false;
+				return true;
 
 			case DragEvent.ACTION_DRAG_ENTERED:
+
+				Log.i(TAG, String.format("ACTION_DRAG_ENTERED, dest = %s", dest));
 				if (getPossibleTarget(cardLayout, dest) != null) {
 					gameActivity.startHighlightAnimation(dest);
 					return true;
@@ -141,6 +147,8 @@ public class GameDragListener implements OnDragListener {
 				return false;
 
 			case DragEvent.ACTION_DRAG_EXITED:
+
+				Log.i(TAG, String.format("ACTION_DRAG_EXITED, dest = %s", dest));
 				if (getPossibleTarget(cardLayout, dest) != null) {
 					gameActivity.stopHightlightAnimation(dest);
 					return true;
@@ -149,7 +157,7 @@ public class GameDragListener implements OnDragListener {
 
 			case DragEvent.ACTION_DROP:
 
-				Log.i(TAG, String.format("DROP, dest = %s", dest));
+				Log.i(TAG, String.format("ACTION_DROP, dest = %s", dest));
 				gameActivity.hideCardLayoutDetail();
 
 				String source = cardLayout.getPossibleSource(((View) cardLayout.getParent()).getId());
@@ -170,11 +178,15 @@ public class GameDragListener implements OnDragListener {
 				break;
 
 			case DragEvent.ACTION_DRAG_ENDED:
+
+				Log.i(TAG, String.format("ACTION_DRAG_ENDED, dest = %s", dest));
 				gameActivity.setBeingModified(false);
 				unloadTargetViews(cardLayout);
 				return false;
 
 			default:
+
+				Log.d(TAG, String.format("Default (not handled action event), dest = %s", dest));
 				if (getPossibleTarget(cardLayout, dest) != null) {
 					return true;
 				}
