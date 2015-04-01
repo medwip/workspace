@@ -89,7 +89,7 @@ public class Player {
 		this.game = game;
 	}
 
-	public PlayerDeck getplayerDeck() {
+	public PlayerDeck getPlayerDeck() {
 		return playerDeck;
 	}
 

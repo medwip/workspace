@@ -4,6 +4,7 @@
 <!--     <color name="defaultBackground">#FFFFDDA6</color> -->
     <color name="defaultBackground">#FF000000</color>
     <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
     <color name="transparent">#00FFFFFF</color>
 
     <color name="highlight_color0">#FFFFFFFF</color>

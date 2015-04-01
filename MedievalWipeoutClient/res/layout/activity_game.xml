@@ -1,4 +1,5 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res/com.guntzergames.medievalwipeout.activities"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -9,26 +10,71 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.guntzergames.medievalwipeout.activities.GameActivity" >
 
-    <TextView
-        android:id="@+id/gameInfos"
-        style="@style/Section"
+    <LinearLayout
+        android:id="@+id/gameInfosLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/not_initialized" />
+        android:orientation="horizontal" >
 
-    <ImageView
-        android:id="@+id/beingModified"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:contentDescription="@string/being_modified"
-        android:src="@drawable/green" />
+        <TextView
+            android:id="@+id/gameInfos"
+            style="@style/Section"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:text="@string/not_initialized" />
+
+        <android.support.v7.widget.GridLayout
+            android:id="@+id/gameResources"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:background="@drawable/frame_border_highlightable"
+            app:columnCount="2"
+            app:rowCount="2" >
+
+            <TextView
+                android:id="@+id/gameTrade"
+                style="@style/Skill.Resource.Game"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:drawableLeft="@drawable/trade"
+                android:text="@string/not_initialized" />
+
+            <TextView
+                android:id="@+id/gameDefense"
+                style="@style/Skill.Resource.Game"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:drawableLeft="@drawable/defense"
+                android:text="@string/not_initialized" />
+
+            <TextView
+                android:id="@+id/gameFaith"
+                style="@style/Skill.Resource.Game"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:drawableLeft="@drawable/faith"
+                android:text="@string/not_initialized" />
+        </android.support.v7.widget.GridLayout>
+
+        <ImageView
+            android:id="@+id/beingModified"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:contentDescription="@string/being_modified"
+            android:src="@drawable/green" />
+    </LinearLayout>
 
     <RelativeLayout
         android:id="@+id/opponentZone"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/zoneHeight"
-        android:layout_below="@id/gameInfos"
+        android:layout_below="@id/gameInfosLayout"
         android:background="@drawable/frame_border" >
 
         <com.guntzergames.medievalwipeout.layouts.PlayerLayout
@@ -441,82 +487,6 @@
         android:layout_toLeftOf="@id/nextPhaseButton"
         android:contentDescription="@string/deck"
         android:src="@drawable/abc_ab_bottom_solid_dark_holo" />
-
-    <LinearLayout
-        android:id="@+id/gameResources"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:background="@drawable/frame_border_highlightable"
-        android:orientation="vertical" >
-
-        <LinearLayout
-            android:id="@+id/gameTradeRow"
-            android:layout_width="110dp"
-            android:layout_height="match_parent"
-            android:background="@drawable/card_border_highlightable"
-            android:orientation="horizontal"
-            android:paddingBottom="5dp"
-            android:paddingLeft="10dp"
-            android:paddingTop="5dp" >
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/trade" />
-
-            <TextView
-                android:id="@+id/gameTrade"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/not_initialized" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/gameDefenseRow"
-            android:layout_width="110dp"
-            android:layout_height="match_parent"
-            android:background="@drawable/card_border_highlightable"
-            android:orientation="horizontal"
-            android:paddingBottom="5dp"
-            android:paddingLeft="10dp"
-            android:paddingTop="5dp" >
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/defense" />
-
-            <TextView
-                android:id="@+id/gameDefense"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/not_initialized" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/gameFaithRow"
-            android:layout_width="110dp"
-            android:layout_height="match_parent"
-            android:background="@drawable/card_border_highlightable"
-            android:orientation="horizontal"
-            android:paddingBottom="5dp"
-            android:paddingLeft="10dp"
-            android:paddingTop="5dp" >
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/faith" />
-
-            <TextView
-                android:id="@+id/gameFaith"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/not_initialized" />
-        </LinearLayout>
-    </LinearLayout>
 
     <RelativeLayout
         android:id="@+id/playerChoices"

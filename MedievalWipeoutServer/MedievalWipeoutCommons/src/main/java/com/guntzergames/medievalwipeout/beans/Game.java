@@ -74,6 +74,8 @@ public class Game {
 	@Transient
 	private ResourceDeck resourceDeck = new ResourceDeck();
 	@Transient
+	private ResourceDeck initialResourceDeck = new ResourceDeck();
+	@Transient
 	private ResourceDeckCard resourceCard1, resourceCard2;
 	@Transient
 	private int turn;
@@ -149,6 +151,14 @@ public class Game {
 
 	public void setResourceDeck(ResourceDeck resourceDeck) {
 		this.resourceDeck = resourceDeck;
+	}
+
+	public ResourceDeck getInitialResourceDeck() {
+		return initialResourceDeck;
+	}
+
+	public void setInitialResourceDeck(ResourceDeck initialResourceDeck) {
+		this.initialResourceDeck = initialResourceDeck;
 	}
 
 	public int getTurn() {
@@ -242,34 +252,34 @@ public class Game {
 
 	public GameView buildGameView(Player player) throws PlayerNotInGameException {
 
-		GameView gameClientView = new GameView();
-		gameClientView.setId(id);
+		GameView gameView = new GameView();
+		gameView.setId(id);
 
-		gameClientView.setPlayer(selectPlayer(player));
-		gameClientView.setOpponents(selectOpponents(player));
+		gameView.setPlayer(selectPlayer(player));
+		gameView.setOpponents(selectOpponents(player));
 		System.out.println("activePlayer : " + getActivePlayer());
 		if (player.getAccount().getFacebookUserId().equals(getActivePlayer().getAccount().getFacebookUserId())) {
-			gameClientView.setActivePlayer(true);
+			gameView.setActivePlayer(true);
 		} else {
-			gameClientView.setActivePlayer(false);
+			gameView.setActivePlayer(false);
 		}
 
-		gameClientView.setResourceCard1(resourceCard1);
-		gameClientView.setResourceCard2(resourceCard2);
+		gameView.setResourceCard1(resourceCard1);
+		gameView.setResourceCard2(resourceCard2);
 
-		gameClientView.setPlayerHand(player.getPlayerHand());
-		gameClientView.setPlayerFieldAttack(player.getPlayerFieldAttack());
-		gameClientView.setPlayerFieldDefense(player.getPlayerFieldDefense());
+		gameView.setPlayerHand(player.getPlayerHand());
+		gameView.setPlayerFieldAttack(player.getPlayerFieldAttack());
+		gameView.setPlayerFieldDefense(player.getPlayerFieldDefense());
 
-		gameClientView.setGameState(gameState);
-		gameClientView.setTurn(turn);
-		gameClientView.setPhase(phase);
-		gameClientView.setGold(player.getGold());
-		gameClientView.setTrade(trade);
-		gameClientView.setDefense(defense);
-		gameClientView.setFaith(faith);
+		gameView.setGameState(gameState);
+		gameView.setTurn(turn);
+		gameView.setPhase(phase);
+		gameView.setGold(player.getGold());
+		gameView.setTrade(trade);
+		gameView.setDefense(defense);
+		gameView.setFaith(faith);
 
-		return gameClientView;
+		return gameView;
 
 	}
 

@@ -14,9 +14,11 @@
 	<f:view>
 
 		<h:form>
-			<h:commandButton action="#{gameMB.createGame()}" value="Create" />
-			<h:commandButton action="#{gameMB.refresh()}" value="Refresh" /><br/>
-		
+			<h:commandButton action="#{gameMB.refresh()}" value="Refresh" />
+			<h:commandButton action="#{gameMB.joinGame()}"
+				value="Join with a Bot" />
+			<br />
+
 			<h:dataTable value="#{gameMB.allGames}" var="game">
 				<h:column>
 					<f:facet name="header">
@@ -52,8 +54,10 @@
 					<f:facet name="header">
 						<h:outputText value="Actions" />
 					</f:facet>
-					<h:commandButton action="#{gameMB.deleteGame(game.id)}" value="Delete" />
-					<h:commandButton action="#{gameMB.joinGame(game.id)}" value="Join" />
+					<h:commandButton action="#{gameMB.deleteGame(game.id)}"
+						value="Delete" />
+					<h:commandButton action="#{gameMB.nextPhase(game.id)}"
+						value="Next Phase" />
 				</h:column>
 
 			</h:dataTable>

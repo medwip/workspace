@@ -45,7 +45,7 @@ public class HomeActivity extends ApplicationActivity {
 	private LinearLayout layout = null;
 	private long gameId, selectedDeckTemplateId;
 	private GraphUser user = null;
-	private Button createGameButton, resumeGameButton, editDeckButton;
+	private Button createGameButton, editDeckButton;
 	private TextView debugTextView = null;
 	private ProgressBar loader;
 	private int gameCheckAttempts;
@@ -74,6 +74,7 @@ public class HomeActivity extends ApplicationActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
+		
 		layout = (LinearLayout) LinearLayout.inflate(this, R.layout.activity_home, null);
 
 		setContentView(layout);
@@ -84,7 +85,6 @@ public class HomeActivity extends ApplicationActivity {
 		// Check if there is a more recent version
 		gameWebClient.getVersion();
 
-		resumeGameButton = (Button) layout.findViewById(R.id.resumeGame);
 		editDeckButton = (Button) layout.findViewById(R.id.editDeck);
 		debugTextView = (TextView) layout.findViewById(R.id.debug);
 		loader = (ProgressBar) layout.findViewById(R.id.progressBar);
@@ -93,19 +93,13 @@ public class HomeActivity extends ApplicationActivity {
 
 		gameId = intent.getLongExtra(ClientConstants.GAME_ID, 0);
 		int gameState = intent.getIntExtra(ClientConstants.GAME_STATE, ClientConstants.GAME_NOT_STARTED);
-		if (gameId > 0 && gameState != ClientConstants.GAME_STOPPED) {
-			getGame(gameId);
-		}
-		debugTextView.setText("Game: " + gameView);
+		Log.i(TAG, String.format("onCreate, gameId=%s", gameId));
 
 		if (gameState == ClientConstants.GAME_IN_PROGRESS) {
 			Toast.makeText(this, String.format("Returned to home page from game %s", gameId), Toast.LENGTH_SHORT).show();
-			resumeGameButton.setEnabled(true);
 		} else if (gameState == ClientConstants.GAME_STOPPED) {
 			Toast.makeText(this, String.format("Stopped game %s", gameId), Toast.LENGTH_SHORT).show();
-			resumeGameButton.setEnabled(false);
 		} else if (gameState == ClientConstants.GAME_NOT_STARTED) {
-			resumeGameButton.setEnabled(false);
 		} else { 
 			onError(String.format("Unknown state... %s", gameId));
 		}
@@ -139,16 +133,6 @@ public class HomeActivity extends ApplicationActivity {
 
 		);
 
-		resumeGameButton.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				startGameActivity(gameView);
-			}
-		}
-
-		);
-		
 		editDeckButton.setOnClickListener(new OnClickListener() {
 			
 			@Override
@@ -199,11 +183,16 @@ public class HomeActivity extends ApplicationActivity {
 		});
 
 	}
-
+	
 	public GraphUser getUser() {
 		return user;
 	}
 	
+	@Override
+	public void onError(String err) {
+		super.onError("gameId=" + gameId + " " + err);
+	}
+
 	@Override
 	public String getFacebookUserId() {
 		if (user == null) return null;
@@ -431,15 +420,13 @@ public class HomeActivity extends ApplicationActivity {
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-		Log.i("Ici Request code", String.format("%s", requestCode));
+		Log.i(TAG, String.format("Request code = %s", requestCode));
 		Session.getActiveSession().onActivityResult(this, requestCode, resultCode, data);
-		Log.d("Request code", String.format("%s", requestCode));
 		if (requestCode == MAIN_ACTIVITY) {
-			Log.d("resultCode", String.format("%s", resultCode));
+			Log.d(TAG, String.format("resultCode = %s", resultCode));
 			if (/* resultCode == RESULT_OK */true) {
 				Toast.makeText(this, String.format("Gamed stopped"), Toast.LENGTH_SHORT).show();
 				createGameButton.setEnabled(true);
-				resumeGameButton.setEnabled(true);
 				debugTextView.setText(String.format("requestCode: %s, resultCode: %s", requestCode, resultCode));
 			}
 		}

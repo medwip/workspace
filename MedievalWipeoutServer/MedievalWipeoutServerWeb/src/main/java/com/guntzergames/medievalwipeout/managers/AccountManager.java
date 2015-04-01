@@ -52,8 +52,8 @@ public class AccountManager {
 			account = accountDao.mergeAccount(account);
 		}
 		
-		System.out.println("Account: " + account);
-		System.out.println("Templates: " + account.getDeckTemplates());
+		LOGGER.info("Account: " + account);
+		LOGGER.info("Templates: " + account.getDeckTemplates());
 		
 		DeckTemplate deckTemplate = null;
 		

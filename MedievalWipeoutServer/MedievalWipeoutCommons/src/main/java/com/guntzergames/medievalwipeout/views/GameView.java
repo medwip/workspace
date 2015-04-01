@@ -219,7 +219,7 @@ public class GameView {
 
 	@Override
 	public String toString() {
-		return String.format("Game %s, state=%s, turn=%s, phase=%s", id, gameState, turn, phase);
+		return String.format("Game %s, state=%s, turn=%s, phase=%s, activePlayer=%s", id, gameState, turn, phase, activePlayer);
 	}
 
 }

@@ -77,7 +77,7 @@ public class OnGetGameWebAsyncResponse extends AsyncHttpResponseHandler {
 	@Override
 	public void onSuccess(String response) {
 		
-		Log.i(TAG, "Success");
+		Log.i(TAG, String.format("Successfull call to %s by %s", responseType, callbackable.getClass().getSimpleName()));
 		
 		switch (responseType) {
 			case GET_ACCOUNT:
@@ -115,7 +115,10 @@ public class OnGetGameWebAsyncResponse extends AsyncHttpResponseHandler {
 
 	@Override
 	public void onFailure(int arg0, Header[] arg1, byte[] arg2, Throwable arg3) {
-		callbackable.onError(arg3.getMessage());
+		callbackable.onError(responseType + " " + callbackable.getClass() + " " + callbackable.isInterruptedSignalSent() + " " + arg3.getMessage());
+		if ( !callbackable.isInterruptedSignalSent() ) {
+//			callbackable.onError(callbackable.isInterruptedSignalSent() + " " + arg3.getMessage());
+		}
 	}
 
 }

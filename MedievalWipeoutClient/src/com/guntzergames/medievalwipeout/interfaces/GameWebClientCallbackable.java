@@ -10,6 +10,8 @@ import com.guntzergames.medievalwipeout.views.GameView;
 public interface GameWebClientCallbackable {
 
 	public boolean isHttpRequestBeingExecuted();
+	public boolean isInterruptedSignalSent();
+	
 	public void setHttpRequestBeingExecuted(boolean httpRequestBeingExecuted);
 	public int getCurrentRequestPriority();
 	public void setCurrentRequestPriority(int currentRequestPriority);

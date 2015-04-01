@@ -11,10 +11,12 @@ import org.apache.log4j.Logger;
 import com.guntzergames.medievalwipeout.beans.Account;
 import com.guntzergames.medievalwipeout.beans.DeckTemplate;
 import com.guntzergames.medievalwipeout.beans.Game;
+import com.guntzergames.medievalwipeout.beans.GameEvent.PlayerType;
 import com.guntzergames.medievalwipeout.beans.GameEventPlayCard;
 import com.guntzergames.medievalwipeout.beans.GameEventPlayCard.EventType;
-import com.guntzergames.medievalwipeout.beans.GameEventPlayCard.PlayerType;
+import com.guntzergames.medievalwipeout.beans.GameEventResourceCard;
 import com.guntzergames.medievalwipeout.beans.Player;
+import com.guntzergames.medievalwipeout.beans.PlayerDeck;
 import com.guntzergames.medievalwipeout.beans.PlayerDeckCard;
 import com.guntzergames.medievalwipeout.beans.PlayerField;
 import com.guntzergames.medievalwipeout.beans.PlayerFieldCard;
@@ -44,6 +46,8 @@ public class GameManager {
 	private GameDao gameDao;
 	@EJB
 	private AccountDao accountDao;
+	@EJB
+	private AccountManager accountManager;
 
 	public Game findGameToJoin(Player player) {
 
@@ -67,8 +71,19 @@ public class GameManager {
 		gameSingleton.addGame(dbGame);
 		return dbGame;
 	}
+	
+	public Game joinGame(String facebookUserId, long deckId) throws GameException {
+		
+		Account account = accountManager.getAccount(facebookUserId, false);
+		LOGGER.info(String.format("Account: %s", account));
+		Player player = new Player();
+		DeckTemplate deckTemplate = findDeckTemplateById(deckId);
+		player.setDeckTemplate(deckTemplate);
+		return joinGame(player);
+		
+	}
 
-	public Game joinGame(Player player) throws PlayerNotInGameException {
+	public Game joinGame(Player player) throws GameException {
 
 		Game game = findGameToJoin(player);
 
@@ -102,7 +117,7 @@ public class GameManager {
 
 	}
 
-	public void initializeGame(Game game) throws PlayerNotInGameException {
+	public void initializeGame(Game game) throws GameException {
 
 		LOGGER.info(String.format("Before initialize game, game=%s", game));
 		
@@ -112,24 +127,48 @@ public class GameManager {
 			drawInitialHand(player, game);
 		}
 
-		ResourceDeck resourceDeck = game.getResourceDeck();
-		resourceDeck.addCard(new ResourceDeckCard(3, 0, 0));
-		resourceDeck.addCard(new ResourceDeckCard(2, 1, 0));
-		resourceDeck.addCard(new ResourceDeckCard(3, 0, 0));
-		resourceDeck.addCard(new ResourceDeckCard(0, 0, 1));
-		resourceDeck.addCard(new ResourceDeckCard(3, 0, 0));
-		resourceDeck.addCard(new ResourceDeckCard(0, 3, 0));
-		resourceDeck.addCard(new ResourceDeckCard(1, 2, 0));
-		resourceDeck.addCard(new ResourceDeckCard(1, 2, 0));
-		resourceDeck.addCard(new ResourceDeckCard(0, 0, 1));
-		resourceDeck.addCard(new ResourceDeckCard(0, 3, 0));
-		resourceDeck.addCard(new ResourceDeckCard(0, 0, 1));
-		Collections.shuffle(resourceDeck.getCards());
+		ResourceDeck initialResourceDeck = game.getInitialResourceDeck();
+		initialResourceDeck.addCard(new ResourceDeckCard(3, 0, 0));
+		initialResourceDeck.addCard(new ResourceDeckCard(2, 1, 0));
+		initialResourceDeck.addCard(new ResourceDeckCard(3, 0, 0));
+		initialResourceDeck.addCard(new ResourceDeckCard(0, 0, 1));
+		initialResourceDeck.addCard(new ResourceDeckCard(3, 0, 0));
+		initialResourceDeck.addCard(new ResourceDeckCard(0, 3, 0));
+		initialResourceDeck.addCard(new ResourceDeckCard(1, 2, 0));
+		initialResourceDeck.addCard(new ResourceDeckCard(1, 2, 0));
+		initialResourceDeck.addCard(new ResourceDeckCard(0, 0, 1));
+		initialResourceDeck.addCard(new ResourceDeckCard(0, 3, 0));
+		initialResourceDeck.addCard(new ResourceDeckCard(0, 0, 1));
+		Collections.shuffle(initialResourceDeck.getCards());
+		game.getResourceDeck().getCards().addAll(initialResourceDeck.getCards());
 		game.setTurn(1);
 		game.setPhase(Phase.BEFORE_RESOURCE_CHOOSE);
 		game.setActivePlayer(game.getPlayers().get(0));
 		nextPhase(game.getId());
 
+	}
+	
+	private PlayerDeckCard drawPlayerDeckInternal(Player player) {
+
+		PlayerDeck playerDeck = player.getPlayerDeck();
+		
+		if ( playerDeck.getCards().size() == 0 ) {
+			// TODO: Change this to add initial player deck shuffled
+			playerDeck.getCards().addAll(player.getPlayerDeck().getCards());
+		}
+		
+		return playerDeck.pop();
+		
+	}
+	
+	private ResourceDeckCard drawResourceDeck(Game game) {
+		
+		if ( game.getResourceDeck().getCards().size() == 0 ) {
+			game.getResourceDeck().getCards().addAll(game.getInitialResourceDeck().getCards());
+		}
+		
+		return game.getResourceDeck().pop();
+		
 	}
 
 	public void initPlayer(Player player) {
@@ -138,6 +177,12 @@ public class GameManager {
 		player.setGold(10);
 		player.setTrade(5);
 		player.setLifePoints(100);
+	}
+	
+	private void resolveBotResourceChoose(Player player) throws GameException {
+		
+		playCard(player, null, 1, null, -1);
+		
 	}
 
 	/*
@@ -153,21 +198,27 @@ public class GameManager {
 	 * 
 	 * }
 	 */
-	public Game nextPhase(long gameId) {
+	public Game nextPhase(long gameId) throws GameException {
 
 		Game game = getGame(gameId);
+		Player activePlayer = game.getActivePlayer();
 
 		LOGGER.info(String.format("nextPhase : %s", game));
 
 		switch (game.getPhase()) {
 
 			case BEFORE_RESOURCE_CHOOSE:
-				resolveBeforeResourceDraw(game.getActivePlayer());
-				game.setResourceCard1(game.getResourceDeck().pop());
+				resolveBeforeResourceDraw(activePlayer);
+				game.setResourceCard1(drawResourceDeck(game));
 				game.getResourceCard1().setId(1);
-				game.setResourceCard2(game.getResourceDeck().pop());
+				game.setResourceCard2(drawResourceDeck(game));
 				game.getResourceCard2().setId(2);
 				game.setPhase(Phase.DURING_RESOURCE_CHOOSE);
+				LOGGER.info("isBot = " + activePlayer.getAccount().isBot());
+				if ( activePlayer.getAccount().isBot() ) {
+					LOGGER.info("Resource choose for bot");
+					resolveBotResourceChoose(activePlayer);
+				}
 				break;
 
 			case DURING_RESOURCE_CHOOSE:
@@ -240,8 +291,8 @@ public class GameManager {
 
 	public void drawPlayerDeck(Player player) {
 
-		player.setPlayerDeckCard1(player.getplayerDeck().pop());
-		player.setPlayerDeckCard2(player.getplayerDeck().pop());
+		player.setPlayerDeckCard1(drawPlayerDeckInternal(player));
+		player.setPlayerDeckCard2(drawPlayerDeckInternal(player));
 
 	}
 
@@ -261,6 +312,12 @@ public class GameManager {
 
 		player.setCurrentDefense(player.getDefense());
 
+	}
+	
+	public Game playCard(Player player, String sourceLayout, int sourceCardId, String destinationLayout, int destinationCardId) throws GameException {
+		
+		return playCard(player.getAccount().getFacebookUserId(), player.getGame().getId(), sourceLayout, sourceCardId, destinationLayout, destinationCardId);
+		
 	}
 
 	public Game playCard(String userName, long gameId, String sourceLayout, int sourceCardId, String destinationLayout, int destinationCardId) throws GameException {
@@ -364,18 +421,15 @@ public class GameManager {
 				break;
 
 			case DURING_RESOURCE_CHOOSE:
-				/*
-				 * ResourceDeckCard playerResourceDeckCard = ((cardId == 1) ?
-				 * game.getResourceCard1() : game.getResourceCard2());
-				 * player.addTrade(playerResourceDeckCard.getTrade());
-				 * player.addDefense(playerResourceDeckCard.getDefense());
-				 * player.addFaith(playerResourceDeckCard.getFaith());
-				 * player.updatePlayableHandCards();
-				 */
 				ResourceDeckCard gameResourceDeckCard = ((sourceCardId == 1) ? game.getResourceCard1() : game.getResourceCard2());
 				game.addTrade(gameResourceDeckCard.getTrade());
 				game.addDefense(gameResourceDeckCard.getDefense());
 				game.addFaith(gameResourceDeckCard.getFaith());
+				GameEventResourceCard gameEventResourceCard = new GameEventResourceCard(PlayerType.PLAYER);
+				gameEventResourceCard.setResourceId(sourceCardId);
+				gameEventResourceCard.setResourceDeckCard(gameResourceDeckCard);
+				player.getEvents().add(gameEventResourceCard);
+				opponent.getEvents().add(gameEventResourceCard.duplicate());
 				game = nextPhase(gameId);
 				break;
 
@@ -416,8 +470,8 @@ public class GameManager {
 
 		player = game.selectPlayer(player);
 		for (int i = 0; i < 5; i++) {
-			LOGGER.info(String.format("Player: %s, player.getHand(): %s, player.getDeck(): %s", player, player.getPlayerHand(), player.getplayerDeck()));
-			player.getPlayerHand().addCard(new PlayerHandCard(player.getplayerDeck().pop(), player));
+			LOGGER.info(String.format("Player: %s, player.getHand(): %s, player.getDeck(): %s", player, player.getPlayerHand(), player.getPlayerDeck()));
+			player.getPlayerHand().addCard(new PlayerHandCard(player.getPlayerDeck().pop(), player));
 		}
 		game.setGameState(GameState.INITIALIZING_JOINER_HAND);
 

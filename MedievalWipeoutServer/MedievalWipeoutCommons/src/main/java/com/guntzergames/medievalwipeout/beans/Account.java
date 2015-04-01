@@ -44,6 +44,9 @@ public class Account {
 	@Column(name = "LEVEL")
 	private int level;
 
+	@Column(name = "BOT")
+	private boolean bot;
+
 	@OneToMany(mappedBy = "account", fetch = FetchType.EAGER)
 	private List<DeckTemplate> deckTemplates;
 
@@ -67,6 +70,14 @@ public class Account {
 
 	public void setLevel(int level) {
 		this.level = level;
+	}
+
+	public boolean isBot() {
+		return bot;
+	}
+
+	public void setBot(boolean bot) {
+		this.bot = bot;
 	}
 
 	public List<DeckTemplate> getDeckTemplates() {

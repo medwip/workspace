@@ -16,8 +16,6 @@ import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 
-import com.guntzergames.medievalwipeout.beans.Account;
-import com.guntzergames.medievalwipeout.beans.DeckTemplate;
 import com.guntzergames.medievalwipeout.beans.Game;
 import com.guntzergames.medievalwipeout.beans.Player;
 import com.guntzergames.medievalwipeout.exceptions.GameException;
@@ -47,13 +45,10 @@ public class GameResource {
 	@GET
 	@Path("join/{facebookUserId}/{deckId}")
     @Produces("text/plain")
-	public String joinGame(@PathParam("facebookUserId") String facebookUserId, @PathParam("deckId") long deckId) throws PlayerNotInGameException {
-		Account account = accountManager.getAccount(facebookUserId, false);
-		LOGGER.info(String.format("Account: %s", account));
-		Player player = new Player();
-		DeckTemplate deckTemplate = gameManager.findDeckTemplateById(deckId);
-		player.setDeckTemplate(deckTemplate);
-		Game game = gameManager.joinGame(player);
+	public String joinGame(@PathParam("facebookUserId") String facebookUserId, @PathParam("deckId") long deckId) throws GameException {
+		Game game = gameManager.joinGame(facebookUserId, deckId);
+		Player player = gameManager.selectPlayer(game, facebookUserId);
+		
 		LOGGER.info(String.format("Game joined: %s", game));
 		String ret = buildGameView(player, game);
         return ret;
@@ -92,7 +87,7 @@ public class GameResource {
 	@GET
 	@Path("nextPhase/{gameId}/{userName}")
     @Produces("text/plain")
-	public String nextPhase(@PathParam("gameId") long gameId, @PathParam("userName") String userName) throws PlayerNotInGameException {
+	public String nextPhase(@PathParam("gameId") long gameId, @PathParam("userName") String userName) throws GameException {
 		Game game = gameManager.nextPhase(gameId);
 		Player player = gameManager.selectPlayer(game, userName);
 		String ret = buildGameView(player, game);

@@ -2,17 +2,12 @@ package com.guntzergames.medievalwipeout.beans;
 
 public class GameEventPlayCard extends GameEvent {
 
-	public enum PlayerType {
-		PLAYER, OPPONENT;
-	}
-	
 	public enum EventType {
 		ATTACK_ATTACK_CARD, ATTACK_DEFENSE_FIELD;
 	}
 	
 	private PlayerDeckCard source;
 	private PlayerDeckCard destination;
-	private PlayerType playerType;
 	private EventType eventType;
 	private int sourceIndex, destinationIndex;
 	
@@ -20,9 +15,8 @@ public class GameEventPlayCard extends GameEvent {
 		super();
 	}
 	
-	public GameEventPlayCard(GameEventPlayCard.PlayerType playerType) {
-		this();
-		this.playerType = playerType;
+	public GameEventPlayCard(GameEvent.PlayerType playerType) {
+		super(playerType);
 	}
 	
 	public PlayerDeckCard getSource() {
@@ -36,12 +30,6 @@ public class GameEventPlayCard extends GameEvent {
 	}
 	public void setDestination(PlayerDeckCard destination) {
 		this.destination = destination;
-	}
-	public PlayerType getPlayerType() {
-		return playerType;
-	}
-	public void setPlayerType(PlayerType playerType) {
-		this.playerType = playerType;
 	}
 	
 	public EventType getEventType() {
@@ -70,7 +58,7 @@ public class GameEventPlayCard extends GameEvent {
 
 	public GameEventPlayCard duplicate() {
 		GameEventPlayCard event = new GameEventPlayCard();
-		event.setPlayerType(playerType == PlayerType.PLAYER ? PlayerType.OPPONENT : PlayerType.PLAYER);
+		event.setPlayerType(getPlayerType() == PlayerType.PLAYER ? PlayerType.OPPONENT : PlayerType.PLAYER);
 		event.setSource(source);
 		event.setDestination(destination);
 		event.setEventType(eventType);
@@ -79,7 +67,7 @@ public class GameEventPlayCard extends GameEvent {
 	
 	@Override
 	public String toString() {
-		return String.format("%s source=[index=%s][%s], destination=[index=%s][%s]", playerType, sourceIndex, source, destinationIndex, destination);
+		return String.format("%s source=[index=%s][%s], destination=[index=%s][%s]", getPlayerType(), sourceIndex, source, destinationIndex, destination);
 	}
 	
 }

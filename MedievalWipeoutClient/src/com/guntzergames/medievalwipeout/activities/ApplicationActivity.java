@@ -18,7 +18,7 @@ public class ApplicationActivity extends FragmentActivity implements GameWebClie
 
 	protected GameWebClient gameWebClient;
 	protected GameView gameView;
-	protected boolean httpRequestBeingExecuted = false;
+	protected boolean httpRequestBeingExecuted = false, interruptedSignalSent = false;
 	protected int currentRequestPriority;
 	protected String facebookUserId;
 	
@@ -42,6 +42,14 @@ public class ApplicationActivity extends FragmentActivity implements GameWebClie
 		return httpRequestBeingExecuted;
 	}
 	
+	public boolean isInterruptedSignalSent() {
+		return interruptedSignalSent;
+	}
+
+	public void setInterruptedSignalSent(boolean interruptedSignalSent) {
+		this.interruptedSignalSent = interruptedSignalSent;
+	}
+
 	public int getCurrentRequestPriority() {
 		return currentRequestPriority;
 	}

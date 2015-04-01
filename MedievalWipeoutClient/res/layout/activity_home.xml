@@ -52,13 +52,6 @@
             android:text="@string/preferences" />
 
         <Button
-            android:id="@+id/resumeGame"
-            style="@style/Button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/resume_game" />
-
-        <Button
             android:id="@+id/startGame"
             style="@style/Button"
             android:layout_width="wrap_content"

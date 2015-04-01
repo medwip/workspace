@@ -9,6 +9,8 @@ import com.guntzergames.medievalwipeout.views.GameView;
 
 public class GameCheckerThread extends Thread {
 	
+	private static final String TAG = "GameCheckerThread";
+	
 	private Handler checkGameHandler;
 	private long gameId;
 	private GameActivity gameActivity;
@@ -29,14 +31,14 @@ public class GameCheckerThread extends Thread {
 	}
 
 	public void getGame(long gameId) {
-		Log.d("MainGameCheckerThread", String.format("Get game resource for gameId %s", gameId));
+		Log.d(TAG, String.format("Get game resource for gameId %s", gameId));
 		gameActivity.getGameWebClient().getGame(gameId, this);
 	}
 	
 	public void onGetGame(GameView game) {
 		Message message = checkGameHandler.obtainMessage();
 		message.obj = game;
-		Log.d("MainGameCheckerThread", String.format("Sending message to MainActivity for game %s", game));
+		Log.d(TAG, String.format("Sending message to MainActivity for game %s", game));
 		checkGameHandler.sendMessage(message);
 	}
 	
@@ -68,7 +70,7 @@ public class GameCheckerThread extends Thread {
 			try {
 				Thread.sleep(5000);
 			} catch (InterruptedException e) {
-				Log.e("MainGameCheckerThread", String.format("Error occured while sleeping: %s", e.getMessage()));
+				Log.e(TAG, String.format("Error occured while sleeping: %s", e.getMessage()));
 			}
 			
 			if ( !interruptedSignalSent && !paused && !gameActivity.isHttpRequestBeingExecuted() ) {

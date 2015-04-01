@@ -6,9 +6,9 @@ import java.io.FileReader;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.guntzergames.medievalwipeout.beans.GameEventPlayCard;
-import com.guntzergames.medievalwipeout.beans.GameEventPlayCard.PlayerType;
 import com.guntzergames.medievalwipeout.beans.CardModel;
+import com.guntzergames.medievalwipeout.beans.GameEvent.PlayerType;
+import com.guntzergames.medievalwipeout.beans.GameEventPlayCard;
 import com.guntzergames.medievalwipeout.beans.Player;
 import com.guntzergames.medievalwipeout.beans.PlayerDeckCard;
 import com.guntzergames.medievalwipeout.views.GameView;

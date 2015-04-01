@@ -8,7 +8,7 @@ import javax.faces.bean.SessionScoped;
 
 import com.guntzergames.medievalwipeout.beans.Game;
 import com.guntzergames.medievalwipeout.beans.Player;
-import com.guntzergames.medievalwipeout.exceptions.PlayerNotInGameException;
+import com.guntzergames.medievalwipeout.exceptions.GameException;
 import com.guntzergames.medievalwipeout.managers.AccountManager;
 import com.guntzergames.medievalwipeout.managers.GameManager;
 
@@ -29,12 +29,12 @@ public class GameMB  {
 		gameManager.deleteGame(gameId);
 	}
 	
-	private Player getBotPlayer(long gameId) {
-		return accountManager.getBotPlayer(gameId);
+	public void nextPhase(long gameId) throws GameException {
+		gameManager.nextPhase(gameId);
 	}
 	
-	public void joinGame(long gameId) throws PlayerNotInGameException {
-		gameManager.joinGame(getBotPlayer(gameId));
+	public void joinGame() throws GameException {
+		gameManager.joinGame("BOT", 11);
 	}
 	
 	public String getPlayers(long gameId) {

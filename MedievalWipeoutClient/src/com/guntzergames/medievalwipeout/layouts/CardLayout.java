@@ -433,9 +433,9 @@ public class CardLayout extends RelativeLayout {
 			reset();
 			image = (ImageView)rootView.findViewById(R.id.cardLayoutImage);
 			name = (TextView)rootView.findViewById(R.id.cardLayoutName);
-			trade = (TextView)rootView.findViewById(R.id.cardLayoutTrade);
-			defense = (TextView)rootView.findViewById(R.id.cardLayoutDefense);
-			faith = (TextView)rootView.findViewById(R.id.cardLayoutFaith);
+			trade = (TextView)rootView.findViewById(R.id.cardResourceTrade);
+			defense = (TextView)rootView.findViewById(R.id.cardResourceDefense);
+			faith = (TextView)rootView.findViewById(R.id.cardResourceFaith);
 		}
 		else {
 			rootView = (LinearLayout)layoutInflater.inflate(R.layout.card_creature, null);

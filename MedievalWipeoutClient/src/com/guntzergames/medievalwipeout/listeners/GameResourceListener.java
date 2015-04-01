@@ -24,13 +24,13 @@ public class GameResourceListener implements OnClickListener {
 	@Override
 	public void onClick(View v) {
 		
-		if ( v.getId() == R.id.gameTradeRow ) {
+		if ( v.getId() == R.id.gameTrade ) {
 			selectResource(CommonConstants.GAME_RESOURCE_TRADE);
 		}
-		if ( v.getId() == R.id.gameDefenseRow ) {
+		if ( v.getId() == R.id.gameDefense ) {
 			selectResource(CommonConstants.GAME_RESOURCE_DEFENSE);
 		}
-		if ( v.getId() == R.id.gameFaithRow ) {
+		if ( v.getId() == R.id.gameFaith ) {
 			selectResource(CommonConstants.GAME_RESOURCE_FAITH);
 		}
 		

@@ -13,6 +13,7 @@ import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.widget.GridLayout;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
@@ -22,6 +23,7 @@ import android.view.View;
 import android.view.View.DragShadowBuilder;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -40,9 +42,10 @@ import com.facebook.Session;
 import com.guntzergames.medievalwipeout.abstracts.AbstractCard;
 import com.guntzergames.medievalwipeout.abstracts.AbstractCardList;
 import com.guntzergames.medievalwipeout.beans.GameEvent;
+import com.guntzergames.medievalwipeout.beans.GameEvent.PlayerType;
 import com.guntzergames.medievalwipeout.beans.GameEventPlayCard;
 import com.guntzergames.medievalwipeout.beans.GameEventPlayCard.EventType;
-import com.guntzergames.medievalwipeout.beans.GameEventPlayCard.PlayerType;
+import com.guntzergames.medievalwipeout.beans.GameEventResourceCard;
 import com.guntzergames.medievalwipeout.beans.Player;
 import com.guntzergames.medievalwipeout.beans.PlayerDeckCard;
 import com.guntzergames.medievalwipeout.beans.PlayerFieldCard;
@@ -77,7 +80,7 @@ public class GameActivity extends ApplicationActivity {
 	private boolean beingModified = false, opponentDefenseDown = false;
 	private CardLayout cardLayoutDetail = null;
 	private PlayerLayout playerPlayerLayout, opponentPlayerLayout;
-	
+
 	private CardDetailListener cardDetailListener;
 	private GameResourceListener gameResourceListener;
 	private PlayerChoiceListener playerResourceListener;
@@ -89,18 +92,20 @@ public class GameActivity extends ApplicationActivity {
 	private TranslateAnimation cardEventTranslationAnimation, highlightTranslationAnimation;
 	private AlphaAnimation highlightAlphaAnimation;
 
-	private LinearLayout playerHandLayout, opponentFieldDefenseLayout, opponentFieldAttackLayout, playerFieldDefenseLayout, playerFieldAttackLayout, highlightLayout, gameTradeRow,
-			gameDefenseRow, gameFaithRow, gameResourcesLayout;
+	private LinearLayout playerHandLayout, opponentFieldDefenseLayout, opponentFieldAttackLayout, playerFieldDefenseLayout, playerFieldAttackLayout, highlightLayout;
+	private GridLayout gameResourcesLayout;
 	private int httpCallsDone = 0, httpCallsAborted = 0, touchEvents = 0;
 	private CardLayout playerChoiceCard1Layout, playerChoiceCard2Layout, gameEventLayout;
-	
+
 	private HorizontalScrollView handScrollView;
 
 	private Dialog resourceDialog;
-	
-	private TextView gameInfos;
-	
+
+	private TextView gameInfos, gameTrade, gameDefense, gameFaith;
+
 	private Set<View> dragableRegisteredViews = new HashSet<View>();
+
+	private Button nextPhaseButton;
 
 	final private Handler checkGameHandler = new Handler() {
 
@@ -132,7 +137,7 @@ public class GameActivity extends ApplicationActivity {
 	}
 
 	private class CardDetailListener implements OnTouchListener {
-		
+
 		private static final String TAG = "CardDetailListener";
 
 		@Override
@@ -156,7 +161,7 @@ public class GameActivity extends ApplicationActivity {
 				v.performClick();
 
 				if (gameView.isActivePlayer()) {
-					
+
 					if ((cardLayout.getCard() instanceof ResourceDeckCard) && gameView.getPhase() == getDuringPlayerResourceChoosePhase()) {
 						Log.i(TAG, "Drag initiated during player resource draw");
 						ClipData data = ClipData.newPlainText("", "");
@@ -184,7 +189,7 @@ public class GameActivity extends ApplicationActivity {
 						DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(v);
 						v.startDrag(data, shadowBuilder, v, 0);
 					}
-					
+
 				}
 
 				return true;
@@ -267,14 +272,13 @@ public class GameActivity extends ApplicationActivity {
 	}
 
 	private void initOpponentDragListener() {
-		
-		if ( opponentDefenseDown ) {
+
+		if (opponentDefenseDown) {
 			unregisterDragListener(opponentFieldDefenseLayout);
-		}
-		else {
+		} else {
 			registerDragListener(opponentFieldDefenseLayout);
 		}
-		
+
 		int len = opponent.getPlayerFieldAttack().getCards().size();
 
 		for (int i = 0; i < Math.min(opponentFieldAttackLayout.getChildCount(), len); i++) {
@@ -284,14 +288,14 @@ public class GameActivity extends ApplicationActivity {
 
 		}
 
-		if ( opponentDefenseDown ) {
+		if (opponentDefenseDown) {
 			len = opponent.getPlayerFieldDefense().getCards().size();
-			
+
 			for (int i = 0; i < Math.min(opponentFieldDefenseLayout.getChildCount(), len); i++) {
-	
+
 				CardLayout cardInFieldLayout = (CardLayout) opponentFieldDefenseLayout.getChildAt(i);
 				registerDragListener(cardInFieldLayout);
-	
+
 			}
 		}
 
@@ -331,111 +335,112 @@ public class GameActivity extends ApplicationActivity {
 		highlightAnimationSet.setAnimationListener(highlightAnimationListener);
 
 	}
-	
+
 	private AnimationDrawable getAnimationDrawable(View view, int index) {
-		
+
 		Drawable background = view.getBackground();
-		
-		if ( background instanceof LayerDrawable ) {
-			
-			LayerDrawable layerDrawable = (LayerDrawable)background;
+
+		if (background instanceof LayerDrawable) {
+
+			LayerDrawable layerDrawable = (LayerDrawable) background;
 			int num = 0;
-			
-			for ( int i = 0; i < layerDrawable.getNumberOfLayers(); i++ ) {
-				
+
+			for (int i = 0; i < layerDrawable.getNumberOfLayers(); i++) {
+
 				Drawable drawable = layerDrawable.getDrawable(i);
-				if ( drawable instanceof AnimationDrawable ) {
-					AnimationDrawable animationDrawable = (AnimationDrawable)drawable;
-					if ( num++ == index ) {
+				if (drawable instanceof AnimationDrawable) {
+					AnimationDrawable animationDrawable = (AnimationDrawable) drawable;
+					if (num++ == index) {
 						return animationDrawable;
 					}
 				}
-				
+
 			}
-			
+
 		}
-		
+
 		return null;
-		
+
 	}
-	
+
 	public void startAnimation(View view, int index) {
-		
+
 		AnimationDrawable animationDrawable = getAnimationDrawable(view, index);
-		if ( animationDrawable != null ) {
+		if (animationDrawable != null) {
 			animationDrawable.setAlpha(255);
 			animationDrawable.start();
 		}
-		
+
 	}
 
 	public void stopAnimation(View view, int index) {
-		
+
 		AnimationDrawable animationDrawable = getAnimationDrawable(view, index);
-		if ( animationDrawable != null ) {
+		if (animationDrawable != null) {
 			animationDrawable.setAlpha(0);
 			animationDrawable.stop();
 		}
-		
+
 	}
-	
+
 	public void startHighlightAnimation(View view) {
 
 		startAnimation(view, 0);
-		
+
 	}
-	
+
 	public void stopHightlightAnimation(View view) {
-		
+
 		stopAnimation(view, 0);
-		
+
 	}
-	
+
 	public void startTargetAnimation(View view) {
 
 		startAnimation(view, 1);
-		
+
 	}
-	
+
 	public void startTargetAnimationLayout(LinearLayout layout) {
-		
-		for ( int i = 0; i < layout.getChildCount(); i++ ) {
+
+		for (int i = 0; i < layout.getChildCount(); i++) {
 			startTargetAnimation(layout.getChildAt(i));
 		}
-		
+
 	}
-	
-	public void stopTargetAnimationLayout(LinearLayout layout) {
-		
-		for ( int i = 0; i < layout.getChildCount(); i++ ) {
+
+	public void stopTargetAnimationLayout(ViewGroup layout) {
+
+		for (int i = 0; i < layout.getChildCount(); i++) {
 			stopTargetAnimation(layout.getChildAt(i));
 		}
-		
+
 	}
-	
+
 	public void stopTargetAnimation(View view) {
-		
+
 		stopAnimation(view, 1);
-		
+
 	}
-	
+
 	private void registerDragListener(View view) {
-		
+
 		view.setOnDragListener(gameDragListener);
 		dragableRegisteredViews.add(view);
-		
+
 	}
-	
+
 	private void unregisterDragListener(View view) {
-		
+
 		view.setOnDragListener(null);
 		dragableRegisteredViews.remove(view);
-		
+
 	}
-	
+
 	public void updateCardsDisplay() {
 
-		if ( gameView.isActivePlayer() ) player.updatePlayableHandCards();
+		if (gameView.isActivePlayer())
+			player.updatePlayableHandCards();
 
 		setupField(opponent.getPlayerFieldDefense(), "opponentFieldDefense", 5, CardLocation.FIELD_DEFENSE);
 		setupField(opponent.getPlayerFieldAttack(), "opponentFieldAttack", 5, CardLocation.FIELD_ATTACK);
@@ -454,29 +459,26 @@ public class GameActivity extends ApplicationActivity {
 		stopTargetAnimationLayout(playerFieldAttackLayout);
 		stopTargetAnimationLayout(opponentFieldDefenseLayout);
 		stopTargetAnimationLayout(opponentFieldAttackLayout);
+		stopTargetAnimationLayout(playerChoicesLayout);
+		stopTargetAnimation(cardLayoutDetail);
 		stopHightlightAnimation(gameResourcesLayout);
 		stopHightlightAnimation(playerChoicesLayout);
-		
-//		stopTargetAnimation(playerFieldDefenseLayout);
-		
-		if ( gameView.isActivePlayer() ) {
+
+		// stopTargetAnimation(playerFieldDefenseLayout);
+
+		if (gameView.isActivePlayer()) {
 
 			Phase phase = gameView.getPhase();
 
 			switch (phase) {
 				case DURING_DECK_DRAW:
-					playerChoicesLayout.setVisibility(View.VISIBLE);
-					playerChoiceCard1Layout.setup(this, player.getPlayerDeckCard1(), 1, CardLocation.MODAL);
-					playerChoiceCard1Layout.show();
-					playerChoiceCard2Layout.setup(this, player.getPlayerDeckCard2(), 2, CardLocation.MODAL);
-					playerChoiceCard2Layout.show();
-					startHighlightAnimation(playerChoicesLayout);
+					displayPlayerChoices(player.getPlayerDeckCard1(), player.getPlayerDeckCard2());
 					break;
 				case DURING_PLAY:
 					initOpponentDragListener();
 					break;
 				case DURING_RESOURCE_CHOOSE:
-					displayPlayerChoices();
+					displayPlayerChoices(gameView.getResourceCard1(), gameView.getResourceCard2());
 					break;
 				case DURING_RESOURCE_SELECT:
 					startHighlightAnimation(gameResourcesLayout);
@@ -489,23 +491,20 @@ public class GameActivity extends ApplicationActivity {
 		}
 
 	}
-	
-	private void displayPlayerChoices() {
-		
-//		resourceDialog.setTitle("Choose a resource");
+
+	private void displayPlayerChoices(ICard cardLayout1, ICard cardLayout2) {
+
 		playerChoicesLayout.setVisibility(View.VISIBLE);
-		
-		playerChoiceCard1Layout.setup(this, gameView.getResourceCard1(), 1, CardLocation.MODAL);
+
+		playerChoiceCard1Layout.setup(this, cardLayout1, 1, CardLocation.MODAL);
 		playerChoiceCard1Layout.show();
 		startHighlightAnimation(playerChoiceCard1Layout);
-		playerChoiceCard2Layout.setup(this, gameView.getResourceCard2(), 2, CardLocation.MODAL);
+		playerChoiceCard2Layout.setup(this, cardLayout2, 2, CardLocation.MODAL);
 		playerChoiceCard2Layout.show();
 		startHighlightAnimation(playerChoiceCard2Layout);
-		
-//		resourceDialog.show();
-		
+
 	}
-	
+
 	public void hideResourceDialog() {
 		resourceDialog.hide();
 		stopHightlightAnimation(playerChoicesLayout);
@@ -527,13 +526,13 @@ public class GameActivity extends ApplicationActivity {
 		gameCheckerThread.getGame(gameId);
 
 	}
-	
+
 	@Override
 	protected void onNewIntent(Intent intent) {
-		
+
 		super.onNewIntent(intent);
 		Log.i(TAG, String.format("onNewIntent, gameId=%s", gameId));
-		
+
 	}
 
 	@Override
@@ -569,11 +568,11 @@ public class GameActivity extends ApplicationActivity {
 		opponentFieldDefenseLayout = (LinearLayout) layout.findViewById(R.id.opponentFieldDefense);
 		opponentFieldAttackLayout = (LinearLayout) layout.findViewById(R.id.opponentFieldAttack);
 		playerChoicesLayout = (RelativeLayout) layout.findViewById(R.id.playerChoices);
-		gameResourcesLayout = (LinearLayout) layout.findViewById(R.id.gameResources);
+		gameResourcesLayout = (GridLayout) layout.findViewById(R.id.gameResources);
 
-		gameTradeRow = (LinearLayout) layout.findViewById(R.id.gameTradeRow);
-		gameDefenseRow = (LinearLayout) layout.findViewById(R.id.gameDefenseRow);
-		gameFaithRow = (LinearLayout) layout.findViewById(R.id.gameFaithRow);
+		gameTrade = (TextView) layout.findViewById(R.id.gameTrade);
+		gameDefense = (TextView) layout.findViewById(R.id.gameDefense);
+		gameFaith = (TextView) layout.findViewById(R.id.gameFaith);
 
 		cardDetailListener = new CardDetailListener();
 		gameResourceListener = new GameResourceListener(this);
@@ -582,7 +581,7 @@ public class GameActivity extends ApplicationActivity {
 
 		gameAnimationListener = new GameAnimationListener(this);
 		highlightAnimationListener = new HighlightAnimationListener(highlightLayout);
-		
+
 		handScrollView = (HorizontalScrollView) layout.findViewById(R.id.handScrollView);
 
 		initField(playerHandLayout);
@@ -590,7 +589,7 @@ public class GameActivity extends ApplicationActivity {
 		initField(opponentFieldAttackLayout);
 		initField(playerFieldDefenseLayout);
 		initField(playerFieldAttackLayout);
-		
+
 		// TODO: Verify if this is still needed
 		initHighlightLayout();
 		initCardEventAnimation();
@@ -626,7 +625,7 @@ public class GameActivity extends ApplicationActivity {
 			}
 		});
 
-		Button nextPhaseButton = (Button) layout.findViewById(R.id.nextPhaseButton);
+		nextPhaseButton = (Button) layout.findViewById(R.id.nextPhaseButton);
 		nextPhaseButton.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -635,9 +634,9 @@ public class GameActivity extends ApplicationActivity {
 			}
 		});
 
-		gameTradeRow.setOnClickListener(gameResourceListener);
-		gameDefenseRow.setOnClickListener(gameResourceListener);
-		gameFaithRow.setOnClickListener(gameResourceListener);
+		gameTrade.setOnClickListener(gameResourceListener);
+		gameDefense.setOnClickListener(gameResourceListener);
+		gameFaith.setOnClickListener(gameResourceListener);
 
 		registerDragListener(layout);
 		registerDragListener(playerHandLayout);
@@ -652,31 +651,35 @@ public class GameActivity extends ApplicationActivity {
 		resourceDialog.setContentView(R.layout.dialog_player_choices);
 		resourceDialog.getWindow().setFlags(Window.FEATURE_NO_TITLE, 0);
 
-//		resourceCard1Layout = (CardLayout) resourceDialog.findViewById(CardLayout.getCardFromId("resource", 0));
+		// resourceCard1Layout = (CardLayout)
+		// resourceDialog.findViewById(CardLayout.getCardFromId("resource", 0));
 		playerChoiceCard1Layout = (CardLayout) layout.findViewById(CardLayout.getCardFromId("playerChoice", 0));
 		playerChoiceCard1Layout.setOnClickListener(playerResourceListener);
 		playerChoiceCard1Layout.setDetailShown(true);
-//		resourceCard2Layout = (CardLayout) resourceDialog.findViewById(CardLayout.getCardFromId("resource", 1));
+		// resourceCard2Layout = (CardLayout)
+		// resourceDialog.findViewById(CardLayout.getCardFromId("resource", 1));
 		playerChoiceCard2Layout = (CardLayout) layout.findViewById(CardLayout.getCardFromId("playerChoice", 1));
 		playerChoiceCard2Layout.setOnClickListener(playerResourceListener);
 		playerChoiceCard2Layout.setDetailShown(true);
-//		playerDeckCard1Layout = (CardLayout) layout.findViewById(CardLayout.getCardFromId("playerDeck", 0));
-//		playerDeckCard1Layout.setOnTouchListener(cardDetailListener);
-//		playerDeckCard2Layout = (CardLayout) layout.findViewById(CardLayout.getCardFromId("playerDeck", 1));
-//		playerDeckCard2Layout.setOnTouchListener(cardDetailListener);
+		// playerDeckCard1Layout = (CardLayout)
+		// layout.findViewById(CardLayout.getCardFromId("playerDeck", 0));
+		// playerDeckCard1Layout.setOnTouchListener(cardDetailListener);
+		// playerDeckCard2Layout = (CardLayout)
+		// layout.findViewById(CardLayout.getCardFromId("playerDeck", 1));
+		// playerDeckCard2Layout.setOnTouchListener(cardDetailListener);
 
 		gameCheckerThread = new GameCheckerThread(checkGameHandler, gameId, this);
 		gameCheckerThread.start();
 		hideCardLayoutDetail();
-		
+
 		handScrollView.setOnTouchListener(new OnTouchListener() {
-			
+
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
-				if ( event.getAction() == MotionEvent.ACTION_UP) {
+				if (event.getAction() == MotionEvent.ACTION_UP) {
 					hideCardLayoutDetail();
 				}
-				
+
 				return true;
 			}
 		});
@@ -688,21 +691,21 @@ public class GameActivity extends ApplicationActivity {
 		super.onStop();
 		gameCheckerThread.setInterruptedSignalSent(true);
 	}
-	
+
 	private void initIntentExtras() {
-		
+
 		gameId = getIntent().getExtras().getLong(ClientConstants.GAME_ID);
 		gameCommand = getIntent().getExtras().getString(ClientConstants.GAME_COMMAND);
 		facebookUserId = getIntent().getExtras().getString(ClientConstants.FACEBOOK_USER_ID);
 
 		Toast.makeText(this, String.format("Command %s for game ID: %s, userName=%s", gameCommand, gameId, facebookUserId), Toast.LENGTH_SHORT).show();
-		
+
 	}
 
 	private void init() {
 
 		initIntentExtras();
-		
+
 		layout = (RelativeLayout) LinearLayout.inflate(this, R.layout.activity_game, null);
 
 		setContentView(layout);
@@ -716,6 +719,7 @@ public class GameActivity extends ApplicationActivity {
 		 * Intent result = new Intent(); setResult(RESULT_OK, result); finish();
 		 */
 
+		setInterruptedSignalSent(true);
 		Intent intent = new Intent(GameActivity.this, HomeActivity.class);
 		intent.putExtra(ClientConstants.GAME_ID, gameId);
 		intent.putExtra(ClientConstants.GAME_STATE, status);
@@ -746,80 +750,100 @@ public class GameActivity extends ApplicationActivity {
 		boolean handleUpdateDisplay = false;
 		LinkedList<GameEvent> events = player.getEvents();
 		String str = "Events... ";
-		
+
 		if (events != null && events.size() > 0) {
-			
+
 			for (GameEvent event : events) {
-				
+
 				if (event instanceof GameEventPlayCard) {
-					
+
 					GameEventPlayCard gameEventPlayCard = (GameEventPlayCard) event;
 					PlayerDeckCard source = gameEventPlayCard.getSource();
 					PlayerDeckCard destination = gameEventPlayCard.getDestination();
 					PlayerType type = gameEventPlayCard.getPlayerType();
-					
+
 					Log.i(TAG, String.format("Display event: %s, type=%s, source=%s, destination=%s", gameEventPlayCard, type, source, destination));
 
-					if (type == PlayerType.PLAYER && source instanceof PlayerHandCard && destination instanceof PlayerFieldCard) {
-
-						CardLayout sourceCardLayout = (CardLayout) layout.findViewById(CardLayout.getCardFromId("playerHand", gameEventPlayCard.getSourceIndex()));
-						handleUpdateDisplay = true;
-						animateCardEvent(sourceCardLayout.getCard(), playerHandLayout, playerFieldDefenseLayout);
-
-					} else if (type == PlayerType.PLAYER && source instanceof PlayerFieldCard && destination instanceof PlayerFieldCard) {
-
-						PlayerFieldCard playerFieldCardSource = (PlayerFieldCard) source;
-						CardLayout sourceCardLayout = (CardLayout) layout.findViewById(CardLayout.getCardFromId(playerFieldCardSource.getField(),
-								gameEventPlayCard.getSourceIndex()));
-						PlayerFieldCard playerFieldCardDestination = (PlayerFieldCard) destination;
-						CardLayout destinationCardLayout = (CardLayout) layout.findViewById(CardLayout.getCardFromId(playerFieldCardDestination.getField(),
-								gameEventPlayCard.getDestinationIndex()));
-						Log.i("TEST", String.format("playerFieldCard=%s, location=%s, playerFieldCard.getField()=%s", playerFieldCardSource, playerFieldCardSource.getLocation(),
-								playerFieldCardSource.getField()));
-						handleUpdateDisplay = true;
+					switch (gameView.getPhase()) {
 						
-						View destinationView = destinationCardLayout;
-						
-						if ( gameEventPlayCard.getEventType() == EventType.ATTACK_DEFENSE_FIELD ) {
-							destinationView = opponentFieldDefenseLayout;
-						}
-						else if ( gameEventPlayCard.getEventType() == EventType.ATTACK_ATTACK_CARD ) {
-							destinationView = (CardLayout) layout.findViewById(
-									CardLayout.getCardFromId("opponentFieldAttack",
-									gameEventPlayCard.getDestinationIndex()));
-						}
-						
-						animateCardEvent(sourceCardLayout.getCard(), (View) sourceCardLayout.getParent(), destinationView);
+						case DURING_PLAY:
 
-					} else if (type == PlayerType.OPPONENT && source instanceof PlayerHandCard && destination instanceof PlayerFieldCard) {
+							if (type == PlayerType.PLAYER && source instanceof PlayerHandCard && destination instanceof PlayerFieldCard) {
 
-						handleUpdateDisplay = true;
-						PlayerFieldCard playerFieldCardDestination = (PlayerFieldCard) destination;
-						animateCardEvent(destination,
-								gameInfos,
-								playerFieldCardDestination.getLocation().equals(Location.DEFENSE) ? opponentFieldDefenseLayout : opponentFieldAttackLayout);
+								CardLayout sourceCardLayout = (CardLayout) layout.findViewById(CardLayout.getCardFromId("playerHand", gameEventPlayCard.getSourceIndex()));
+								handleUpdateDisplay = true;
+								animateCardEvent(sourceCardLayout.getCard(), playerHandLayout, playerFieldDefenseLayout);
 
-					} else if (type == PlayerType.OPPONENT && source instanceof PlayerFieldCard && destination instanceof PlayerFieldCard) {
+							} else if (type == PlayerType.PLAYER && source instanceof PlayerFieldCard && destination instanceof PlayerFieldCard) {
 
-						handleUpdateDisplay = true;
-						PlayerFieldCard playerFieldCardSource = (PlayerFieldCard) source;
-						PlayerFieldCard playerFieldCardDestination = (PlayerFieldCard) destination;
-						animateCardEvent(
-							destination,
-							playerFieldCardSource.getLocation().equals(Location.DEFENSE) ? opponentFieldDefenseLayout : opponentFieldAttackLayout,
-							playerFieldCardDestination.getLocation().equals(Location.DEFENSE) ? playerFieldDefenseLayout : playerFieldAttackLayout
-						);
+								PlayerFieldCard playerFieldCardSource = (PlayerFieldCard) source;
+								CardLayout sourceCardLayout = (CardLayout) layout.findViewById(CardLayout.getCardFromId(playerFieldCardSource.getField(),
+										gameEventPlayCard.getSourceIndex()));
+								PlayerFieldCard playerFieldCardDestination = (PlayerFieldCard) destination;
+								CardLayout destinationCardLayout = (CardLayout) layout.findViewById(CardLayout.getCardFromId(playerFieldCardDestination.getField(),
+										gameEventPlayCard.getDestinationIndex()));
+								Log.i("TEST", String.format("playerFieldCard=%s, location=%s, playerFieldCard.getField()=%s", playerFieldCardSource,
+										playerFieldCardSource.getLocation(), playerFieldCardSource.getField()));
+								handleUpdateDisplay = true;
 
-					} else {
-						str += gameEventPlayCard.toString() + "\n";
+								View destinationView = destinationCardLayout;
+
+								if (gameEventPlayCard.getEventType() == EventType.ATTACK_DEFENSE_FIELD) {
+									destinationView = opponentFieldDefenseLayout;
+								} else if (gameEventPlayCard.getEventType() == EventType.ATTACK_ATTACK_CARD) {
+									destinationView = (CardLayout) layout.findViewById(CardLayout.getCardFromId("opponentFieldAttack", gameEventPlayCard.getDestinationIndex()));
+								}
+
+								animateCardEvent(sourceCardLayout.getCard(), (View) sourceCardLayout.getParent(), destinationView);
+
+							} else if (type == PlayerType.OPPONENT && source instanceof PlayerHandCard && destination instanceof PlayerFieldCard) {
+
+								handleUpdateDisplay = true;
+								PlayerFieldCard playerFieldCardDestination = (PlayerFieldCard) destination;
+								animateCardEvent(destination, gameInfos, playerFieldCardDestination.getLocation().equals(Location.DEFENSE) ? opponentFieldDefenseLayout
+										: opponentFieldAttackLayout);
+
+							} else if (type == PlayerType.OPPONENT && source instanceof PlayerFieldCard && destination instanceof PlayerFieldCard) {
+
+								handleUpdateDisplay = true;
+								PlayerFieldCard playerFieldCardSource = (PlayerFieldCard) source;
+								PlayerFieldCard playerFieldCardDestination = (PlayerFieldCard) destination;
+								animateCardEvent(destination,
+										playerFieldCardSource.getLocation().equals(Location.DEFENSE) ? opponentFieldDefenseLayout : opponentFieldAttackLayout,
+										playerFieldCardDestination.getLocation().equals(Location.DEFENSE) ? playerFieldDefenseLayout : playerFieldAttackLayout);
+
+							} else {
+								str += gameEventPlayCard.toString() + "\n";
+							}
+
+							break;
+							
+						default:
+							onError(String.format("Unhandled phase in displayEvent: %s", gameView.getPhase()));
+
 					}
 
 				}
-			
+				
+				else if (event instanceof GameEventResourceCard) {
+					
+					GameEventResourceCard gameEventResourceCard = (GameEventResourceCard)event;
+					CardLayout cardLayout =  gameEventResourceCard.getResourceId() == 1 ? playerChoiceCard1Layout : playerChoiceCard2Layout;
+					animateCardEvent(gameEventResourceCard.getResourceDeckCard(), cardLayout, playerFieldAttackLayout);
+					handleUpdateDisplay = true;
+					
+				}
+				
+				else {
+					
+					onError(String.format("Unhandled event class %s", event.getClass()));
+					
+				}
+
 			}
-			
+
 			Toast.makeText(this, str, Toast.LENGTH_SHORT).show();
-		
+
 		}
 		return handleUpdateDisplay;
 
@@ -870,46 +894,50 @@ public class GameActivity extends ApplicationActivity {
 	}
 
 	@Override
-	public void onGetGame(GameView game) {
+	public void onGetGame(GameView gameView) {
 
-		if (game == null) {
-			Toast.makeText(this, String.format("Unable to get game"), Toast.LENGTH_LONG).show();
+		if (gameView == null) {
+			onError("Unable to get game");
 			return;
 		}
 
 		gameInfos = (TextView) layout.findViewById(R.id.gameInfos);
-		TextView gameTrade = (TextView) layout.findViewById(R.id.gameTrade);
-		TextView gameDefense = (TextView) layout.findViewById(R.id.gameDefense);
-		TextView gameFaith = (TextView) layout.findViewById(R.id.gameFaith);
+		this.gameView = gameView;
 
-		this.gameView = game;
-		
-		player = game.getPlayer();
-		opponent = game.getOpponents().get(0);
+		player = gameView.getPlayer();
+		opponent = gameView.getOpponents().get(0);
 		opponentPlayerLayout.setup(opponent);
 		playerPlayerLayout.setup(player);
 		opponentDefenseDown = opponent.getCurrentDefense() > 0 ? false : true;
 
-		Log.d(TAG, String.format("Entering onGetGame: state=%s", game.getGameState()));
+		Log.d(TAG, String.format("Entering onGetGame: state=%s", gameView.getGameState()));
 
-		switch (game.getGameState()) {
+		switch (gameView.getGameState()) {
 
 			case STARTED:
 				boolean handleDisplay = displayEvents();
-				if (!handleDisplay)
+				if (!handleDisplay) {
 					updateCardsDisplay();
+				}
 				break;
 
 			default:
-				Log.e("onGetGame", String.format("Invalid game state: %s", game.getGameState()));
+				Log.e("onGetGame", String.format("Invalid game state: %s", gameView.getGameState()));
 				break;
 
 		}
 
-		gameInfos.setText(String.format("%s [%s / %s]", game.toString(), ++httpCallsDone, httpCallsAborted));
-		gameTrade.setText(String.format("%s", game.getTrade()));
-		gameDefense.setText(String.format("%s", game.getDefense()));
-		gameFaith.setText(String.format("%s", game.getFaith()));
+		gameInfos.setText(String.format("%s [%s / %s]", gameView.toString(), ++httpCallsDone, httpCallsAborted));
+		gameTrade.setText(String.format("%s", gameView.getTrade()));
+		gameDefense.setText(String.format("%s", gameView.getDefense()));
+		gameFaith.setText(String.format("%s", gameView.getFaith()));
+
+		// Activate Next Phase only if this is the active player
+		if (gameView.isActivePlayer()) {
+			nextPhaseButton.setEnabled(true);
+		} else {
+			nextPhaseButton.setEnabled(false);
+		}
 
 	}
 
